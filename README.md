@@ -2,7 +2,7 @@
 
 **Py**thon **S**olar **E**nergy **B**alancer
 
-The goal is to allocate  solar energy production on multiple devices (resistive load) in order to improve grid resiliency and reduce homeowner electric bills.
+The aim is to allocate  solar energy production on multiple devices (resistive load) in order to improve grid resiliency and reduce homeowner electric bills.
 Devices priority is managed.
 This project is cloned from https://github.com/pierrehebert 
 
