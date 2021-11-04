@@ -8,6 +8,11 @@ This project is cloned from https://github.com/pierrehebert
 ## Hardware requirements :
 
 - 2 Wifi MQTT Energy Smartmeter
-- _n_ Wifi MQTT Energy Variator
+- _n_ Wifi MQTT Energy Variator (Coturex project on going...)
+- _n_ Wifi MQTT Energy Commutator (like Sonoff Relay etc...)
 - 1 Raspberry Pi Zero 2    (which host Mosquito Mqtt Server and pySEB)
 
+
+
+
+# pySeb on going ...
