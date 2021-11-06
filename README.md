@@ -9,7 +9,7 @@ Thanks a lot to ![Pierre](https://github.com/pierrehebert)
 
 → Python code : https://github.com/pierrehebert/photovoltaic_optimizer/tree/master/regulation
 
-Let update/improve it to your needs...
+Let update/improve this code to your needs...
 
 ## Hardware requirements :
 
