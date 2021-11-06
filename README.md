@@ -1,7 +1,7 @@
 # **Py**thon **S**olar **E**nergy **B**alancer
 
 The aim is to allocate  solar energy production on multiple devices (resistive load) in order to improve grid resiliency and reduce homeowner electric bills.
-Devices priority will be managed.
+Devices priority should be managed.
 Communication througth Wifi/Mqtt
 
 A Python programm called !['regulation.py'](https://github.com/pierrehebert/photovoltaic_optimizer/blob/master/regulation/power_regulation.py) is doing this job.
