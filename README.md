@@ -20,7 +20,7 @@ Let update/improve this code to your needs...
 - 1 Raspberry Pi Zero 2    (which host Mosquito Mqtt broker and python programm)
 
 ## Idea box :
- - WebGui to manage Equipments and priority
+ - WebGui to manage Equipments and priority, mqtt topic mapping
  - Add multiple 'Polynomial Regression Vector' depending on Power Variator technology and different calibration
  
    maybe use ![pylib sklearn...](https://www.askpython.com/python/examples/polynomial-regression-in-python)
