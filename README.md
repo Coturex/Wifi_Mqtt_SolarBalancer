@@ -1,8 +1,8 @@
 # **Py**thon **S**olar **E**nergy **B**alancer
 
-The aim is to allocate  solar energy production on multiple devices (resistive load) in order to improve grid resiliency and reduce homeowner electric bills.
-Devices priority should be managed.
-Communication througth Wifi/Mqtt
+The aim is to allocate  solar energy production on multiple equipments (resistive load) in order to improve grid resiliency and reduce homeowner electric bills.
+Equipments priority should be managed.
+Communication througth _Wifi/Mqtt._
 
 A Python programm called !['regulation.py'](https://github.com/pierrehebert/photovoltaic_optimizer/blob/master/regulation/power_regulation.py) is doing this job.
 
@@ -17,11 +17,11 @@ Let update/improve this code to your needs...
 - 2  ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter)
 - _n_ ![Wifi MQTT Energy Variator](https://github.com/Coturex/Wifi_Mqtt_PowerVariator) (... this project is on going...)
 - _n_ Wifi MQTT Energy Commutator (like Sonoff Relay etc...)
-- 1 Raspberry Pi Zero 2    (which host Mosquito Mqtt broker and python programm)
+- 1 Raspberry Pi Zero 2    (which host Mosquito Mqtt broker and python program)
 
 ## Idea box :
  - WebGui to manage Equipments and priority, mqtt topic mapping
- - Add multiple 'Polynomial Regression Vector' depending on Power Variator technology and different calibration
+ - Add multiple 'Polynomial Regression Vector' depending on Power Variator technology and differents calibrations
  
    maybe use ![pylib sklearn...](https://www.askpython.com/python/examples/polynomial-regression-in-python)
  - etc...
