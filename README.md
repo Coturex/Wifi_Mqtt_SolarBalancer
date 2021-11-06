@@ -25,4 +25,60 @@ Let update/improve this code to your needs...
  
    maybe use ![pylib sklearn...](https://www.askpython.com/python/examples/polynomial-regression-in-python)
  - etc...
- - 
+
+
+
+-------
+
+### My own topic mapping :
+
+  **Wifi_MQTT_Energy_Smartmeter** : (pzem_topic = smeter/pzem)
+  
+   <pzem_topic>/<pzem_id>/
+   
+   - smeter/pzem/{boot.json}
+   
+   - smeter/pzem/id_0/{status.json}
+   
+   - smeter/pzem/id_n/{status.json}
+
+
+   **Wifi_MQTT_Power_Variator :**  (vload_topic = regul/vload)
+   
+   <vload_topic>/<vload_id>/
+   
+   - regul/vload/{boot.json}
+   
+   - regul/vload/id_0/{status.json}
+   
+   - regul/vload/id_0/**cmd**/{cmd.json}
+   
+   - regul/vload/id_n/{status.json}
+   
+   - regul/vload/id_n/**cmd**/{cmd.json}
+
+   **Constant Power Equipment :** 
+   
+   <kload_topic>/<kload_id>/
+   
+   - regul/cload/{boot.json}
+   
+   - regul/cload/id_0/{status.json}
+   
+   - regul/cload/id_0/**cmd**/{cmd.json}
+   
+   
+   **Unknown Power Load :**
+   
+   <uload_topic>/<uload_id>/
+   
+   - regul/uload/{boot.json}
+   
+   - regul/uload/id_0/{status.json}
+   
+   - regul/uload/id_0/**cmd**/{cmd.json}
+   
+   
+   **Domoticz link :**
+   
+   domoticz/in/{json} 
