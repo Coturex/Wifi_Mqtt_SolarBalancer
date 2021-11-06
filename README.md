@@ -30,7 +30,7 @@ Let update/improve this code to your needs...
 
 -------
 
-### My own topic mapping :
+### _My topic mapping :_
 
   **Wifi_MQTT_Energy_Smartmeter** : (pzem_topic = smeter/pzem)
   
