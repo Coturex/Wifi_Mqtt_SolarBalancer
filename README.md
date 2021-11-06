@@ -3,7 +3,7 @@
 The aim is to allocate  solar energy production on multiple devices (resistive load) in order to improve grid resiliency and reduce homeowner electric bills.
 Devices priority will be managed.
 
-A Python programm called !['regulation.py']() is doing this job.
+A Python programm called !['regulation.py'](https://github.com/pierrehebert/photovoltaic_optimizer/blob/master/regulation/power_regulation.py) is doing this job.
 
 Thanks a lot to ![Pierre](https://github.com/pierrehebert)
 
