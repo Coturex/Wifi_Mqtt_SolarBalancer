@@ -18,7 +18,7 @@ Let update/improve it to your needs...
 - _'n'_ Wifi MQTT Energy Commutator (like Sonoff Relay etc...)
 - 1 Raspberry Pi Zero 2    (which host Mosquito Mqtt broker and python programm)
 
-## ToDo :
+## Idea box :
  - WebGui to manage Equipments and priority
  - Add 'Polynomial Regression Vector' depending on Power Variator technology and different calibration
    maybe use ![pylib sklearn...](https://www.askpython.com/python/examples/polynomial-regression-in-python)
