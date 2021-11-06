@@ -1,19 +1,26 @@
-# pySEB
-
-**Py**thon **S**olar **E**nergy **B**alancer
+# **Py**thon **S**olar **E**nergy **B**alancer
 
 The aim is to allocate  solar energy production on multiple devices (resistive load) in order to improve grid resiliency and reduce homeowner electric bills.
-Devices priority is managed.
-This project is cloned from https://github.com/pierrehebert 
+Devices priority will be managed.
+
+A Python programm called !['regulation.py']() is doing this job.
+
+Thanks a lot to ![Pierre](https://github.com/pierrehebert)
+
+→ Python code : https://github.com/pierrehebert/photovoltaic_optimizer/tree/master/regulation
+
+Let update/improve it to your needs...
 
 ## Hardware requirements :
 
-- 2 Wifi MQTT Energy Smartmeter
-- _'n'_ Wifi MQTT Energy Variator (... this project is on going...)
+- 2 Wifi ![MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter)
+- _'n'_ ![Wifi MQTT Energy Variator](https://github.com/Coturex/Wifi_Mqtt_PowerVariator) (... this project is on going...)
 - _'n'_ Wifi MQTT Energy Commutator (like Sonoff Relay etc...)
-- 1 Raspberry Pi Zero 2    (which host Mosquito Mqtt broker and pySEB)
+- 1 Raspberry Pi Zero 2    (which host Mosquito Mqtt broker and python programm)
 
-
-
-
-## _pySEB is on going ..._
+## ToDo :
+ - WebGui to manage Equipments and priority
+ - Add 'Polynomial Regression Vector' depending on Power Variator technology and different calibration
+   maybe use ![pylib sklearn...](https://www.askpython.com/python/examples/polynomial-regression-in-python)
+ - etc...
+ - 
