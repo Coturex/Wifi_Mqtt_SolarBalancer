@@ -8,7 +8,7 @@ A Python programm called !['regulation.py'](https://github.com/pierrehebert/phot
 
 Thanks a lot to ![Pierre](https://github.com/pierrehebert)
 
-→ Python code : https://github.com/pierrehebert/photovoltaic_optimizer/tree/master/regulation
+ → Python code : https://github.com/pierrehebert/photovoltaic_optimizer/tree/master/regulation
 
 Let update/improve this code to your needs...
 
@@ -32,53 +32,53 @@ Let update/improve this code to your needs...
 
 ### _My topic mapping :_
 
-  **Wifi_MQTT_Energy_Smartmeter** : (pzem_topic = smeter/pzem)
+  **Wifi_MQTT_Energy_Smartmeter** : (_pzem_topic_ = smeter/pzem)
   
    <pzem_topic>/<pzem_id>/
    
-   - smeter/pzem/{boot.json}
+      - smeter/pzem/{boot.json}
    
-   - smeter/pzem/id_0/{status.json}
+      - smeter/pzem/id_0/{status.json}
    
-   - smeter/pzem/id_n/{status.json}
+      - smeter/pzem/id_n/{status.json}
 
 
-   **Wifi_MQTT_Power_Variator :**  (vload_topic = regul/vload)
+   **Wifi_MQTT_Power_Variator :**  (_vload_topic_ = regul/vload)
    
    <vload_topic>/<vload_id>/
    
-   - regul/vload/{boot.json}
+      - regul/vload/{boot.json}
    
-   - regul/vload/id_0/{status.json}
+      - regul/vload/id_0/{status.json}
    
-   - regul/vload/id_0/**cmd**/{cmd.json}
+      - regul/vload/id_0/**cmd**/{cmd.json}
    
-   - regul/vload/id_n/{status.json}
+      - regul/vload/id_n/{status.json}
    
-   - regul/vload/id_n/**cmd**/{cmd.json}
+      - regul/vload/id_n/**cmd**/{cmd.json}
 
-   **Constant Power Equipment :** 
+   **Constant Power Equipment :** (_cload_topic_ = regul/cload)
    
    <kload_topic>/<kload_id>/
    
-   - regul/cload/{boot.json}
+      - regul/cload/{boot.json}
    
-   - regul/cload/id_0/{status.json}
+      - regul/cload/id_0/{status.json}
    
-   - regul/cload/id_0/**cmd**/{cmd.json}
+      - regul/cload/id_0/**cmd**/{cmd.json}
    
    
-   **Unknown Power Load :**
+   **Unknown Power Load :** (_uload_topic_ = regul/uload)
    
    <uload_topic>/<uload_id>/
    
-   - regul/uload/{boot.json}
+      - regul/uload/{boot.json}
    
-   - regul/uload/id_0/{status.json}
+      - regul/uload/id_0/{status.json}
    
-   - regul/uload/id_0/**cmd**/{cmd.json}
+      - regul/uload/id_0/**cmd**/{cmd.json}
    
    
    **Domoticz link :**
    
-   domoticz/in/{json} 
+      - domoticz/in/{json} 
