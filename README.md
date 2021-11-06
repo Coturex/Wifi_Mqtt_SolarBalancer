@@ -20,7 +20,8 @@ Let update/improve this code to your needs...
 
 ## Idea box :
  - WebGui to manage Equipments and priority
- - Add 'Polynomial Regression Vector' depending on Power Variator technology and different calibration
+ - Add multiple 'Polynomial Regression Vector' depending on Power Variator technology and different calibration
+ 
    maybe use ![pylib sklearn...](https://www.askpython.com/python/examples/polynomial-regression-in-python)
  - etc...
  - 
