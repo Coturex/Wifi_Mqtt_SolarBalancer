@@ -65,13 +65,13 @@ Let update/improve this code to your needs...
    
    <kload_topic>/<kload_id>/
    
-   
+      ...
    
    **Unknown Power Load :** (_uload_topic_ = regul/uload)
    
    <uload_topic>/<uload_id>/
    
-
+      ...
    
    
    **Domoticz link :**
