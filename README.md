@@ -32,25 +32,27 @@ Let update/improve this code to your needs...
 
 ### _My topic mapping :_
 
+  **Python Regul Topic**
+  
+      - regul/mode/{mode.json}
+      
+      - regul/status/{evaluate status.json}   
+
   **Wifi_MQTT_Energy_Smartmeter** : (_pzem_topic_ = smeter/pzem)
   
    <pzem_topic>/<pzem_id>/
    
       - smeter/pzem/{boot.json}
    
-      - smeter/pzem/id_0/{status.json}
+      - smeter/pzem/id_0/{pzem.json}
    
-      - smeter/pzem/id_n/{status.json}
+      - smeter/pzem/id_n/{pzem.json}
 
 
    **Wifi_MQTT_Power_Variator :**  (_vload_topic_ = regul/vload)
    
    <vload_topic>/<vload_id>/
-   
-      - regul/mode/{mode.json}
-      
-      - regul/status/{status.json}
-           
+             
       - regul/vload/{boot.json}
      
       - regul/vload/id_0/{percent power}
