@@ -47,36 +47,29 @@ Let update/improve this code to your needs...
    
    <vload_topic>/<vload_id>/
    
+      - regul/evt/{event.json}
+           
       - regul/vload/{boot.json}
    
-      - regul/vload/id_0/{status.json}
+      - regul/vload/status/{status.json}
    
-      - regul/vload/id_0/**cmd**/{cmd.json}
+      - regul/vload/id_0/{percent power}
    
-      - regul/vload/id_n/{status.json}
-   
-      - regul/vload/id_n/**cmd**/{cmd.json}
+      - regul/vload/id_n/{percent power}
 
    **Constant Power Equipment :** (_cload_topic_ = regul/cload)
    
    <kload_topic>/<kload_id>/
    
       - regul/cload/{boot.json}
-   
-      - regul/cload/id_0/{status.json}
-   
-      - regul/cload/id_0/**cmd**/{cmd.json}
+         etc...
    
    
    **Unknown Power Load :** (_uload_topic_ = regul/uload)
    
    <uload_topic>/<uload_id>/
    
-      - regul/uload/{boot.json}
-   
-      - regul/uload/id_0/{status.json}
-   
-      - regul/uload/id_0/**cmd**/{cmd.json}
+
    
    
    **Domoticz link :**
