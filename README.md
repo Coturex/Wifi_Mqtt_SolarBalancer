@@ -47,22 +47,22 @@ Let update/improve this code to your needs...
    
    <vload_topic>/<vload_id>/
    
-      - regul/evt/{event.json}
-           
-      - regul/boot/{boot.json}
-   
+      - regul/mode/{mode.json}
+      
       - regul/status/{status.json}
+           
+      - regul/vload/{boot.json}
+     
+      - regul/vload/id_0/{percent power}
    
-      - regul/control/id_0/{percent power}
-   
-      - regul/control/id_n/{percent power}
+      - regul/vload/id_n/{percent power}
+      
+      ...
 
    **Constant Power Equipment :** (_cload_topic_ = regul/cload)
    
    <kload_topic>/<kload_id>/
    
-      - regul/cload/
-         etc...
    
    
    **Unknown Power Load :** (_uload_topic_ = regul/uload)
