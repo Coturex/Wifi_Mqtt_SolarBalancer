@@ -49,19 +49,19 @@ Let update/improve this code to your needs...
    
       - regul/evt/{event.json}
            
-      - regul/vload/{boot.json}
+      - regul/boot/{boot.json}
    
-      - regul/vload/status/{status.json}
+      - regul/status/{status.json}
    
-      - regul/vload/id_0/{percent power}
+      - regul/control/id_0/{percent power}
    
-      - regul/vload/id_n/{percent power}
+      - regul/control/id_n/{percent power}
 
    **Constant Power Equipment :** (_cload_topic_ = regul/cload)
    
    <kload_topic>/<kload_id>/
    
-      - regul/cload/{boot.json}
+      - regul/cload/
          etc...
    
    
