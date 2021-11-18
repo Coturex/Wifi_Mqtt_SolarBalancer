@@ -72,7 +72,9 @@ equipment_water_heater = None
 prefix = 'simu/' if SIMULATION else ''
 TOPIC_SENSOR_CONSUMPTION = prefix + "smeter/pzem/Cons"
 TOPIC_SENSOR_PRODUCTION = prefix + "smeter/pzem/Prod"
-TOPIC_REGULATION_MODE = prefix + "regul/mode"            # set forced/unforced duration - Can be bind to domotics device topic 
+TOPIC_REGULATION_MODE = prefix + "regul/mode"
+# set forced/unforced duration - Can be bind to domotics device topic 
+# TOPIC_REGULATION_MODE = "domoticz/out"            
 TOPIC_STATUS = prefix + "regul/status"
 
 
