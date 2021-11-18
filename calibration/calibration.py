@@ -1,19 +1,5 @@
 #!/usr/bin/env python
 
-# Copyright (C) 2018-2019 Pierre Hébert
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import json
 
 import paho.mqtt.client as mqtt
@@ -21,39 +7,67 @@ import time
 
 import sys
 
-from pzem import BTPOWER
+mqtt_client = None
+percent = None
+avg_power = avg_count = 0
+measuring = 0 
+csv_file = None
+TOPIC_CALIBRATE =  "smeter/pzem/calibrate"
+MQTT_BROKER = "10.3.141.1"
 
 
-def main():
-    client = mqtt.Client()
-    client.connect("10.3.141.1", 1883, 120)
+def on_connect(mqtt_client, userdata, flags, rc):
+    print('Connected to mqtt')
+    mqtt_client.subscribe(TOPIC_CALIBRATE)
 
-    client.loop_start()
-
-    sensor = BTPOWER()
-
-    print('percent;power')
-    for percent in range(100, -1, -0.5):
-        print('# command to {}%'.format(percent))
-        client.publish('regul/vload/ECS', str(percent))
-
-        time.sleep(5)
-
-        avg_power = 0
-        avg_count = 12
-        n = 0
-        while n < avg_count:
-            read_power = sensor.readPower()
+def on_pzem_message(client, userdata, msg):
+    global percent, avg_power, avg_count, measuring
+    if msg.topic == TOPIC_CALIBRATE:
+        j = json.loads(msg.payload.decode())
+        
+        if (avg_count < 12 and measuring):
+            read_power = int(j['power'])
             if read_power > 1:
                 print('# read {}W'.format(read_power))
                 sys.stdout.flush()
                 avg_power += read_power
-                n += 1
-            time.sleep(1)
-        avg_power /= float(avg_count)
+                avg_count += 1
 
-        print('{};{}'.format(percent, avg_power))
-        sys.stdout.flush()
+        if (avg_count > 12 and measuring):
+            avg_power /= float(avg_count)
+            line = '{},{}'.format(percent, avg_power)
+            print(line)
+            sys.stdout.flush()  
+            csv_file.write(line)
+            avg_power = 0
+            avg_count = 0
+            measuring = 0
+
+
+def main():
+    global mqtt_client, csv_file
+   
+    mqtt_client = mqtt.Client()
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_message = on_pzem_message
+
+    mqtt_client.connect(MQTT_BROKER, 1883, 120)
+    mqtt_client.loop_start()
+
+    csv_file = open("out.csv", "w") 
+    
+    print('percent;power')
+
+    for percent in range(100, -1, -0.5):
+        print('# command to {}%'.format(percent))
+        mqtt_client.publish('regul/vload/ECS', str(percent))
+        time.sleep(6)
+        measuring = 1 
+        while measuring:    # only on_pzem_message can down it after sample count is done
+            pass
+
+    csv_file.close()   
+    print("Calibration results saved on out.csv") 
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
-import numpy as np  
-import matplotlib.pyplot as plt
+import numpy as np                  #> pip3 install numpy
+import matplotlib.pyplot as plt     #> pip3 install matplotlib ; pip3 install tk
 import sys
 from os.path import exists
 
@@ -30,12 +30,11 @@ def main():
     poly_fit = np.poly1d(np.polyfit(X,Y, degree))
 
     # New predict.
-    print( poly_fit )
-    print ("coefs are :") 
+    print("\n", poly_fit )
+    print("\nCoefs are :") 
     print( poly_fit.c)
-    print("x = 10 -> P= ", poly_fit(10)) # evaluate at x=50
+    print("\nx = 10 -> P = ", poly_fit(10)) # evaluate at x=10
     print("-----")
-
 
     # Plot data
     xx = np.linspace(0, 20, 100)
