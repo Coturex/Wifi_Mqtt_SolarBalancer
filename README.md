@@ -12,6 +12,9 @@ Thanks a lot to ![Pierre](https://github.com/pierrehebert)
 
 Let update/improve this code to your needs...
 
+
+Here my version.
+
 ## Hardware requirements :
 
 - 2  ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter)
