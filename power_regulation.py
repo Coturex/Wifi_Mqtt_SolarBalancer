@@ -63,17 +63,17 @@ last_evaluation_date = None
 power_production = None
 power_consumption = None
 
-mqtt_client = None
-
 equipments = None
 equipment_water_heater = None
+
+mqtt_client = None
+MQTT_BROKER = "10.3.141.1"
 
 # MQTT topics on which to subscribe and send messages
 prefix = 'simu/' if SIMULATION else ''
 TOPIC_SENSOR_CONSUMPTION = prefix + "smeter/pzem/Cons"
 TOPIC_SENSOR_PRODUCTION = prefix + "smeter/pzem/Prod"
-TOPIC_REGULATION_MODE = prefix + "regul/mode"
-# set forced/unforced duration - Can be bind to domotics device topic 
+TOPIC_REGULATION_MODE = prefix + "regul/mode" # forced/unforced duration - Can be bind to domotics device topic 
 # TOPIC_REGULATION_MODE = "domoticz/out"            
 TOPIC_STATUS = prefix + "regul/status"
 
@@ -139,6 +139,7 @@ def on_message(client, userdata, msg):
 
 # Specific fallback: the energy put in the water heater yesterday (see below)
 energy_yesterday = 0
+
 
 def low_energy_fallback():
     """ Fallback, when the amount of energy today went below a minimum"""
@@ -315,7 +316,7 @@ def main():
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_message
 
-    mqtt_client.connect("10.3.141.1", 1883, 120)
+    mqtt_client.connect(MQTT_BROKER, 1883, 120)
 
     equipment.setup(mqtt_client, not SIMULATION)
 
