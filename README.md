@@ -25,8 +25,7 @@ Here my version.
 ## Idea box :
  - WebGui to manage Equipments and priority, mqtt topic mapping
  - Add multiple 'Polynomial Regression Vector' depending on Power Variator technology and differents calibrations
- 
-   maybe use ![pylib sklearn...](https://www.askpython.com/python/examples/polynomial-regression-in-python)
+      maybe use _numpy_ and make regression vector from a .csv file while starting program
  - etc...
 
 
