@@ -1,6 +1,6 @@
 # **Py**thon **S**olar **E**nergy **B**alancer
 
-The aim is to allocate  solar energy production on multiple equipments (resistive load) in order to improve grid resiliency and reduce homeowner electric bills.
+**The aim is to allocate  solar energy production on multiple equipments (resistive load) in order to improve grid resiliency and reduce homeowner electric bills.**
 Equipments priority should be managed.
 Communication through _Wifi/Mqtt._
 
