@@ -4,9 +4,7 @@ The aim is to allocate  solar energy production on multiple equipments (resistiv
 Equipments priority should be managed.
 Communication through _Wifi/Mqtt._
 
-A Python programm called !['regulation.py'](https://github.com/pierrehebert/photovoltaic_optimizer/blob/master/regulation/power_regulation.py) is doing this job.
-
-Thanks a lot to ![Pierre](https://github.com/pierrehebert)
+A Python programm called !['regulation.py'](https://github.com/pierrehebert/photovoltaic_optimizer/blob/master/regulation/power_regulation.py) is doing this job. Thanks a lot to ![Pierre](https://github.com/pierrehebert)
 
  → Main concept : https://www.pierrox.net/wordpress/2019/02/25/optimisation-photovoltaique-2-principe-et-survol-de-la-solution-technique/
 
