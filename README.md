@@ -27,8 +27,8 @@ Here my version.
 
 ## Features - Addons
   _Pierre vs Coturex Diff_
-- At startup it **Calculate 'Polynomial Regression Vector'** depending on Power Variator technology and differents calibrations/equipment **directly from CSV calibration files**   -> implemented in _VariablePowerEquipment_ subclass
-- Do calibration through Mqtt _(instead of pzem hardware attachment)_
+- At startup it **Calculate** 'Polynomial Regression' **Vector'** depending on Power Variator technology and differents calibrations/equipment **directly from CSV calibration files**   -> implemented in _VariablePowerEquipment_ subclass
+- Do ![calibration](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/tree/main/calibration) through Mqtt _(instead of pzem hardware attachment)_
 
 ## Todo - ideas :
  - config file to manage Equipments and priority, mqtt topic mapping
