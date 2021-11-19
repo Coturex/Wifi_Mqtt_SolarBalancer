@@ -8,8 +8,6 @@ A Python programm called !['regulation.py'](https://github.com/pierrehebert/phot
 
 Thanks a lot to ![Pierre](https://github.com/pierrehebert)
 
- → Python code  : https://github.com/pierrehebert/photovoltaic_optimizer/tree/master/regulation
- 
  → Main concept : https://www.pierrox.net/wordpress/2019/02/25/optimisation-photovoltaique-2-principe-et-survol-de-la-solution-technique/
 
 Let update/improve this code to your needs...
