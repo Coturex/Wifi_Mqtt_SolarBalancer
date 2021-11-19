@@ -2,25 +2,26 @@
 
 The aim is to allocate  solar energy production on multiple equipments (resistive load) in order to improve grid resiliency and reduce homeowner electric bills.
 Equipments priority should be managed.
-Communication througth _Wifi/Mqtt._
+Communication through _Wifi/Mqtt._
 
 A Python programm called !['regulation.py'](https://github.com/pierrehebert/photovoltaic_optimizer/blob/master/regulation/power_regulation.py) is doing this job.
 
 Thanks a lot to ![Pierre](https://github.com/pierrehebert)
 
- → Python code : https://github.com/pierrehebert/photovoltaic_optimizer/tree/master/regulation
+ → Python code  : https://github.com/pierrehebert/photovoltaic_optimizer/tree/master/regulation
+ → Main concept : https://www.pierrox.net/wordpress/2019/02/25/optimisation-photovoltaique-2-principe-et-survol-de-la-solution-technique/
 
 Let update/improve this code to your needs...
 
 
-Here is my forked version.
+**Here is a forked version.**
 
 ## Hardware requirements :
 
 - 2  ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter)
 - _n_ ![Wifi MQTT Energy Variator](https://github.com/Coturex/Wifi_Mqtt_PowerVariator) (... this project is on going...)
 - _n_ Wifi MQTT Energy Commutator (like Sonoff Relay etc...)
-- 1 Raspberry Pi Zero 2    (which host this python program and Mosquito Mqtt broker)
+- 1 **Raspberry Pi Zero 2**    (which host this python program and Mosquito Mqtt broker)
 
 ## Python requirements :
 - python 3
@@ -33,7 +34,7 @@ Here is my forked version.
 
 ## Todo - ideas :
  - config file to manage Equipments and priority, mqtt topic mapping etc...
- - attach (un)forced mode to Domoticz device
+ - attach the (un)forced mode to Domoticz device
 
 
 -------
