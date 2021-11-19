@@ -13,16 +13,17 @@ Thanks a lot to ![Pierre](https://github.com/pierrehebert)
 Let update/improve this code to your needs...
 
 
-Here my version.
+Here is my forked version.
 
 ## Hardware requirements :
 
 - 2  ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter)
 - _n_ ![Wifi MQTT Energy Variator](https://github.com/Coturex/Wifi_Mqtt_PowerVariator) (... this project is on going...)
 - _n_ Wifi MQTT Energy Commutator (like Sonoff Relay etc...)
-- 1 Raspberry Pi Zero 2    (which host Mosquito Mqtt broker and python program)
+- 1 Raspberry Pi Zero 2    (which host Mosquito Mqtt broker and this python program)
 
 ## Python requirements :
+- python 3
 - paho-mqtt : $> pip3 install paho-mqtt
 
 ## Features - Addons
@@ -31,18 +32,17 @@ Here my version.
 - Do ![calibration](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/tree/main/calibration) through Mqtt _(instead of pzem hardware attachment)_
 
 ## Todo - ideas :
- - config file to manage Equipments and priority, mqtt topic mapping
- 
-
+ - config file to manage Equipments and priority, mqtt topic mapping etc...
+ - attach (un)forced mode to Domoticz device
 
 
 -------
 
 ### _My topic mapping :_
 
-  **Python Regul Topic**
+  **Python Regulation**
   
-      - regul/mode/{mode.json}
+      - regul/mode/{(un)forced mode.json}
       
       - regul/status/{evaluate status.json}   
 
@@ -85,3 +85,4 @@ Here my version.
    **Domoticz link :**
    
       - domoticz/in/{json} 
+      - domoticz/out/{json} 
