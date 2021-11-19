@@ -29,6 +29,9 @@ import time
 #       ConstantPowerEquipment is essentially an optimization of UnknownPowerEquipment as it will allow the regulation
 #       loop to match power consumption and production faster.
 
+import numpy as np
+from calibration.poly_regression import Y                  # seems available on python3, if not $> pip3 install numpy
+
 from debug import debug as debug
 
 _mqtt_client = None
@@ -43,6 +46,15 @@ def setup(mqtt_client, send_commands):
 
 def now_ts():
     return time.time()
+
+X = Y = None
+
+def readCSV(csv_file):
+    global X, Y
+    with open(csv_file) as file_name:
+        array = np.loadtxt(file_name, delimiter=",")
+    X = list(tuple(x[0] for x in array))
+    Y = list(tuple(x[1] for x in array))
 
 
 class Equipment:
@@ -113,29 +125,29 @@ class Equipment:
 class VariablePowerEquipment(Equipment):
     MINIMUM_POWER = 150
     MINIMUM_PERCENT = 4
+    POLYREG_DEGREE = 5
 
+    global X, Y
     def __init__(self, name, max_power, topic):
         Equipment.__init__(self, name,topic)
         self.max_power = max_power
         self.type = "variable"
+        try:
+            readCSV("calibration/power_calibration_" + name +".csv")
+        except:
+            print ("exit : cannot open calibration/power_calibration_" + name +".csv")
+            exit()
+        
+        self.poly_reg = np.poly1d(np.polyfit(X,Y, VariablePowerEquipment.POLYREG_DEGREE))
 
     def set_current_power(self, power):
         super(VariablePowerEquipment, self).set_current_power(power)
-
-        # regression factors computed from the response measurement of the SCR regulator
-        a=1156.7360635374
-        b=-2733.09296216279
-        c=2365.91298447422
-        d=-924.443712230202
-        e=218.242717162968
-        f=-0.010002294517421
-        g=11.3205979917473
 
         if self.current_power == 0:
             percent = 0
         else:
             z = self.current_power / float(self.max_power)
-            percent = g + f/z + e*z + d*z*z + c*z*z*z + b*z*z*z*z + a*z*z*z*z*z
+            percent = self.poly_reg(z)
 
         # issue with the regulator, don't go below 4
         if percent < VariablePowerEquipment.MINIMUM_PERCENT:

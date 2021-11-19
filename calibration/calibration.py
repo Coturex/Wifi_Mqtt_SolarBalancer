@@ -1,6 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
+# #!/usr/bin/env python
 
 import json
+import numpy as np
 
 import paho.mqtt.client as mqtt
 import time
@@ -57,8 +59,9 @@ def main():
     csv_file = open("out.csv", "w") 
     
     print('percent;power')
-
-    for percent in range(100, -1, -0.5):
+   
+    for x in np.arange(100, -0.5, -0.5):
+        print(x)  
         print('# command to {}%'.format(percent))
         mqtt_client.publish('regul/vload/ECS', str(percent))
         time.sleep(6)

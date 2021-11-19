@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 #!/usr/bin/env python
 
-# Copyright (C) 2018-2019 Pierre Hébert
+# Copyright (C) 2018-2019 Pierre Hebert
 #                 Mods -> Coturex - F5RQG
 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -91,7 +92,7 @@ def get_equipment_by_name(name):
 
 
 def on_connect(client, userdata, flags, rc):
-    debug(0, 'ready')
+    debug(0, "Connected to BROKER " + MQTT_BROKER )
 
     client.subscribe(TOPIC_SENSOR_CONSUMPTION)
     client.subscribe(TOPIC_SENSOR_PRODUCTION)
@@ -317,7 +318,6 @@ def main():
     mqtt_client.on_message = on_message
 
     mqtt_client.connect(MQTT_BROKER, 1883, 120)
-
     equipment.setup(mqtt_client, not SIMULATION)
 
     # This is a list of equipments by priority order (first one has the higher priority). As many equipments as needed

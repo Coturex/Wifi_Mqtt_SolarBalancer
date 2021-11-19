@@ -22,11 +22,16 @@ Here my version.
 - _n_ Wifi MQTT Energy Commutator (like Sonoff Relay etc...)
 - 1 Raspberry Pi Zero 2    (which host Mosquito Mqtt broker and python program)
 
-## Idea box :
- - WebGui to manage Equipments and priority, mqtt topic mapping
- - Add multiple 'Polynomial Regression Vector' depending on Power Variator technology and differents calibrations
-      maybe use _numpy_ and make regression vector from a .csv file while starting program
- - etc...
+## Python requirements :
+- paho-mqtt : $> pip3 install paho-mqtt
+
+## Features - Addons
+  _Pierre's Diff_
+- At startup it **Calculate 'Polynomial Regression Vector'** depending on Power Variator technology and differents calibrations/equipment **directly from CSV calibration files** - implemented in _VariablePowerEquipment_ subclass
+
+## Todo - ideas :
+ - config file to manage Equipments and priority, mqtt topic mapping
+ 
 
 
 

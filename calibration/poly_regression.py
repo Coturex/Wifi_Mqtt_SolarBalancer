@@ -1,5 +1,7 @@
-#!/usr/bin/python3
-import numpy as np                  #> pip3 install numpy
+d#!/usr/bin/python3
+#!/usr/bin/env python
+
+import numpy as np                  # seems available on python3, if not $> pip3 install numpy
 import matplotlib.pyplot as plt     #> pip3 install matplotlib ; pip3 install tk
 import sys
 from os.path import exists
@@ -7,7 +9,8 @@ from os.path import exists
 #X = [1, 5, 8, 10, 14, 18]
 #Y = [1, 1, 10, 20, 45, 75]
 
-X = Y = None
+X = Y = None 
+
 def readCSV(csv_file):
     global X, Y
     with open(csv_file) as file_name:
@@ -15,15 +18,14 @@ def readCSV(csv_file):
     # print(array)
     X = list(tuple(x[0] for x in array))
     Y = list(tuple(x[1] for x in array))
-    print(X)
-    print(Y)
-
+    
+    
 def main():
     try:
         if exists(sys.argv[1]):
             readCSV(sys.argv[1])
     except:
-        readCSV("calibration/power_calibration.csv")
+        readCSV("power_calibration.csv")
     
     #  Algorithm (Polynomial) https://numpy.org/doc/stable/reference/generated/numpy.polyfit.html
     degree = 5

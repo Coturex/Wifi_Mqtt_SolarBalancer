@@ -1,0 +1,26 @@
+* calibration.py
+  This tools start a benchmark in order to create a .csv calibration file of your 'wifi_mqtt_Smartmeter'
+  This file.csv is used in order to generate the polynimial regession vector at 'regulation.py'  startup
+
+* power_calibration.csv
+  is given as an example
+
+* poly_regression is an optionnal use for test. 
+  It read a .csv calibration file and display all poly regression parameters
+  Requirements :
+  $> pip3 install matplotlib
+  $> pip3 install tk
+
+  output ex. 
+                 5           4          3         2
+    -0.0002439 x + 0.01363 x - 0.2254 x + 1.141 x + 6.545 x + 1.892
+
+    Coefs are :
+    [-2.43931440e-04  1.36331667e-02 -2.25426421e-01  1.14087409e+00
+      6.54478029e+00  1.89231166e+00]
+
+    calculate x = 10 -> P =  67.93962579082017
+
+    -> and it will ![plot a chart :](https://user-images.githubusercontent.com/53934994/142597687-734e6c19-edd0-4386-8bae-68175c828331.png)
+
+  
