@@ -32,16 +32,17 @@ def main():
     poly_fit = np.poly1d(np.polyfit(X,Y, degree))
 
     # New predict.
+    print("\nPolynomial function :")
     print("\n", poly_fit )
-    print("\nCoefs are :") 
+    print("\nCoef/Vector :") 
     print( poly_fit.c)
-    print("\nx = 10 -> P = ", poly_fit(10)) # evaluate at x=10
+    print("\nCalculate x = 10 -> P = ", poly_fit(10)) # evaluate at x=10
     print("-----")
 
     # Plot data
     xx = np.linspace(0, 20, 100)
     plt.plot(xx, poly_fit(xx), c='r',linestyle='-')
-    plt.title('Polynomial')
+    plt.title('Polynomial curve')
     plt.xlabel('X')
     plt.ylabel('Y')
     plt.axis([0, 20, 0, 100])
