@@ -2,8 +2,8 @@
   This tools start a benchmark in order to create a .csv calibration file of your 'wifi_mqtt_Smartmeter'
   This file.csv is used in order to generate the polynimial regession vector at 'regulation.py'  startup
 
-* power_calibration.csv
-  is given as an example
+* power_calibration.csv, power_calibration_water_heater.csv
+  are given as example
 
 * poly_regression is an optionnal use for test. 
   It read a .csv calibration file and display all poly regression parameters

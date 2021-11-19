@@ -26,7 +26,7 @@ Here my version.
 - paho-mqtt : $> pip3 install paho-mqtt
 
 ## Features - Addons
-  _Pierre's Diff_
+  _<Pierre vs Coturex> Diffs_
 - At startup it **Calculate 'Polynomial Regression Vector'** depending on Power Variator technology and differents calibrations/equipment **directly from CSV calibration files** - implemented in _VariablePowerEquipment_ subclass
 
 ## Todo - ideas :
