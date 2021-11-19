@@ -1,4 +1,4 @@
-d#!/usr/bin/python3
+#!/usr/bin/python3
 #!/usr/bin/env python
 
 import numpy as np                  # seems available on python3, if not $> pip3 install numpy

@@ -30,8 +30,6 @@ import time
 #       loop to match power consumption and production faster.
 
 import numpy as np
-from calibration.poly_regression import Y                  # seems available on python3, if not $> pip3 install numpy
-
 from debug import debug as debug
 
 _mqtt_client = None
