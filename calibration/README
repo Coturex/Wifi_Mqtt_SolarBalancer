@@ -1,4 +1,4 @@
-**calibration_mqtt.py**
+* calibration_mqtt.py 
   This tools start a benchmark (through Mqtt) in order to create a .csv calibration file using a  'wifi_mqtt_Smartmeter' and a 'wifi_mqtt_EnergyVariator'
   This file.csv is used in order to generate the polynimial regession vector at 'regulation.py'  startup
 
@@ -22,6 +22,6 @@
 
     calculate x = 10 -> P =  67.93962579082017
 
-    -> and it will plot a chart : (https://user-images.githubusercontent.com/53934994/142597687-734e6c19-edd0-4386-8bae-68175c828331.png)
+    -> and it will plot a chart : https://user-images.githubusercontent.com/53934994/142597687-734e6c19-edd0-4386-8bae-68175c828331.png
 
   
