@@ -20,7 +20,7 @@ Here is my forked version.
 - 2  ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter)
 - _n_ ![Wifi MQTT Energy Variator](https://github.com/Coturex/Wifi_Mqtt_PowerVariator) (... this project is on going...)
 - _n_ Wifi MQTT Energy Commutator (like Sonoff Relay etc...)
-- 1 ~~Raspberry Pi Zero 2~~    (which host this python program and Mosquito Mqtt broker)
+- 1 Raspberry Pi Zero 2    (which host this python program and Mosquito Mqtt broker)
 
 ## Python requirements :
 - python 3
