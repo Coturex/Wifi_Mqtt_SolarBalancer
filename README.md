@@ -33,7 +33,7 @@ Let update/improve this code to your needs...
 
 ## Todo - ideas :
  - config file to manage Equipments and priority, mqtt topic mapping etc...
- - attach the (un)forced mode to Domoticz device
+ - attach the (un)forced mode to ![MQTT Domoticz device](https://www.domoticz.com/wiki/MQTT)
 
 
 -------
