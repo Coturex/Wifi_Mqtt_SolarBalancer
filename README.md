@@ -13,6 +13,8 @@ Let update/improve this code to your needs...
 
 **Here is a forked version.**
 
+![archi](https://user-images.githubusercontent.com/53934994/143042074-46d2aba1-f50b-46ba-abc4-a69445c7c8cb.png)
+
 ## Hardware requirements :
 
 - 2  ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter)
@@ -31,7 +33,7 @@ Let update/improve this code to your needs...
 
 ## Todo - ideas :
  - config file to manage Equipments and priority, mqtt topic mapping etc...
- - attach the (un)forced mode to Domoticz device
+ - attach the (un)forced mode to _MQTT Domoticz device_ - _https://www.domoticz.com/wiki/MQTT_
 
 
 -------
