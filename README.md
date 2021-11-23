@@ -13,7 +13,8 @@ Let update/improve this code to your needs...
 
 **Here is a forked version.**
 
-![archi](https://user-images.githubusercontent.com/53934994/143038000-737227eb-16fd-4b5b-aa6a-6f5e4fc00e81.png)
+![archi](https://user-images.githubusercontent.com/53934994/143040856-c61ec029-1b4f-407b-b745-ef83f1b4eb21.png)
+
 ## Hardware requirements :
 
 - 2  ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter)
