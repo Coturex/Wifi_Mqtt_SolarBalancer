@@ -13,7 +13,7 @@ Let update/improve this code to your needs...
 
 **Here is a forked version.**
 
-![archi](https://user-images.githubusercontent.com/53934994/143042074-46d2aba1-f50b-46ba-abc4-a69445c7c8cb.png)
+![archi](https://user-images.githubusercontent.com/53934994/143547962-fb6c8af1-31ba-43cf-982e-b5d66d1b472c.png)
 
 ## Hardware requirements :
 
