@@ -1,2 +1,3 @@
 *.pyc
 calibration/out.csv
+doc/.~lock.mqtt_pvrouter_archi.odg#

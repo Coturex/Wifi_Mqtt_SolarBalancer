@@ -17,8 +17,8 @@ Let update/improve this code to your needs...
 
 ## Hardware requirements :
 
-- 2  ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter)
-- _n_ ![Wifi MQTT Energy Variator](https://github.com/Coturex/Wifi_Mqtt_PowerVariator) (... this project is on going...)
+- 2  ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter) modules
+- _n_ ![Wifi MQTT Energy Variator](https://github.com/Coturex/Wifi_Mqtt_PowerVariator) module(s) (... this project is on going...)
 - _n_ Wifi MQTT Energy Commutator (like Sonoff Relay etc...)
 - 1 **Raspberry Pi Zero 2**    (which host this python program and Mosquito Mqtt broker)
 
