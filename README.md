@@ -94,7 +94,7 @@ You can monitor the energy flow of the solar system.
       ...
    
    
-   **Domoticz link :**
+   **Domoticz link (then influxDb, Grafana) :**
    
       - domoticz/in/{json} 
       - domoticz/out/{json} 
