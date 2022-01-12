@@ -14,7 +14,7 @@ Let update/improve this code to your needs...
 **Here is a forked version.**
 
 ![archi](https://user-images.githubusercontent.com/53934994/143550182-6fd8dece-473a-403d-a239-0491a142e8cf.png)
-
+![→ Grafana](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/grafana/grafana_screenshot.png) screenshot (dev on going...)
 ## Hardware requirements :
 
 - 2  ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter) modules
