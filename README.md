@@ -22,6 +22,17 @@ Let update/improve this code to your needs...
 - _n_ Wifi MQTT Energy Commutator (like Sonoff Relay etc...)
 - 1 **Raspberry Pi Zero 2**    (which host this python program and Mosquito Mqtt broker)
 
+Installation :
+
+By installing 2 ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter) in your solar system, and clamping the first PZEM toroid  onto main house loads and the second PZEM toroid onto solar inverter, you can monitor &quot;Grid Consumption Energy&quot; (the energy consumed from the grid), &quot; Solar Production Energy&quot; (the energy producted by solar inverter), and &quot;Exported Energy&quot; (the calculated energy exported to the grid) 
+
+You can monitor the energy flow of the solar system.
+
+
+![→ Installation](https://user-images.githubusercontent.com/53934994/149158317-c42a7bb8-f4ff-4ae2-8558-30705d612a8b.png)
+
+ 
+
 ## Python requirements :
 - python 3
 - paho-mqtt : $> pip3 install paho-mqtt
