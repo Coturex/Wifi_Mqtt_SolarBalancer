@@ -13,7 +13,7 @@ Let update/improve this code to your needs...
 
 **Here is a forked version.**
 
-![archi](https://user-images.githubusercontent.com/53934994/143550182-6fd8dece-473a-403d-a239-0491a142e8cf.png)
+![archi](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/archi.png)
 
 ## Hardware requirements :
 
