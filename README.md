@@ -14,7 +14,7 @@ Let update/improve this code to your needs...
 **Here is a forked version.**
 
 ![archi](https://user-images.githubusercontent.com/53934994/143550182-6fd8dece-473a-403d-a239-0491a142e8cf.png)
-![→ Grafana](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/grafana/grafana_screenshot.png) screenshot (dev on going...)
+
 ## Hardware requirements :
 
 - 2  ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter) modules
@@ -26,10 +26,11 @@ Installation :
 
 By installing 2 ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter) in your solar system, and clamping the first PZEM toroid  onto main house loads and the second PZEM toroid onto solar inverter, you can monitor &quot;Grid Consumption Energy&quot; (the energy consumed from the grid), &quot; Solar Production Energy&quot; (the energy producted by solar panels), and &quot;Exported Energy&quot; (the calculated energy exported to the grid) 
 
+![→ Installation](https://user-images.githubusercontent.com/53934994/149158317-c42a7bb8-f4ff-4ae2-8558-30705d612a8b.png)
+
 You can monitor the energy flow of the solar system.
 
-
-![→ Installation](https://user-images.githubusercontent.com/53934994/149158317-c42a7bb8-f4ff-4ae2-8558-30705d612a8b.png)
+![→ Grafana](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/grafana/grafana_screenshot.png) screenshot (dev on going...)
 
  
 
