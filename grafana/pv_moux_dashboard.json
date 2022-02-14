@@ -1,6 +1,22 @@
 {
   "annotations": {
-    "list": []
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
   },
   "description": "Moux Solar System",
   "editable": true,
@@ -132,9 +148,9 @@
           ],
           "tags": [
             {
-              "key": "idx",
+              "key": "name",
               "operator": "=",
-              "value": "293"
+              "value": "CONSOMMATION"
             }
           ]
         }
@@ -340,7 +356,7 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Synthèse  sur cette période",
+      "title": "Cette Période",
       "transformations": [
         {
           "id": "calculateField",
@@ -378,7 +394,7 @@
       "type": "bargauge"
     },
     {
-      "collapsed": false,
+      "collapsed": true,
       "datasource": null,
       "gridPos": {
         "h": 1,
@@ -387,606 +403,607 @@
         "y": 9
       },
       "id": 120,
-      "panels": [],
+      "panels": [
+        {
+          "datasource": "domoticz",
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "decimals": 3,
+              "mappings": [],
+              "min": 0.0999,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 12
+                  }
+                ]
+              },
+              "unit": "kwatth"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Rendement PV"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "%"
+                  },
+                  {
+                    "id": "color"
+                  },
+                  {
+                    "id": "decimals",
+                    "value": 2
+                  },
+                  {
+                    "id": "color"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 5,
+            "x": 0,
+            "y": 10
+          },
+          "hideTimeOverride": false,
+          "id": 121,
+          "interval": null,
+          "options": {
+            "displayMode": "gradient",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showUnfilled": false,
+            "text": {}
+          },
+          "pluginVersion": "8.2.5",
+          "targets": [
+            {
+              "alias": "Consommation",
+              "groupBy": [],
+              "hide": false,
+              "measurement": "Instant",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "query": "SELECT sum(\"value\")  / 60 FROM \"Instant\" WHERE (\"idx\" = '293') AND $timeFilter GROUP BY time(1m) fill(null)",
+              "rawQuery": false,
+              "refId": "D",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "integral"
+                  },
+                  {
+                    "params": [
+                      " / 3600000"
+                    ],
+                    "type": "math"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "idx",
+                  "operator": "=",
+                  "value": "293"
+                }
+              ]
+            },
+            {
+              "alias": "Cumulus",
+              "groupBy": [],
+              "hide": false,
+              "measurement": "Instant",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "query": "SELECT sum(\"value\")  / 60 FROM \"Instant\" WHERE (\"idx\" = '293') AND $timeFilter GROUP BY time(1m) fill(null)",
+              "rawQuery": false,
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "integral"
+                  },
+                  {
+                    "params": [
+                      " / 3600000"
+                    ],
+                    "type": "math"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "idx",
+                  "operator": "=",
+                  "value": "209"
+                }
+              ]
+            }
+          ],
+          "timeFrom": "now/d",
+          "timeShift": null,
+          "title": "Aujourd'hui",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Autres",
+                "binary": {
+                  "left": "Consommation",
+                  "operator": "-",
+                  "reducer": "sum",
+                  "right": "Cumulus"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Rendement PV",
+                "binary": {
+                  "left": "Consommation",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "Cumulus"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            }
+          ],
+          "type": "bargauge"
+        },
+        {
+          "datasource": "domoticz",
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "decimals": 3,
+              "mappings": [],
+              "min": 0.0999,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 12
+                  }
+                ]
+              },
+              "unit": "kwatth"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Rendement PV"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "%"
+                  },
+                  {
+                    "id": "color"
+                  },
+                  {
+                    "id": "decimals",
+                    "value": 2
+                  },
+                  {
+                    "id": "color"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 5,
+            "x": 5,
+            "y": 10
+          },
+          "hideTimeOverride": false,
+          "id": 108,
+          "interval": null,
+          "options": {
+            "displayMode": "gradient",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showUnfilled": false,
+            "text": {}
+          },
+          "pluginVersion": "8.2.5",
+          "targets": [
+            {
+              "alias": "Consommation",
+              "groupBy": [],
+              "hide": false,
+              "measurement": "Instant",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "query": "SELECT sum(\"value\")  / 60 FROM \"Instant\" WHERE (\"idx\" = '293') AND $timeFilter GROUP BY time(1m) fill(null)",
+              "rawQuery": false,
+              "refId": "D",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "integral"
+                  },
+                  {
+                    "params": [
+                      " / 3600000"
+                    ],
+                    "type": "math"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "idx",
+                  "operator": "=",
+                  "value": "293"
+                }
+              ]
+            },
+            {
+              "alias": "Cumulus",
+              "groupBy": [],
+              "hide": false,
+              "measurement": "Instant",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "query": "SELECT sum(\"value\")  / 60 FROM \"Instant\" WHERE (\"idx\" = '293') AND $timeFilter GROUP BY time(1m) fill(null)",
+              "rawQuery": false,
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "integral"
+                  },
+                  {
+                    "params": [
+                      " / 3600000"
+                    ],
+                    "type": "math"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "idx",
+                  "operator": "=",
+                  "value": "209"
+                }
+              ]
+            }
+          ],
+          "timeFrom": "now/M",
+          "timeShift": null,
+          "title": "Ce mois",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Autres",
+                "binary": {
+                  "left": "Consommation",
+                  "operator": "-",
+                  "reducer": "sum",
+                  "right": "Cumulus"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Rendement PV",
+                "binary": {
+                  "left": "Consommation",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "Cumulus"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            }
+          ],
+          "type": "bargauge"
+        },
+        {
+          "datasource": null,
+          "gridPos": {
+            "h": 8,
+            "w": 1,
+            "x": 10,
+            "y": 10
+          },
+          "id": 123,
+          "options": {
+            "content": "",
+            "mode": "markdown"
+          },
+          "pluginVersion": "8.2.5",
+          "title": ".",
+          "transparent": true,
+          "type": "text"
+        },
+        {
+          "datasource": "domoticz",
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "decimals": 3,
+              "mappings": [],
+              "min": 0.0999,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 12
+                  }
+                ]
+              },
+              "unit": "kwatth"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Rendement PV"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "%"
+                  },
+                  {
+                    "id": "color"
+                  },
+                  {
+                    "id": "decimals",
+                    "value": 2
+                  },
+                  {
+                    "id": "color"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 5,
+            "x": 19,
+            "y": 10
+          },
+          "hideTimeOverride": false,
+          "id": 116,
+          "interval": null,
+          "options": {
+            "displayMode": "gradient",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showUnfilled": false,
+            "text": {}
+          },
+          "pluginVersion": "8.2.5",
+          "targets": [
+            {
+              "alias": "Consommation",
+              "groupBy": [],
+              "hide": false,
+              "measurement": "Instant",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "query": "SELECT sum(\"value\")  / 60 FROM \"Instant\" WHERE (\"idx\" = '293') AND $timeFilter GROUP BY time(1m) fill(null)",
+              "rawQuery": false,
+              "refId": "D",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "integral"
+                  },
+                  {
+                    "params": [
+                      " / 3600000"
+                    ],
+                    "type": "math"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "idx",
+                  "operator": "=",
+                  "value": "293"
+                }
+              ]
+            },
+            {
+              "alias": "Cumulus",
+              "groupBy": [],
+              "hide": false,
+              "measurement": "Instant",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "query": "SELECT sum(\"value\")  / 60 FROM \"Instant\" WHERE (\"idx\" = '293') AND $timeFilter GROUP BY time(1m) fill(null)",
+              "rawQuery": false,
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "integral"
+                  },
+                  {
+                    "params": [
+                      " / 3600000"
+                    ],
+                    "type": "math"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "idx",
+                  "operator": "=",
+                  "value": "209"
+                }
+              ]
+            }
+          ],
+          "timeFrom": "now/y",
+          "timeShift": null,
+          "title": "Cette année",
+          "transformations": [
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Autres",
+                "binary": {
+                  "left": "Consommation",
+                  "operator": "-",
+                  "reducer": "sum",
+                  "right": "Cumulus"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "alias": "Rendement PV",
+                "binary": {
+                  "left": "Consommation",
+                  "operator": "/",
+                  "reducer": "sum",
+                  "right": "Cumulus"
+                },
+                "mode": "binary",
+                "reduce": {
+                  "reducer": "sum"
+                }
+              }
+            }
+          ],
+          "type": "bargauge"
+        }
+      ],
       "title": "PV - Synthèse",
       "type": "row"
-    },
-    {
-      "datasource": "domoticz",
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 3,
-          "mappings": [],
-          "min": 0.0999,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 12
-              }
-            ]
-          },
-          "unit": "kwatth"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Rendement PV"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "%"
-              },
-              {
-                "id": "color"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "color"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 5,
-        "x": 0,
-        "y": 10
-      },
-      "hideTimeOverride": false,
-      "id": 121,
-      "interval": null,
-      "options": {
-        "displayMode": "gradient",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showUnfilled": false,
-        "text": {}
-      },
-      "pluginVersion": "8.2.5",
-      "targets": [
-        {
-          "alias": "Consommation",
-          "groupBy": [],
-          "hide": false,
-          "measurement": "Instant",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT sum(\"value\")  / 60 FROM \"Instant\" WHERE (\"idx\" = '293') AND $timeFilter GROUP BY time(1m) fill(null)",
-          "rawQuery": false,
-          "refId": "D",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "integral"
-              },
-              {
-                "params": [
-                  " / 3600000"
-                ],
-                "type": "math"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "idx",
-              "operator": "=",
-              "value": "293"
-            }
-          ]
-        },
-        {
-          "alias": "Cumulus",
-          "groupBy": [],
-          "hide": false,
-          "measurement": "Instant",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT sum(\"value\")  / 60 FROM \"Instant\" WHERE (\"idx\" = '293') AND $timeFilter GROUP BY time(1m) fill(null)",
-          "rawQuery": false,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "integral"
-              },
-              {
-                "params": [
-                  " / 3600000"
-                ],
-                "type": "math"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "idx",
-              "operator": "=",
-              "value": "209"
-            }
-          ]
-        }
-      ],
-      "timeFrom": "now/d",
-      "timeShift": null,
-      "title": "Aujourd'hui",
-      "transformations": [
-        {
-          "id": "calculateField",
-          "options": {
-            "alias": "Autres",
-            "binary": {
-              "left": "Consommation",
-              "operator": "-",
-              "reducer": "sum",
-              "right": "Cumulus"
-            },
-            "mode": "binary",
-            "reduce": {
-              "reducer": "sum"
-            }
-          }
-        },
-        {
-          "id": "calculateField",
-          "options": {
-            "alias": "Rendement PV",
-            "binary": {
-              "left": "Consommation",
-              "operator": "/",
-              "reducer": "sum",
-              "right": "Cumulus"
-            },
-            "mode": "binary",
-            "reduce": {
-              "reducer": "sum"
-            }
-          }
-        }
-      ],
-      "type": "bargauge"
-    },
-    {
-      "datasource": "domoticz",
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 3,
-          "mappings": [],
-          "min": 0.0999,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 12
-              }
-            ]
-          },
-          "unit": "kwatth"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Rendement PV"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "%"
-              },
-              {
-                "id": "color"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "color"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 5,
-        "x": 5,
-        "y": 10
-      },
-      "hideTimeOverride": false,
-      "id": 108,
-      "interval": null,
-      "options": {
-        "displayMode": "gradient",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showUnfilled": false,
-        "text": {}
-      },
-      "pluginVersion": "8.2.5",
-      "targets": [
-        {
-          "alias": "Consommation",
-          "groupBy": [],
-          "hide": false,
-          "measurement": "Instant",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT sum(\"value\")  / 60 FROM \"Instant\" WHERE (\"idx\" = '293') AND $timeFilter GROUP BY time(1m) fill(null)",
-          "rawQuery": false,
-          "refId": "D",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "integral"
-              },
-              {
-                "params": [
-                  " / 3600000"
-                ],
-                "type": "math"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "idx",
-              "operator": "=",
-              "value": "293"
-            }
-          ]
-        },
-        {
-          "alias": "Cumulus",
-          "groupBy": [],
-          "hide": false,
-          "measurement": "Instant",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT sum(\"value\")  / 60 FROM \"Instant\" WHERE (\"idx\" = '293') AND $timeFilter GROUP BY time(1m) fill(null)",
-          "rawQuery": false,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "integral"
-              },
-              {
-                "params": [
-                  " / 3600000"
-                ],
-                "type": "math"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "idx",
-              "operator": "=",
-              "value": "209"
-            }
-          ]
-        }
-      ],
-      "timeFrom": "now/M",
-      "timeShift": null,
-      "title": "Ce mois",
-      "transformations": [
-        {
-          "id": "calculateField",
-          "options": {
-            "alias": "Autres",
-            "binary": {
-              "left": "Consommation",
-              "operator": "-",
-              "reducer": "sum",
-              "right": "Cumulus"
-            },
-            "mode": "binary",
-            "reduce": {
-              "reducer": "sum"
-            }
-          }
-        },
-        {
-          "id": "calculateField",
-          "options": {
-            "alias": "Rendement PV",
-            "binary": {
-              "left": "Consommation",
-              "operator": "/",
-              "reducer": "sum",
-              "right": "Cumulus"
-            },
-            "mode": "binary",
-            "reduce": {
-              "reducer": "sum"
-            }
-          }
-        }
-      ],
-      "type": "bargauge"
-    },
-    {
-      "datasource": null,
-      "gridPos": {
-        "h": 8,
-        "w": 1,
-        "x": 10,
-        "y": 10
-      },
-      "id": 123,
-      "options": {
-        "content": "",
-        "mode": "markdown"
-      },
-      "pluginVersion": "8.2.5",
-      "title": ".",
-      "transparent": true,
-      "type": "text"
-    },
-    {
-      "datasource": "domoticz",
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 3,
-          "mappings": [],
-          "min": 0.0999,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 12
-              }
-            ]
-          },
-          "unit": "kwatth"
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Rendement PV"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "%"
-              },
-              {
-                "id": "color"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "color"
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 5,
-        "x": 19,
-        "y": 10
-      },
-      "hideTimeOverride": false,
-      "id": 116,
-      "interval": null,
-      "options": {
-        "displayMode": "gradient",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showUnfilled": false,
-        "text": {}
-      },
-      "pluginVersion": "8.2.5",
-      "targets": [
-        {
-          "alias": "Consommation",
-          "groupBy": [],
-          "hide": false,
-          "measurement": "Instant",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT sum(\"value\")  / 60 FROM \"Instant\" WHERE (\"idx\" = '293') AND $timeFilter GROUP BY time(1m) fill(null)",
-          "rawQuery": false,
-          "refId": "D",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "integral"
-              },
-              {
-                "params": [
-                  " / 3600000"
-                ],
-                "type": "math"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "idx",
-              "operator": "=",
-              "value": "293"
-            }
-          ]
-        },
-        {
-          "alias": "Cumulus",
-          "groupBy": [],
-          "hide": false,
-          "measurement": "Instant",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT sum(\"value\")  / 60 FROM \"Instant\" WHERE (\"idx\" = '293') AND $timeFilter GROUP BY time(1m) fill(null)",
-          "rawQuery": false,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "integral"
-              },
-              {
-                "params": [
-                  " / 3600000"
-                ],
-                "type": "math"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "idx",
-              "operator": "=",
-              "value": "209"
-            }
-          ]
-        }
-      ],
-      "timeFrom": "now/y",
-      "timeShift": null,
-      "title": "Cette année",
-      "transformations": [
-        {
-          "id": "calculateField",
-          "options": {
-            "alias": "Autres",
-            "binary": {
-              "left": "Consommation",
-              "operator": "-",
-              "reducer": "sum",
-              "right": "Cumulus"
-            },
-            "mode": "binary",
-            "reduce": {
-              "reducer": "sum"
-            }
-          }
-        },
-        {
-          "id": "calculateField",
-          "options": {
-            "alias": "Rendement PV",
-            "binary": {
-              "left": "Consommation",
-              "operator": "/",
-              "reducer": "sum",
-              "right": "Cumulus"
-            },
-            "mode": "binary",
-            "reduce": {
-              "reducer": "sum"
-            }
-          }
-        }
-      ],
-      "type": "bargauge"
     },
     {
       "collapsed": false,
@@ -995,7 +1012,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 18
+        "y": 10
       },
       "id": 118,
       "panels": [],
@@ -1024,7 +1041,7 @@
         "h": 7,
         "w": 8,
         "x": 0,
-        "y": 19
+        "y": 11
       },
       "hiddenSeries": false,
       "hideTimeOverride": false,
@@ -1113,9 +1130,9 @@
           ],
           "tags": [
             {
-              "key": "idx",
+              "key": "name",
               "operator": "=",
-              "value": "293"
+              "value": "CONSOMMATION"
             }
           ]
         },
@@ -1179,7 +1196,7 @@
         }
       ],
       "timeShift": null,
-      "title": "Consommation / Aujourd'hui / 30 min",
+      "title": "Consommation  Aujourd'hui  (30 min)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1242,7 +1259,7 @@
         "h": 7,
         "w": 8,
         "x": 8,
-        "y": 19
+        "y": 11
       },
       "hiddenSeries": false,
       "hideTimeOverride": false,
@@ -1328,9 +1345,9 @@
           ],
           "tags": [
             {
-              "key": "idx",
+              "key": "name",
               "operator": "=",
-              "value": "293"
+              "value": "CONSOMMATION"
             }
           ]
         },
@@ -1394,7 +1411,7 @@
         }
       ],
       "timeShift": null,
-      "title": "Consommation / Ce mois",
+      "title": "Consommation ce mois  (Jours)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1457,7 +1474,7 @@
         "h": 7,
         "w": 8,
         "x": 16,
-        "y": 19
+        "y": 11
       },
       "hiddenSeries": false,
       "hideTimeOverride": false,
@@ -1543,9 +1560,9 @@
           ],
           "tags": [
             {
-              "key": "idx",
+              "key": "name",
               "operator": "=",
-              "value": "293"
+              "value": "CONSOMMATION"
             }
           ]
         },
@@ -1609,7 +1626,7 @@
         }
       ],
       "timeShift": null,
-      "title": "Consommation / Cette année",
+      "title": "Consommation cette année  (Mois)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1657,7 +1674,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 26
+        "y": 18
       },
       "id": 105,
       "panels": [],
@@ -1686,7 +1703,7 @@
         "h": 7,
         "w": 8,
         "x": 0,
-        "y": 27
+        "y": 19
       },
       "hiddenSeries": false,
       "hideTimeOverride": true,
@@ -1751,6 +1768,8 @@
           "measurement": "Instant",
           "orderByTime": "ASC",
           "policy": "default",
+          "query": "SELECT integral(\"value\")  / 1800000 FROM \"Instant\" WHERE (\"idx\" = '293') AND $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": false,
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -1775,9 +1794,9 @@
           ],
           "tags": [
             {
-              "key": "idx",
+              "key": "name",
               "operator": "=",
-              "value": "293"
+              "value": "CONSOMMATION"
             }
           ]
         },
@@ -1841,7 +1860,7 @@
         }
       ],
       "timeShift": "1d/d",
-      "title": "Consommation / Hier / 30 min",
+      "title": "Consommation  Hier (30 min)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1904,7 +1923,7 @@
         "h": 7,
         "w": 8,
         "x": 8,
-        "y": 27
+        "y": 19
       },
       "hiddenSeries": false,
       "hideTimeOverride": true,
@@ -1990,9 +2009,9 @@
           ],
           "tags": [
             {
-              "key": "idx",
+              "key": "name",
               "operator": "=",
-              "value": "293"
+              "value": "CONSOMMATION"
             }
           ]
         },
@@ -2056,7 +2075,7 @@
         }
       ],
       "timeShift": "1M/M",
-      "title": "Consommation / Mois dernier",
+      "title": "Consommation mois dernier (Jours)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -2119,7 +2138,7 @@
         "h": 7,
         "w": 8,
         "x": 16,
-        "y": 27
+        "y": 19
       },
       "hiddenSeries": false,
       "hideTimeOverride": true,
@@ -2205,9 +2224,9 @@
           ],
           "tags": [
             {
-              "key": "idx",
+              "key": "name",
               "operator": "=",
-              "value": "293"
+              "value": "CONSOMMATION"
             }
           ]
         },
@@ -2271,7 +2290,7 @@
         }
       ],
       "timeShift": "1y/y",
-      "title": "Consommation / Année dernière",
+      "title": "Consommation année derniere (Mois)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -2313,13 +2332,689 @@
       }
     },
     {
-      "collapsed": true,
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 26
+      },
+      "id": 94,
+      "panels": [],
+      "title": "Cumulus",
+      "type": "row"
+    },
+    {
+      "aliasColors": {
+        "EDF": "semi-dark-blue",
+        "Grid Consumption": "semi-dark-blue"
+      },
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "domoticz",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "links": []
+        },
+        "overrides": []
+      },
+      "fill": 0,
+      "fillGradient": 2,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 27
+      },
+      "hiddenSeries": false,
+      "hideTimeOverride": false,
+      "id": 113,
+      "interval": "30m",
+      "legend": {
+        "avg": false,
+        "current": false,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": false,
+        "min": false,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.2.5",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {
+          "$$hashKey": "object:153",
+          "alias": "Production",
+          "bars": false,
+          "color": "rgba(25, 115, 14, 0.51)",
+          "fill": 0,
+          "lines": true,
+          "stack": false,
+          "zindex": -3
+        }
+      ],
+      "spaceLength": 10,
+      "stack": true,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "EDF",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "Instant",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "integral"
+              },
+              {
+                "params": [
+                  " / 1800000"
+                ],
+                "type": "math"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "ECS_Cumulus_pwr"
+            }
+          ]
+        },
+        {
+          "alias": "Direct self-use",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "kWh",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "max"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "entity_id",
+              "operator": "=",
+              "value": "selfuse_energy_hourly"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": "now/d",
+      "timeRegions": [
+        {
+          "colorMode": "gray",
+          "fill": false,
+          "fillColor": "rgba(234, 112, 112, 0.12)",
+          "from": "8:00",
+          "line": false,
+          "lineColor": "rgba(237, 46, 24, 0.60)",
+          "op": "time",
+          "to": "20:00"
+        }
+      ],
+      "timeShift": null,
+      "title": "Consommation Aujourd'hui (30 mi)",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:194",
+          "decimals": null,
+          "format": "kwatt",
+          "label": "Energie - kW / 30m",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:195",
+          "decimals": null,
+          "format": "short",
+          "label": "Production (kWh/day)",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": 0
+      }
+    },
+    {
+      "aliasColors": {
+        "EDF": "semi-dark-blue"
+      },
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "domoticz",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "links": [],
+          "unit": "kwatth"
+        },
+        "overrides": []
+      },
+      "fill": 0,
+      "fillGradient": 2,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 27
+      },
+      "hiddenSeries": false,
+      "hideTimeOverride": false,
+      "id": 129,
+      "interval": "1d",
+      "legend": {
+        "avg": true,
+        "current": false,
+        "max": true,
+        "min": true,
+        "show": true,
+        "total": true,
+        "values": true
+      },
+      "lines": false,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.2.5",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {
+          "$$hashKey": "object:85",
+          "alias": "Production",
+          "bars": false,
+          "color": "rgba(25, 115, 14, 0.51)",
+          "fill": 0,
+          "lines": true,
+          "stack": false,
+          "zindex": -3
+        }
+      ],
+      "spaceLength": 10,
+      "stack": true,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "EDF",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "Instant",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "integral"
+              },
+              {
+                "params": [
+                  " / 3600000"
+                ],
+                "type": "math"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "ECS_Cumulus_pwr"
+            }
+          ]
+        },
+        {
+          "alias": "Direct self-use",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "kWh",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "max"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "entity_id",
+              "operator": "=",
+              "value": "selfuse_energy_daily"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": "now/M",
+      "timeRegions": [
+        {
+          "colorMode": "gray",
+          "fill": false,
+          "fillColor": "rgba(234, 112, 112, 0.12)",
+          "from": "8:00",
+          "line": false,
+          "lineColor": "rgba(237, 46, 24, 0.60)",
+          "op": "time",
+          "to": "20:00"
+        }
+      ],
+      "timeShift": null,
+      "title": "Consommation ce mois (Jours)",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:520",
+          "decimals": null,
+          "format": "kwatth",
+          "label": "Energy (kWh/interval)",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:521",
+          "decimals": null,
+          "format": "short",
+          "label": "Production (kWh/day)",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": 0
+      }
+    },
+    {
+      "aliasColors": {
+        "EDF": "semi-dark-blue"
+      },
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "domoticz",
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "links": [],
+          "unit": "kwatth"
+        },
+        "overrides": []
+      },
+      "fill": 0,
+      "fillGradient": 2,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 27
+      },
+      "hiddenSeries": false,
+      "hideTimeOverride": true,
+      "id": 115,
+      "interval": "1M",
+      "legend": {
+        "avg": true,
+        "current": false,
+        "max": true,
+        "min": true,
+        "show": true,
+        "total": true,
+        "values": true
+      },
+      "lines": false,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "8.2.5",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [
+        {
+          "$$hashKey": "object:85",
+          "alias": "Production",
+          "bars": false,
+          "color": "rgba(25, 115, 14, 0.51)",
+          "fill": 0,
+          "lines": true,
+          "stack": false,
+          "zindex": -3
+        }
+      ],
+      "spaceLength": 10,
+      "stack": true,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "EDF",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "Instant",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "integral"
+              },
+              {
+                "params": [
+                  " / 3600000"
+                ],
+                "type": "math"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "ECS_Cumulus_pwr"
+            }
+          ]
+        },
+        {
+          "alias": "Direct self-use",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "kWh",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "max"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "entity_id",
+              "operator": "=",
+              "value": "selfuse_energy_daily"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": "now/y",
+      "timeRegions": [
+        {
+          "colorMode": "gray",
+          "fill": false,
+          "fillColor": "rgba(234, 112, 112, 0.12)",
+          "from": "8:00",
+          "line": false,
+          "lineColor": "rgba(237, 46, 24, 0.60)",
+          "op": "time",
+          "to": "20:00"
+        }
+      ],
+      "timeShift": null,
+      "title": "Consommation ces mois derniers (Moiss)",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:520",
+          "decimals": null,
+          "format": "kwatth",
+          "label": "Energy (kWh/interval)",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:521",
+          "decimals": null,
+          "format": "short",
+          "label": "Production (kWh/day)",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": 0
+      }
+    },
+    {
+      "collapsed": false,
       "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
         "y": 34
+      },
+      "id": 125,
+      "panels": [],
+      "title": "Seche_serviette",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 35
       },
       "id": 107,
       "panels": [
@@ -2343,7 +3038,7 @@
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 21
+            "y": 13
           },
           "hiddenSeries": false,
           "hideTimeOverride": false,
@@ -2592,7 +3287,7 @@
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 21
+            "y": 13
           },
           "hiddenSeries": false,
           "hideTimeOverride": false,
@@ -2801,7 +3496,7 @@
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 28
+            "y": 20
           },
           "hiddenSeries": false,
           "hideTimeOverride": false,
@@ -3004,7 +3699,7 @@
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 28
+            "y": 20
           },
           "hiddenSeries": false,
           "hideTimeOverride": false,
@@ -3198,756 +3893,94 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 35
-      },
-      "id": 94,
-      "panels": [
-        {
-          "aliasColors": {
-            "EDF": "semi-dark-blue",
-            "Grid Consumption": "semi-dark-blue"
-          },
-          "bars": true,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "domoticz",
-          "description": "",
-          "fieldConfig": {
-            "defaults": {
-              "links": []
-            },
-            "overrides": []
-          },
-          "fill": 0,
-          "fillGradient": 2,
-          "gridPos": {
-            "h": 7,
-            "w": 8,
-            "x": 0,
-            "y": 71
-          },
-          "hiddenSeries": false,
-          "hideTimeOverride": false,
-          "id": 113,
-          "interval": "30m",
-          "legend": {
-            "avg": false,
-            "current": false,
-            "hideEmpty": false,
-            "hideZero": false,
-            "max": false,
-            "min": false,
-            "rightSide": false,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": false,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "options": {
-            "alertThreshold": true
-          },
-          "percentage": false,
-          "pluginVersion": "8.2.5",
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [
-            {
-              "$$hashKey": "object:153",
-              "alias": "Production",
-              "bars": false,
-              "color": "rgba(25, 115, 14, 0.51)",
-              "fill": 0,
-              "lines": true,
-              "stack": false,
-              "zindex": -3
-            }
-          ],
-          "spaceLength": 10,
-          "stack": true,
-          "steppedLine": false,
-          "targets": [
-            {
-              "alias": "EDF",
-              "groupBy": [
-                {
-                  "params": [
-                    "$__interval"
-                  ],
-                  "type": "time"
-                },
-                {
-                  "params": [
-                    "null"
-                  ],
-                  "type": "fill"
-                }
-              ],
-              "measurement": "Instant",
-              "orderByTime": "ASC",
-              "policy": "default",
-              "refId": "A",
-              "resultFormat": "time_series",
-              "select": [
-                [
-                  {
-                    "params": [
-                      "value"
-                    ],
-                    "type": "field"
-                  },
-                  {
-                    "params": [],
-                    "type": "integral"
-                  },
-                  {
-                    "params": [
-                      " / 1800000"
-                    ],
-                    "type": "math"
-                  }
-                ]
-              ],
-              "tags": [
-                {
-                  "key": "idx",
-                  "operator": "=",
-                  "value": "209"
-                }
-              ]
-            },
-            {
-              "alias": "Direct self-use",
-              "groupBy": [
-                {
-                  "params": [
-                    "$__interval"
-                  ],
-                  "type": "time"
-                },
-                {
-                  "params": [
-                    "null"
-                  ],
-                  "type": "fill"
-                }
-              ],
-              "hide": false,
-              "measurement": "kWh",
-              "orderByTime": "ASC",
-              "policy": "default",
-              "refId": "B",
-              "resultFormat": "time_series",
-              "select": [
-                [
-                  {
-                    "params": [
-                      "value"
-                    ],
-                    "type": "field"
-                  },
-                  {
-                    "params": [],
-                    "type": "max"
-                  }
-                ]
-              ],
-              "tags": [
-                {
-                  "key": "entity_id",
-                  "operator": "=",
-                  "value": "selfuse_energy_hourly"
-                }
-              ]
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": "now/d",
-          "timeRegions": [
-            {
-              "colorMode": "gray",
-              "fill": false,
-              "fillColor": "rgba(234, 112, 112, 0.12)",
-              "from": "8:00",
-              "line": false,
-              "lineColor": "rgba(237, 46, 24, 0.60)",
-              "op": "time",
-              "to": "20:00"
-            }
-          ],
-          "timeShift": null,
-          "title": "Consommation / Aujourd'hui / 30 min",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "$$hashKey": "object:194",
-              "decimals": null,
-              "format": "kwatt",
-              "label": "Energie - kW / 30m",
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            },
-            {
-              "$$hashKey": "object:195",
-              "decimals": null,
-              "format": "short",
-              "label": "Production (kWh/day)",
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": false
-            }
-          ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": 0
-          }
-        },
-        {
-          "aliasColors": {
-            "EDF": "semi-dark-blue"
-          },
-          "bars": true,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "domoticz",
-          "description": "",
-          "fieldConfig": {
-            "defaults": {
-              "links": [],
-              "unit": "kwatth"
-            },
-            "overrides": []
-          },
-          "fill": 0,
-          "fillGradient": 2,
-          "gridPos": {
-            "h": 7,
-            "w": 8,
-            "x": 8,
-            "y": 71
-          },
-          "hiddenSeries": false,
-          "hideTimeOverride": false,
-          "id": 114,
-          "interval": "1d",
-          "legend": {
-            "avg": true,
-            "current": false,
-            "max": true,
-            "min": true,
-            "show": true,
-            "total": true,
-            "values": true
-          },
-          "lines": false,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "options": {
-            "alertThreshold": true
-          },
-          "percentage": false,
-          "pluginVersion": "8.2.5",
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [
-            {
-              "$$hashKey": "object:85",
-              "alias": "Production",
-              "bars": false,
-              "color": "rgba(25, 115, 14, 0.51)",
-              "fill": 0,
-              "lines": true,
-              "stack": false,
-              "zindex": -3
-            }
-          ],
-          "spaceLength": 10,
-          "stack": true,
-          "steppedLine": false,
-          "targets": [
-            {
-              "alias": "EDF",
-              "groupBy": [
-                {
-                  "params": [
-                    "$__interval"
-                  ],
-                  "type": "time"
-                },
-                {
-                  "params": [
-                    "null"
-                  ],
-                  "type": "fill"
-                }
-              ],
-              "measurement": "Instant",
-              "orderByTime": "ASC",
-              "policy": "default",
-              "refId": "A",
-              "resultFormat": "time_series",
-              "select": [
-                [
-                  {
-                    "params": [
-                      "value"
-                    ],
-                    "type": "field"
-                  },
-                  {
-                    "params": [],
-                    "type": "integral"
-                  },
-                  {
-                    "params": [
-                      " / 3600000"
-                    ],
-                    "type": "math"
-                  }
-                ]
-              ],
-              "tags": [
-                {
-                  "key": "idx",
-                  "operator": "=",
-                  "value": "209"
-                }
-              ]
-            },
-            {
-              "alias": "Direct self-use",
-              "groupBy": [
-                {
-                  "params": [
-                    "$__interval"
-                  ],
-                  "type": "time"
-                },
-                {
-                  "params": [
-                    "null"
-                  ],
-                  "type": "fill"
-                }
-              ],
-              "hide": false,
-              "measurement": "kWh",
-              "orderByTime": "ASC",
-              "policy": "default",
-              "refId": "B",
-              "resultFormat": "time_series",
-              "select": [
-                [
-                  {
-                    "params": [
-                      "value"
-                    ],
-                    "type": "field"
-                  },
-                  {
-                    "params": [],
-                    "type": "max"
-                  }
-                ]
-              ],
-              "tags": [
-                {
-                  "key": "entity_id",
-                  "operator": "=",
-                  "value": "selfuse_energy_daily"
-                }
-              ]
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": "now/M",
-          "timeRegions": [
-            {
-              "colorMode": "gray",
-              "fill": false,
-              "fillColor": "rgba(234, 112, 112, 0.12)",
-              "from": "8:00",
-              "line": false,
-              "lineColor": "rgba(237, 46, 24, 0.60)",
-              "op": "time",
-              "to": "20:00"
-            }
-          ],
-          "timeShift": null,
-          "title": "Consommation / Ce mois",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "$$hashKey": "object:520",
-              "decimals": null,
-              "format": "kwatth",
-              "label": "Energy (kWh/interval)",
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            },
-            {
-              "$$hashKey": "object:521",
-              "decimals": null,
-              "format": "short",
-              "label": "Production (kWh/day)",
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": false
-            }
-          ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": 0
-          }
-        },
-        {
-          "aliasColors": {
-            "EDF": "semi-dark-blue"
-          },
-          "bars": true,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "domoticz",
-          "description": "",
-          "fieldConfig": {
-            "defaults": {
-              "links": [],
-              "unit": "kwatth"
-            },
-            "overrides": []
-          },
-          "fill": 0,
-          "fillGradient": 2,
-          "gridPos": {
-            "h": 7,
-            "w": 8,
-            "x": 8,
-            "y": 78
-          },
-          "hiddenSeries": false,
-          "hideTimeOverride": true,
-          "id": 115,
-          "interval": "1d",
-          "legend": {
-            "avg": true,
-            "current": false,
-            "max": true,
-            "min": true,
-            "show": true,
-            "total": true,
-            "values": true
-          },
-          "lines": false,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "options": {
-            "alertThreshold": true
-          },
-          "percentage": false,
-          "pluginVersion": "8.2.5",
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [
-            {
-              "$$hashKey": "object:85",
-              "alias": "Production",
-              "bars": false,
-              "color": "rgba(25, 115, 14, 0.51)",
-              "fill": 0,
-              "lines": true,
-              "stack": false,
-              "zindex": -3
-            }
-          ],
-          "spaceLength": 10,
-          "stack": true,
-          "steppedLine": false,
-          "targets": [
-            {
-              "alias": "EDF",
-              "groupBy": [
-                {
-                  "params": [
-                    "$__interval"
-                  ],
-                  "type": "time"
-                },
-                {
-                  "params": [
-                    "null"
-                  ],
-                  "type": "fill"
-                }
-              ],
-              "measurement": "Instant",
-              "orderByTime": "ASC",
-              "policy": "default",
-              "refId": "A",
-              "resultFormat": "time_series",
-              "select": [
-                [
-                  {
-                    "params": [
-                      "value"
-                    ],
-                    "type": "field"
-                  },
-                  {
-                    "params": [],
-                    "type": "integral"
-                  },
-                  {
-                    "params": [
-                      " / 3600000"
-                    ],
-                    "type": "math"
-                  }
-                ]
-              ],
-              "tags": [
-                {
-                  "key": "idx",
-                  "operator": "=",
-                  "value": "209"
-                }
-              ]
-            },
-            {
-              "alias": "Direct self-use",
-              "groupBy": [
-                {
-                  "params": [
-                    "$__interval"
-                  ],
-                  "type": "time"
-                },
-                {
-                  "params": [
-                    "null"
-                  ],
-                  "type": "fill"
-                }
-              ],
-              "hide": false,
-              "measurement": "kWh",
-              "orderByTime": "ASC",
-              "policy": "default",
-              "refId": "B",
-              "resultFormat": "time_series",
-              "select": [
-                [
-                  {
-                    "params": [
-                      "value"
-                    ],
-                    "type": "field"
-                  },
-                  {
-                    "params": [],
-                    "type": "max"
-                  }
-                ]
-              ],
-              "tags": [
-                {
-                  "key": "entity_id",
-                  "operator": "=",
-                  "value": "selfuse_energy_daily"
-                }
-              ]
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": "now/M",
-          "timeRegions": [
-            {
-              "colorMode": "gray",
-              "fill": false,
-              "fillColor": "rgba(234, 112, 112, 0.12)",
-              "from": "8:00",
-              "line": false,
-              "lineColor": "rgba(237, 46, 24, 0.60)",
-              "op": "time",
-              "to": "20:00"
-            }
-          ],
-          "timeShift": "1M/M",
-          "title": "Consommation / Mois dernier",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "$$hashKey": "object:520",
-              "decimals": null,
-              "format": "kwatth",
-              "label": "Energy (kWh/interval)",
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            },
-            {
-              "$$hashKey": "object:521",
-              "decimals": null,
-              "format": "short",
-              "label": "Production (kWh/day)",
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": false
-            }
-          ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": 0
-          }
-        }
-      ],
-      "title": "Cumulus",
-      "type": "row"
-    },
-    {
-      "collapsed": false,
-      "datasource": null,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
         "y": 36
       },
       "id": 98,
-      "panels": [],
-      "title": "Documentation",
-      "type": "row"
-    },
-    {
-      "datasource": "domoticz",
-      "description": "",
-      "gridPos": {
-        "h": 34,
-        "w": 8,
-        "x": 0,
-        "y": 37
-      },
-      "id": 85,
-      "links": [
+      "panels": [
         {
-          "targetBlank": true,
-          "title": "More document",
-          "url": "https://www.iammeter.com/doc/iammeter/monitoring-quickstart-wem3080t.html"
-        }
-      ],
-      "options": {
-        "content": "<div  id='write'  class = 'is-node'><p>\r\n<span>By installing three phase Wifi_Mqtt_SmartMeter energy meter in your solar system, and clamping the first PZEM  onto grid, the second PZEM  onto solar inverter and the third PZEM onto load if applicable, you can monitor &quot;Grid Consumption Energy&quot; (the energy consumed from the grid), &quot;Exported Energy&quot; (the energy exported to the grid) and the energy produced by solar inverter. You can monitor the energy flow of the solar system.</span></p><p><span>Enjoy and have fun on </span>\r\n<a href='https://github.com/Coturex/Wifi_Mqtt_SolarBalancer' target='_blank'><span>Solar Balancer</span></a></p>\r\n<p><img src=\"https://user-images.githubusercontent.com/53934994/149093531-c04b23e2-a036-4c32-84a2-b24550343f8d.png\" referrerpolicy=\"no-referrer\" alt=\"img\"></p></div>",
-        "mode": "html"
-      },
-      "pluginVersion": "8.2.5",
-      "targets": [
-        {
-          "groupBy": [
+          "datasource": "domoticz",
+          "description": "",
+          "gridPos": {
+            "h": 34,
+            "w": 8,
+            "x": 0,
+            "y": 37
+          },
+          "id": 85,
+          "links": [
             {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
+              "targetBlank": true,
+              "title": "More document",
+              "url": "https://www.iammeter.com/doc/iammeter/monitoring-quickstart-wem3080t.html"
             }
           ],
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
+          "options": {
+            "content": "<div  id='write'  class = 'is-node'><p>\r\n<span>By installing 2 in your solar system, and clamping the first PZEM toroid  onto main house loads and the second PZEM toroid onto solar inverter, you can monitor &quot;Grid Consumption Energy&quot; (the energy consumed from the grid), &quot; Solar Production Energy&quot; (the energy producted by solar inverter), and &quot;Exported Energy&quot; (the calculated energy exported to the grid) \r\n\r\nYou can monitor the energy flow of the solar system.</span></p><p><span>Enjoy and have fun on </span>\r\n<a href='https://github.com/Coturex/Wifi_Mqtt_SolarBalancer' target='_blank'><span>Solar Balancer</span></a></p>\r\n<p><img src=\"https://user-images.githubusercontent.com/53934994/149158317-c42a7bb8-f4ff-4ae2-8558-30705d612a8b.png\" referrerpolicy=\"no-referrer\" alt=\"img\"></p></div>",
+            "mode": "html"
+          },
+          "pluginVersion": "8.2.5",
+          "targets": [
+            {
+              "groupBy": [
+                {
+                  "params": [
+                    "$__interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "orderByTime": "ASC",
+              "policy": "default",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": []
+            }
           ],
-          "tags": []
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Solar System",
+          "type": "text"
+        },
+        {
+          "datasource": null,
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 9,
+            "y": 37
+          },
+          "id": 110,
+          "options": {
+            "content": "# Title\nhttps://community.grafana.com/t/daily-power-consumption-from-watts/16196/30          ",
+            "mode": "markdown"
+          },
+          "pluginVersion": "8.2.5",
+          "title": "Memo-tips",
+          "type": "text"
         }
       ],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Solar System",
-      "type": "text"
-    },
-    {
-      "datasource": null,
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 9,
-        "y": 37
-      },
-      "id": 110,
-      "options": {
-        "content": "# Title\nhttps://community.grafana.com/t/daily-power-consumption-from-watts/16196/30          ",
-        "mode": "markdown"
-      },
-      "pluginVersion": "8.2.5",
-      "title": "Memo-tips",
-      "type": "text"
+      "title": "Documentation",
+      "type": "row"
     }
   ],
   "refresh": false,
@@ -3958,7 +3991,7 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now/d",
     "to": "now"
   },
   "timepicker": {
@@ -3989,5 +4022,5 @@
   "timezone": "",
   "title": "PV_MOUX",
   "uid": "UwzXfgddfgkfdgserwer",
-  "version": 47
+  "version": 59
 }
