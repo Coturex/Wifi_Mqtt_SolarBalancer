@@ -41,7 +41,9 @@ import time
 
 import paho.mqtt.client as mqtt
 
-from debug import debug as debug
+from debug_log import log as log
+from debug_log import debug as debug
+
 import equipment
 from equipment import ConstantPowerEquipment, UnknownPowerEquipment, VariablePowerEquipment
 
