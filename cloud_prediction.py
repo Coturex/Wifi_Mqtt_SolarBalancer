@@ -26,12 +26,11 @@
 # Url API request - Forecast Prochaines heures
 # https://api.openweathermap.org/data/2.5/forecast?q=chambery&units=metric&appid=5b203696597154116db974003cef4259
 
-import configparser
 import requests   
 import time
 import datetime
 from pprint import pprint
-from debug import debug as debug
+from debug_log import debug as debug
  
 TODAY = 0 
 DEMAIN = 1
@@ -41,16 +40,12 @@ DAY1 = 1
 DAY2 = 2
 DAY3 = 3
 class Prediction:
-    def __init__(self, location):
+    def __init__(self, location, key):
         self.location = location
         self.energy = 0
         self.data = 0
+        self.apiKey = key
 
-    def getApiKey(self):
-        config = configparser.ConfigParser()
-        config.read('config.ini')
-        return config['openweathermap']['api']
-        
     def setLocation(self, location):
         """Set OpenweatherMap location"""
         self.location = location
@@ -85,7 +80,7 @@ class Prediction:
     def getRawData(self):
         """Print JSON data returned by html request"""
         try:
-            url = "https://api.openweathermap.org/data/2.5/forecast?q={}&units=metric&appid={}".format(self.location, self.getApiKey())
+            url = "https://api.openweathermap.org/data/2.5/forecast?q={}&units=metric&appid={}".format(self.location, self.apiKey)
             wdata = requests.get(url).json()
             pprint(wdata)
         except:
@@ -96,7 +91,7 @@ class Prediction:
         try:
             sdate = datetime.date.today() + datetime.timedelta(days=sDAY)
             sdate = str(datetime.datetime(sdate.year, sdate.month,sdate.day, sHour, 0, 0))
-            url = "https://api.openweathermap.org/data/2.5/forecast?q={}&units=metric&appid={}".format(self.location, self.getApiKey())
+            url = "https://api.openweathermap.org/data/2.5/forecast?q={}&units=metric&appid={}".format(self.location, self.apiKey)
             #debug(0, "Cloud_prediction, url : " + url)
             wdata = requests.get(url).json()
             #pprint(wdata)
@@ -121,8 +116,12 @@ def main():
     #if len(sys.argv) != 2:
     #    exit("Usage: {} LOCATION".format(sys.argv[0]))
     #location = sys.argv[1]
-       
-    weather = Prediction("Chambery")
+    import configparser
+
+    config = configparser.ConfigParser()
+    config.read('config.ini') 
+    
+    weather = Prediction("Chambery",config['openweathermap']['key'])
     weather.getCloudHour(TODAY,18)
     print(weather.getCloudAvg(TOMORROW))
     #weather.getRawData()

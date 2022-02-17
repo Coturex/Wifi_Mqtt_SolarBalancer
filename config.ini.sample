@@ -1,2 +1,20 @@
 [openweathermap]
-api=
+key = xxxxxx
+location = Chambery
+
+[mqtt]
+broker_ip = xxxx
+port = 1883 
+topic_cons = smeter/pzem/CONSOMMATION
+topic_prod = smeter/pzem/PRODUCTION
+topic_mode = regul/mode
+topic_status = regul/status
+
+[evaluate]
+margin = 20
+period = 5
+
+[debug]
+simulation = false
+debug_file = "debug.log"
+log_file = "logfile.log"    

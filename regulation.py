@@ -44,47 +44,57 @@ import paho.mqtt.client as mqtt
 from debug_log import log as log
 from debug_log import debug as debug
 
+
+import configparser
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+import cloud_prediction
+from cloud_prediction import TOMORROW, Prediction
+
 import equipment
 from equipment import ConstantPowerEquipment, UnknownPowerEquipment, VariablePowerEquipment
 
 # The comparison between power consumption and production is done every N seconds, it must be above the measurement
 # rate, which is currently 4s with the PZEM-004t module.
-EVALUATION_PERIOD = 5
+EVALUATION_PERIOD = config['evaluate']['period']
 
 # Consider powers are balanced when the difference is below this value (watts). This helps prevent fluctuations.
-BALANCE_THRESHOLD = 20
+BALANCE_THRESHOLD = config['evaluate']['margin']
 
 # Keep this margin (in watts) between the power production and consumption. This helps in reducing grid consumption
 # knowing that there may be measurement inaccuracy.
 MARGIN = 20
 
 # A debug switch to toggle simulation (uses distinct MQTT topics for instance)
-SIMULATION = False
+if (config['debug']['simulation'].lower() == "true"):
+        SIMULATION = True
+else:
+        SIMULATION = False
 
 last_evaluation_date = None
-
 power_production = None
 power_consumption = None
 
 equipments = None
 equipment_water_heater = None
 
+weather = Prediction(config['openweathermap']['location'],config['openweathermap']['key'])
+
 mqtt_client = None
-MQTT_BROKER = "10.3.141.1"
+MQTT_BROKER = config['mqtt']['broker_ip'] 
 
 # MQTT topics on which to subscribe and send messages
 prefix = 'simu/' if SIMULATION else ''
-TOPIC_SENSOR_CONSUMPTION = prefix + "smeter/pzem/Cons"
-TOPIC_SENSOR_PRODUCTION = prefix + "smeter/pzem/Prod"
-TOPIC_REGULATION_MODE = prefix + "regul/mode" # forced/unforced duration - Can be bind to domotics device topic 
+TOPIC_SENSOR_CONSUMPTION = prefix + config['mqtt']['topic_cons'] 
+TOPIC_SENSOR_PRODUCTION = prefix + config['mqtt']['topic_prod'] 
+TOPIC_REGULATION_MODE = prefix + config['mqtt']['topic_mode']  # forced/unforced duration - Can be bind to domotics device topic 
 # TOPIC_REGULATION_MODE = "domoticz/out"            
-TOPIC_STATUS = prefix + "regul/status"
-
+TOPIC_STATUS = prefix + config['mqtt']['topic_status'] 
 
 def now_ts():
     # python2 support
     return time.time()
-
 
 def get_equipment_by_name(name):
     for e in equipments:
@@ -92,14 +102,11 @@ def get_equipment_by_name(name):
             return e
     return None
 
-
 def on_connect(client, userdata, flags, rc):
     debug(0, "Connected to BROKER " + MQTT_BROKER )
-
     client.subscribe(TOPIC_SENSOR_CONSUMPTION)
     client.subscribe(TOPIC_SENSOR_PRODUCTION)
     client.subscribe(TOPIC_REGULATION_MODE)
-
 
 def on_message(client, userdata, msg):
     # Receive power consumption and production values and triggers the evaluation. We also take into account manual
@@ -139,10 +146,9 @@ def on_message(client, userdata, msg):
                 e.force(None)
                 evaluate()
 
-
 # Specific fallback: the energy put in the water heater yesterday (see below)
-energy_yesterday = 0
-
+ECS_energy_yesterday = 0
+CLOUD_forecast = 999  # undefined
 
 def low_energy_fallback():
     """ Fallback, when the amount of energy today went below a minimum"""
@@ -151,10 +157,10 @@ def low_energy_fallback():
     # solar energy income be below a minimum threshold. We want the water to stay warm.
     # The check is done everyday at 16h
 
-    global energy_yesterday
+    global ECS_energy_yesterday, CLOUD_forecast, power_production
 
-    LOW_ENERGY_TWO_DAYS = 4000  # minimal power on two days
-    LOW_ENERGY_TODAY = 2000  # minimal power for today
+    LOW_ECS_ENERGY_TWO_DAYS = 4000  # minimal power on two days
+    LOW_ECS_ENERGY_TODAY = 2000  # minimal power for today
     CHECK_AT = 16  # hour
 
     t = now_ts()
@@ -163,21 +169,25 @@ def low_energy_fallback():
         d1 = datetime.datetime.fromtimestamp(last_evaluation_date)
         d2 = datetime.datetime.fromtimestamp(t)
 
-        energy_today = equipment_water_heater.get_energy()
+        ECS_energy_today = equipment_water_heater.get_energy()
 
         # save the energy so that it can be used in the fallback check tomorrow
+        # request cloud forecast so that it can be used in the fallback 
         if d1.hour == 22 and d2.hour == 23:
-            energy_yesterday = energy_today
+            ECS_energy_yesterday = ECS_energy_today
+            # CHANTIER, TBD : get PV_energy -> maybe requested to Domoticz
+            PV_energy = 0
+            log(0,"Cloud/Production Today : " + CLOUD_forecast + "/" + PV_energy)
+            CLOUD_forecast = weather.getCloudAvg(TOMORROW)
 
         if d1.hour == CHECK_AT - 1 and d2.hour == CHECK_AT:
             max_power = equipment_water_heater.max_power
-            if (energy_yesterday + energy_today) < LOW_ENERGY_TWO_DAYS and energy_today < LOW_ENERGY_TODAY:
-                duration = 3600 * (LOW_ENERGY_TODAY - energy_today) / max_power
+            if (ECS_energy_yesterday + ECS_energy_today) < LOW_ECS_ENERGY_TWO_DAYS and ECS_energy_today < LOW_ECS_ENERGY_TODAY:
+                duration = 3600 * (LOW_ECS_ENERGY_TODAY - ECS_energy_today) / max_power
                 debug(0, '')
                 debug(0, 'daily energy fallback: forcing equipment {} to {}W for {} seconds'.format(
                     equipment_water_heater.name, max_power, duration))
                 equipment_water_heater.force(max_power, duration)
-
 
 def evaluate():
     # This is where all the magic happen. This function takes decision according to the current power measurements.
@@ -311,7 +321,6 @@ def evaluate():
     except Exception as e:
         debug(0, e)
 
-
 def main():
     global mqtt_client, equipments, equipment_water_heater
 
@@ -319,7 +328,9 @@ def main():
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_message
 
-    mqtt_client.connect(MQTT_BROKER, 1883, 120)
+    mqtt_client.connect(MQTT_BROKER, config['mqtt']['port'], 120)
+
+    # weather = Prediction("Chambery")
     equipment.setup(mqtt_client, not SIMULATION)
 
     # This is a list of equipments by priority order (first one has the higher priority). As many equipments as needed
@@ -336,7 +347,6 @@ def main():
         e.set_current_power(0)
 
     mqtt_client.loop_forever()
-
 
 if __name__ == '__main__':
     main()
