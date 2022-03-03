@@ -60,11 +60,11 @@ from equipment import ConstantPowerEquipment, UnknownPowerEquipment, VariablePow
 EVALUATION_PERIOD = config['evaluate']['period']
 
 # Consider powers are balanced when the difference is below this value (watts). This helps prevent fluctuations.
-BALANCE_THRESHOLD = config['evaluate']['margin']
+BALANCE_THRESHOLD = config['evaluate']['balance_threshold']
 
 # Keep this margin (in watts) between the power production and consumption. This helps in reducing grid consumption
 # knowing that there may be measurement inaccuracy.
-MARGIN = 20
+MARGIN = config['evaluate']['margin']
 
 # A debug switch to toggle simulation (uses distinct MQTT topics for instance)
 if (config['debug']['simulation'].lower() == "true"):
@@ -147,6 +147,7 @@ def on_message(client, userdata, msg):
                 evaluate()
 
 # Specific fallback: the energy put in the water heater yesterday (see below)
+
 ECS_energy_yesterday = 0
 CLOUD_forecast = 999  # undefined
 
@@ -223,7 +224,7 @@ def evaluate():
 
         # Here starts the real work, compare powers
         if power_consumption > (power_production - MARGIN):
-            # Too much power consumption, we need to decrease the load
+            # TOO CONSUMPTION, POWER IS NEEDED, decrease the load
             excess_power = power_consumption - (power_production - MARGIN)
             debug(0, "decreasing global power consumption by {}W".format(excess_power))
             for e in reversed(equipments):
@@ -243,10 +244,10 @@ def evaluate():
                     debug(2, "there is {}W left to cancel, continuing".format(excess_power))
             debug(2, "no more equipment to check")
         elif (power_production - MARGIN - power_consumption) < BALANCE_THRESHOLD:
-            # Nice, this is the goal: consumption is equal to production
+            # Nice, this is the goal: CONSUMPTION is EQUAL to PRODUCTION
             debug(0, "power consumption and production are balanced")
         else:
-            # There's power in excess, try to increase the load to consume this available power
+            # There's PV POWER IN EXCESS, try to increase the load to consume this available power
             available_power = power_production - MARGIN - power_consumption
             debug(0, "increasing global power consumption by {}W".format(available_power))
             for i, e in enumerate(equipments):
@@ -323,7 +324,7 @@ def evaluate():
 
 def main():
     global mqtt_client, equipments, equipment_water_heater
-
+ 
     mqtt_client = mqtt.Client()
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_message

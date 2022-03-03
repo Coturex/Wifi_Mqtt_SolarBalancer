@@ -30,7 +30,7 @@ import time
 #       loop to match power consumption and production faster.
 
 import numpy as np
-from debug import debug as debug
+from debug_log import debug as debug
 
 _mqtt_client = None
 _send_commands = True
