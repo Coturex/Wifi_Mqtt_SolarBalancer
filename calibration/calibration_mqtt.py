@@ -14,17 +14,17 @@ percent = None
 avg_power = avg_count = 0
 measuring = 0 
 csv_file = None
-TOPIC_CALIBRATE =  "smeter/pzem/calibrate"
+TOPIC_READ_POWER =  "smeter/pzem/ECS"
+TOPIC_SET_POWER = "regul/vload/ECS/cmd"
 MQTT_BROKER = "10.3.141.1"
 
-
 def on_connect(mqtt_client, userdata, flags, rc):
-    print('Connected to mqtt')
-    mqtt_client.subscribe(TOPIC_CALIBRATE)
+    print('Connected to mqtt' + MQTT_BROKER))
+    mqtt_client.subscribe(TOPIC_READ_POWER)
 
 def on_pzem_message(client, userdata, msg):
     global percent, avg_power, avg_count, measuring
-    if msg.topic == TOPIC_CALIBRATE:
+    if msg.topic == TOPIC_READ_POWER:
         j = json.loads(msg.payload.decode())
         
         if (avg_count < 12 and measuring):
@@ -45,7 +45,6 @@ def on_pzem_message(client, userdata, msg):
             avg_count = 0
             measuring = 0
 
-
 def main():
     global mqtt_client, csv_file
    
@@ -60,10 +59,10 @@ def main():
     
     print('percent;power')
    
-    for x in np.arange(100, -0.5, -0.5):
-        print(x)  
-        print('# command to {}%'.format(percent))
-        mqtt_client.publish('regul/vload/ECS', str(percent))
+    for percent in np.arange(100, -0.5, -0.5):
+        print(percent)  
+        print('# set power to {}%'.format(percent))
+        mqtt_client.publish(TOPIC_SET_POWER, str(percent))
         time.sleep(6)
         measuring = 1 
         while measuring:    # only on_pzem_message can down it after sample count is done
@@ -71,7 +70,6 @@ def main():
 
     csv_file.close()   
     print("Calibration results saved on out.csv") 
-
 
 if __name__ == "__main__":
     main()
