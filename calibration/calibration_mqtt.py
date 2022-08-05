@@ -4,7 +4,7 @@
 import json
 import numpy as np
 
-import paho.mqtt.client as mqtt
+#import paho.mqtt.client as mqtt
 import time
 
 import sys
@@ -19,7 +19,7 @@ TOPIC_SET_POWER = "regul/vload/ECS/cmd"
 MQTT_BROKER = "10.3.141.1"
 
 def on_connect(mqtt_client, userdata, flags, rc):
-    print('Connected to mqtt' + MQTT_BROKER))
+    print('Connected to mqtt' + MQTT_BROKER)
     mqtt_client.subscribe(TOPIC_READ_POWER)
 
 def on_pzem_message(client, userdata, msg):
@@ -48,12 +48,12 @@ def on_pzem_message(client, userdata, msg):
 def main():
     global mqtt_client, csv_file
    
-    mqtt_client = mqtt.Client()
-    mqtt_client.on_connect = on_connect
-    mqtt_client.on_message = on_pzem_message
+    #mqtt_client = mqtt.Client()
+    #mqtt_client.on_connect = on_connect
+    #mqtt_client.on_message = on_pzem_message
 
-    mqtt_client.connect(MQTT_BROKER, 1883, 120)
-    mqtt_client.loop_start()
+    #mqtt_client.connect(MQTT_BROKER, 1883, 120)
+    #mqtt_client.loop_start()
 
     csv_file = open("out.csv", "w") 
     
@@ -62,9 +62,11 @@ def main():
     for percent in np.arange(100, -0.5, -0.5):
         print(percent)  
         print('# set power to {}%'.format(percent))
-        mqtt_client.publish(TOPIC_SET_POWER, str(percent))
-        time.sleep(6)
-        measuring = 1 
+        #mqtt_client.publish(TOPIC_SET_POWER, str(percent))
+        #time.sleep(6)
+        #measuring = 1 
+        
+        measuring = 0
         while measuring:    # only on_pzem_message can down it after sample count is done
             pass
 
