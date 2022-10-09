@@ -47,12 +47,14 @@ def now_ts():
 
 X = Y = None
 
-def readCSV(csv_file):
+def readCSV(csv_file):   # return MAX Power
     global X, Y
     with open(csv_file) as file_name:
         array = np.loadtxt(file_name, delimiter=",")
     X = list(tuple(x[0] for x in array))
     Y = list(tuple(x[1] for x in array))
+    print("#####" + array[100])
+    # return array[100]
 
 
 class Equipment:

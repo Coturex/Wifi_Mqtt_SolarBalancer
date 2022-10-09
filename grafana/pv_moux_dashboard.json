@@ -82,12 +82,12 @@
       "interval": null,
       "legend": {
         "alignAsTable": false,
-        "avg": false,
+        "avg": true,
         "current": true,
         "hideEmpty": true,
         "hideZero": true,
         "max": true,
-        "min": false,
+        "min": true,
         "rightSide": false,
         "show": true,
         "total": false,
@@ -1021,7 +1021,7 @@
     },
     {
       "aliasColors": {
-        "EDF": "semi-dark-blue",
+        "EDF": "dark-blue",
         "Grid Consumption": "semi-dark-blue"
       },
       "bars": true,
@@ -1135,50 +1135,6 @@
               "value": "CONSOMMATION"
             }
           ]
-        },
-        {
-          "alias": "Direct self-use",
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "kWh",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "B",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "entity_id",
-              "operator": "=",
-              "value": "selfuse_energy_hourly"
-            }
-          ]
         }
       ],
       "thresholds": [],
@@ -1239,7 +1195,7 @@
     },
     {
       "aliasColors": {
-        "EDF": "semi-dark-blue"
+        "EDF": "dark-blue"
       },
       "bars": true,
       "dashLength": 10,
@@ -1350,50 +1306,6 @@
               "value": "CONSOMMATION"
             }
           ]
-        },
-        {
-          "alias": "Direct self-use",
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "kWh",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "B",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "entity_id",
-              "operator": "=",
-              "value": "selfuse_energy_daily"
-            }
-          ]
         }
       ],
       "thresholds": [],
@@ -1454,7 +1366,7 @@
     },
     {
       "aliasColors": {
-        "EDF": "semi-dark-blue"
+        "EDF": "dark-blue"
       },
       "bars": true,
       "dashLength": 10,
@@ -1565,50 +1477,6 @@
               "value": "CONSOMMATION"
             }
           ]
-        },
-        {
-          "alias": "Direct self-use",
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "kWh",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "B",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "entity_id",
-              "operator": "=",
-              "value": "selfuse_energy_daily"
-            }
-          ]
         }
       ],
       "thresholds": [],
@@ -1683,7 +1551,7 @@
     },
     {
       "aliasColors": {
-        "EDF": "semi-dark-blue",
+        "EDF": "dark-blue",
         "Grid Consumption": "semi-dark-blue"
       },
       "bars": true,
@@ -1903,7 +1771,7 @@
     },
     {
       "aliasColors": {
-        "EDF": "semi-dark-blue"
+        "EDF": "dark-blue"
       },
       "bars": true,
       "dashLength": 10,
@@ -2118,7 +1986,7 @@
     },
     {
       "aliasColors": {
-        "EDF": "semi-dark-blue"
+        "EDF": "dark-blue"
       },
       "bars": true,
       "dashLength": 10,
@@ -2332,7 +2200,7 @@
       }
     },
     {
-      "collapsed": false,
+      "collapsed": true,
       "datasource": null,
       "gridPos": {
         "h": 1,
@@ -2341,669 +2209,1033 @@
         "y": 26
       },
       "id": 94,
-      "panels": [],
+      "panels": [
+        {
+          "aliasColors": {
+            "CONSO": "light-orange"
+          },
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "domoticz",
+          "decimals": 3,
+          "fieldConfig": {
+            "defaults": {
+              "links": []
+            },
+            "overrides": []
+          },
+          "fill": 4,
+          "fillGradient": 0,
+          "gridPos": {
+            "h": 8,
+            "w": 19,
+            "x": 0,
+            "y": 27
+          },
+          "hiddenSeries": false,
+          "id": 133,
+          "interval": null,
+          "legend": {
+            "alignAsTable": false,
+            "avg": true,
+            "current": true,
+            "hideEmpty": true,
+            "hideZero": true,
+            "max": true,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "nullPointMode": "null",
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.2.5",
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "CONSO",
+              "groupBy": [
+                {
+                  "params": [
+                    "$__interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "measurement": "Instant",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "refId": "C",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "name",
+                  "operator": "=",
+                  "value": "ECS_Cumulus_pwr"
+                }
+              ]
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeRegions": [],
+          "timeShift": null,
+          "title": "Consommmation / Production / Injection",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "transparent": true,
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "$$hashKey": "object:503",
+              "decimals": null,
+              "format": "watt",
+              "label": "",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "$$hashKey": "object:504",
+              "format": "none",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": false
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
+        },
+        {
+          "aliasColors": {
+            "Cumulus": "dark-red",
+            "EDF": "semi-dark-blue",
+            "Grid Consumption": "semi-dark-blue"
+          },
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "domoticz",
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "links": []
+            },
+            "overrides": []
+          },
+          "fill": 0,
+          "fillGradient": 2,
+          "gridPos": {
+            "h": 7,
+            "w": 8,
+            "x": 0,
+            "y": 35
+          },
+          "hiddenSeries": false,
+          "hideTimeOverride": false,
+          "id": 113,
+          "interval": "30m",
+          "legend": {
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": false,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.2.5",
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [
+            {
+              "$$hashKey": "object:153",
+              "alias": "Production",
+              "bars": false,
+              "color": "rgba(25, 115, 14, 0.51)",
+              "fill": 0,
+              "lines": true,
+              "stack": false,
+              "zindex": -3
+            }
+          ],
+          "spaceLength": 10,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "Cumulus",
+              "groupBy": [
+                {
+                  "params": [
+                    "$__interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "measurement": "Instant",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "integral"
+                  },
+                  {
+                    "params": [
+                      " / 1800000"
+                    ],
+                    "type": "math"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "name",
+                  "operator": "=",
+                  "value": "ECS_Cumulus_pwr"
+                }
+              ]
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": "now/d",
+          "timeRegions": [
+            {
+              "colorMode": "gray",
+              "fill": false,
+              "fillColor": "rgba(234, 112, 112, 0.12)",
+              "from": "8:00",
+              "line": false,
+              "lineColor": "rgba(237, 46, 24, 0.60)",
+              "op": "time",
+              "to": "20:00"
+            }
+          ],
+          "timeShift": null,
+          "title": "Consommation Aujourd'hui (30 min)",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "$$hashKey": "object:194",
+              "decimals": null,
+              "format": "kwatt",
+              "label": "Energie - kW / 30m",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "$$hashKey": "object:195",
+              "decimals": null,
+              "format": "short",
+              "label": "Production (kWh/day)",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": false
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {
+            "Cumulus": "dark-red",
+            "EDF": "semi-dark-blue"
+          },
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "domoticz",
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "links": [],
+              "unit": "kwatth"
+            },
+            "overrides": []
+          },
+          "fill": 0,
+          "fillGradient": 2,
+          "gridPos": {
+            "h": 7,
+            "w": 8,
+            "x": 8,
+            "y": 35
+          },
+          "hiddenSeries": false,
+          "hideTimeOverride": false,
+          "id": 129,
+          "interval": "1d",
+          "legend": {
+            "avg": true,
+            "current": false,
+            "max": true,
+            "min": true,
+            "show": true,
+            "total": true,
+            "values": true
+          },
+          "lines": false,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.2.5",
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [
+            {
+              "$$hashKey": "object:85",
+              "alias": "Production",
+              "bars": false,
+              "color": "rgba(25, 115, 14, 0.51)",
+              "fill": 0,
+              "lines": true,
+              "stack": false,
+              "zindex": -3
+            }
+          ],
+          "spaceLength": 10,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "Cumulus",
+              "groupBy": [
+                {
+                  "params": [
+                    "$__interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "measurement": "Instant",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "integral"
+                  },
+                  {
+                    "params": [
+                      " / 3600000"
+                    ],
+                    "type": "math"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "name",
+                  "operator": "=",
+                  "value": "ECS_Cumulus_pwr"
+                }
+              ]
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": "now/M",
+          "timeRegions": [
+            {
+              "colorMode": "gray",
+              "fill": false,
+              "fillColor": "rgba(234, 112, 112, 0.12)",
+              "from": "8:00",
+              "line": false,
+              "lineColor": "rgba(237, 46, 24, 0.60)",
+              "op": "time",
+              "to": "20:00"
+            }
+          ],
+          "timeShift": null,
+          "title": "Consommation ce mois (Jours)",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "$$hashKey": "object:520",
+              "decimals": null,
+              "format": "kwatth",
+              "label": "Energy (kWh/interval)",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "$$hashKey": "object:521",
+              "decimals": null,
+              "format": "short",
+              "label": "Production (kWh/day)",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": false
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {
+            "Cumulus": "dark-red",
+            "EDF": "light-blue"
+          },
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "domoticz",
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "links": [],
+              "unit": "kwatth"
+            },
+            "overrides": []
+          },
+          "fill": 0,
+          "fillGradient": 2,
+          "gridPos": {
+            "h": 7,
+            "w": 8,
+            "x": 16,
+            "y": 35
+          },
+          "hiddenSeries": false,
+          "hideTimeOverride": true,
+          "id": 115,
+          "interval": "1M",
+          "legend": {
+            "avg": true,
+            "current": false,
+            "max": true,
+            "min": true,
+            "show": true,
+            "total": true,
+            "values": true
+          },
+          "lines": false,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.2.5",
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [
+            {
+              "$$hashKey": "object:85",
+              "alias": "Production",
+              "bars": false,
+              "color": "rgba(25, 115, 14, 0.51)",
+              "fill": 0,
+              "lines": true,
+              "stack": false,
+              "zindex": -3
+            }
+          ],
+          "spaceLength": 10,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "Cumulus",
+              "groupBy": [
+                {
+                  "params": [
+                    "$__interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "measurement": "Instant",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "integral"
+                  },
+                  {
+                    "params": [
+                      " / 3600000"
+                    ],
+                    "type": "math"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "name",
+                  "operator": "=",
+                  "value": "ECS_Cumulus_pwr"
+                }
+              ]
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": "now/y",
+          "timeRegions": [
+            {
+              "colorMode": "gray",
+              "fill": false,
+              "fillColor": "rgba(234, 112, 112, 0.12)",
+              "from": "8:00",
+              "line": false,
+              "lineColor": "rgba(237, 46, 24, 0.60)",
+              "op": "time",
+              "to": "20:00"
+            }
+          ],
+          "timeShift": null,
+          "title": "Consommation ces mois derniers (Mois)",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "$$hashKey": "object:520",
+              "decimals": null,
+              "format": "kwatth",
+              "label": "Energy (kWh/interval)",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "$$hashKey": "object:521",
+              "decimals": null,
+              "format": "short",
+              "label": "Production (kWh/day)",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": false
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        }
+      ],
       "title": "Cumulus",
       "type": "row"
     },
     {
-      "aliasColors": {
-        "EDF": "semi-dark-blue",
-        "Grid Consumption": "semi-dark-blue"
-      },
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "domoticz",
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "links": []
-        },
-        "overrides": []
-      },
-      "fill": 0,
-      "fillGradient": 2,
-      "gridPos": {
-        "h": 7,
-        "w": 8,
-        "x": 0,
-        "y": 27
-      },
-      "hiddenSeries": false,
-      "hideTimeOverride": false,
-      "id": 113,
-      "interval": "30m",
-      "legend": {
-        "avg": false,
-        "current": false,
-        "hideEmpty": false,
-        "hideZero": false,
-        "max": false,
-        "min": false,
-        "rightSide": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": false,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.2.5",
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [
-        {
-          "$$hashKey": "object:153",
-          "alias": "Production",
-          "bars": false,
-          "color": "rgba(25, 115, 14, 0.51)",
-          "fill": 0,
-          "lines": true,
-          "stack": false,
-          "zindex": -3
-        }
-      ],
-      "spaceLength": 10,
-      "stack": true,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "EDF",
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "Instant",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "integral"
-              },
-              {
-                "params": [
-                  " / 1800000"
-                ],
-                "type": "math"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "name",
-              "operator": "=",
-              "value": "ECS_Cumulus_pwr"
-            }
-          ]
-        },
-        {
-          "alias": "Direct self-use",
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "kWh",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "B",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "entity_id",
-              "operator": "=",
-              "value": "selfuse_energy_hourly"
-            }
-          ]
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": "now/d",
-      "timeRegions": [
-        {
-          "colorMode": "gray",
-          "fill": false,
-          "fillColor": "rgba(234, 112, 112, 0.12)",
-          "from": "8:00",
-          "line": false,
-          "lineColor": "rgba(237, 46, 24, 0.60)",
-          "op": "time",
-          "to": "20:00"
-        }
-      ],
-      "timeShift": null,
-      "title": "Consommation Aujourd'hui (30 mi)",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:194",
-          "decimals": null,
-          "format": "kwatt",
-          "label": "Energie - kW / 30m",
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:195",
-          "decimals": null,
-          "format": "short",
-          "label": "Production (kWh/day)",
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": false
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": 0
-      }
-    },
-    {
-      "aliasColors": {
-        "EDF": "semi-dark-blue"
-      },
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "domoticz",
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "links": [],
-          "unit": "kwatth"
-        },
-        "overrides": []
-      },
-      "fill": 0,
-      "fillGradient": 2,
-      "gridPos": {
-        "h": 7,
-        "w": 8,
-        "x": 8,
-        "y": 27
-      },
-      "hiddenSeries": false,
-      "hideTimeOverride": false,
-      "id": 129,
-      "interval": "1d",
-      "legend": {
-        "avg": true,
-        "current": false,
-        "max": true,
-        "min": true,
-        "show": true,
-        "total": true,
-        "values": true
-      },
-      "lines": false,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.2.5",
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [
-        {
-          "$$hashKey": "object:85",
-          "alias": "Production",
-          "bars": false,
-          "color": "rgba(25, 115, 14, 0.51)",
-          "fill": 0,
-          "lines": true,
-          "stack": false,
-          "zindex": -3
-        }
-      ],
-      "spaceLength": 10,
-      "stack": true,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "EDF",
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "Instant",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "integral"
-              },
-              {
-                "params": [
-                  " / 3600000"
-                ],
-                "type": "math"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "name",
-              "operator": "=",
-              "value": "ECS_Cumulus_pwr"
-            }
-          ]
-        },
-        {
-          "alias": "Direct self-use",
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "kWh",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "B",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "entity_id",
-              "operator": "=",
-              "value": "selfuse_energy_daily"
-            }
-          ]
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": "now/M",
-      "timeRegions": [
-        {
-          "colorMode": "gray",
-          "fill": false,
-          "fillColor": "rgba(234, 112, 112, 0.12)",
-          "from": "8:00",
-          "line": false,
-          "lineColor": "rgba(237, 46, 24, 0.60)",
-          "op": "time",
-          "to": "20:00"
-        }
-      ],
-      "timeShift": null,
-      "title": "Consommation ce mois (Jours)",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:520",
-          "decimals": null,
-          "format": "kwatth",
-          "label": "Energy (kWh/interval)",
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:521",
-          "decimals": null,
-          "format": "short",
-          "label": "Production (kWh/day)",
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": false
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": 0
-      }
-    },
-    {
-      "aliasColors": {
-        "EDF": "semi-dark-blue"
-      },
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "domoticz",
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "links": [],
-          "unit": "kwatth"
-        },
-        "overrides": []
-      },
-      "fill": 0,
-      "fillGradient": 2,
-      "gridPos": {
-        "h": 7,
-        "w": 8,
-        "x": 16,
-        "y": 27
-      },
-      "hiddenSeries": false,
-      "hideTimeOverride": true,
-      "id": 115,
-      "interval": "1M",
-      "legend": {
-        "avg": true,
-        "current": false,
-        "max": true,
-        "min": true,
-        "show": true,
-        "total": true,
-        "values": true
-      },
-      "lines": false,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "options": {
-        "alertThreshold": true
-      },
-      "percentage": false,
-      "pluginVersion": "8.2.5",
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [
-        {
-          "$$hashKey": "object:85",
-          "alias": "Production",
-          "bars": false,
-          "color": "rgba(25, 115, 14, 0.51)",
-          "fill": 0,
-          "lines": true,
-          "stack": false,
-          "zindex": -3
-        }
-      ],
-      "spaceLength": 10,
-      "stack": true,
-      "steppedLine": false,
-      "targets": [
-        {
-          "alias": "EDF",
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "measurement": "Instant",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "integral"
-              },
-              {
-                "params": [
-                  " / 3600000"
-                ],
-                "type": "math"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "name",
-              "operator": "=",
-              "value": "ECS_Cumulus_pwr"
-            }
-          ]
-        },
-        {
-          "alias": "Direct self-use",
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "kWh",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "B",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "max"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "entity_id",
-              "operator": "=",
-              "value": "selfuse_energy_daily"
-            }
-          ]
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": "now/y",
-      "timeRegions": [
-        {
-          "colorMode": "gray",
-          "fill": false,
-          "fillColor": "rgba(234, 112, 112, 0.12)",
-          "from": "8:00",
-          "line": false,
-          "lineColor": "rgba(237, 46, 24, 0.60)",
-          "op": "time",
-          "to": "20:00"
-        }
-      ],
-      "timeShift": null,
-      "title": "Consommation ces mois derniers (Moiss)",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:520",
-          "decimals": null,
-          "format": "kwatth",
-          "label": "Energy (kWh/interval)",
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:521",
-          "decimals": null,
-          "format": "short",
-          "label": "Production (kWh/day)",
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": false
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": 0
-      }
-    },
-    {
-      "collapsed": false,
+      "collapsed": true,
       "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 34
+        "y": 27
       },
       "id": 125,
-      "panels": [],
+      "panels": [
+        {
+          "aliasColors": {
+            "EDF": "semi-dark-blue",
+            "Seche_serviette": "light-red"
+          },
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "domoticz",
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "links": [],
+              "unit": "kwatth"
+            },
+            "overrides": []
+          },
+          "fill": 0,
+          "fillGradient": 2,
+          "gridPos": {
+            "h": 7,
+            "w": 8,
+            "x": 4,
+            "y": 28
+          },
+          "hiddenSeries": false,
+          "hideTimeOverride": false,
+          "id": 131,
+          "interval": "1d",
+          "legend": {
+            "avg": true,
+            "current": false,
+            "max": true,
+            "min": true,
+            "show": true,
+            "total": true,
+            "values": true
+          },
+          "lines": false,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.2.5",
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [
+            {
+              "$$hashKey": "object:85",
+              "alias": "Production",
+              "bars": false,
+              "color": "rgba(25, 115, 14, 0.51)",
+              "fill": 0,
+              "lines": true,
+              "stack": false,
+              "zindex": -3
+            }
+          ],
+          "spaceLength": 10,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "Seche_serviette",
+              "groupBy": [
+                {
+                  "params": [
+                    "$__interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "measurement": "Instant",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "integral"
+                  },
+                  {
+                    "params": [
+                      " / 3600000"
+                    ],
+                    "type": "math"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "name",
+                  "operator": "=",
+                  "value": "Seche_serviette"
+                }
+              ]
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": "now/M",
+          "timeRegions": [
+            {
+              "$$hashKey": "object:529",
+              "colorMode": "gray",
+              "fill": false,
+              "fillColor": "rgba(234, 112, 112, 0.12)",
+              "from": "8:00",
+              "line": false,
+              "lineColor": "rgba(237, 46, 24, 0.60)",
+              "op": "time",
+              "to": "20:00"
+            }
+          ],
+          "timeShift": null,
+          "title": "Consommation ce mois (Jours)",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "$$hashKey": "object:520",
+              "decimals": null,
+              "format": "kwatth",
+              "label": "Energy (kWh/interval)",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "$$hashKey": "object:521",
+              "decimals": null,
+              "format": "short",
+              "label": "Production (kWh/day)",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": false
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {
+            "EDF": "light-red",
+            "Seche_serviette": "light-red"
+          },
+          "bars": true,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "domoticz",
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "links": [],
+              "unit": "kwatth"
+            },
+            "overrides": []
+          },
+          "fill": 0,
+          "fillGradient": 2,
+          "gridPos": {
+            "h": 7,
+            "w": 8,
+            "x": 12,
+            "y": 28
+          },
+          "hiddenSeries": false,
+          "hideTimeOverride": true,
+          "id": 132,
+          "interval": "1M",
+          "legend": {
+            "avg": true,
+            "current": false,
+            "max": true,
+            "min": true,
+            "show": true,
+            "total": true,
+            "values": true
+          },
+          "lines": false,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": false,
+          "pluginVersion": "8.2.5",
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [
+            {
+              "$$hashKey": "object:85",
+              "alias": "Production",
+              "bars": false,
+              "color": "rgba(25, 115, 14, 0.51)",
+              "fill": 0,
+              "lines": true,
+              "stack": false,
+              "zindex": -3
+            }
+          ],
+          "spaceLength": 10,
+          "stack": true,
+          "steppedLine": false,
+          "targets": [
+            {
+              "alias": "Seche_serviette",
+              "groupBy": [
+                {
+                  "params": [
+                    "$__interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "null"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "measurement": "Instant",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "value"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "integral"
+                  },
+                  {
+                    "params": [
+                      " / 3600000"
+                    ],
+                    "type": "math"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "name",
+                  "operator": "=",
+                  "value": "Seche_serviette"
+                }
+              ]
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": "now/y",
+          "timeRegions": [
+            {
+              "$$hashKey": "object:631",
+              "colorMode": "gray",
+              "fill": false,
+              "fillColor": "rgba(234, 112, 112, 0.12)",
+              "from": "8:00",
+              "line": false,
+              "lineColor": "rgba(237, 46, 24, 0.60)",
+              "op": "time",
+              "to": "20:00"
+            }
+          ],
+          "timeShift": null,
+          "title": "Consommation ces mois derniers (Mois)",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "$$hashKey": "object:520",
+              "decimals": null,
+              "format": "kwatth",
+              "label": "Energy (kWh/interval)",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "$$hashKey": "object:521",
+              "decimals": null,
+              "format": "short",
+              "label": "Production (kWh/day)",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": false
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        }
+      ],
       "title": "Seche_serviette",
       "type": "row"
     },
@@ -3014,7 +3246,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 35
+        "y": 28
       },
       "id": 107,
       "panels": [
@@ -3893,7 +4125,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 36
+        "y": 29
       },
       "id": 98,
       "panels": [
@@ -3904,7 +4136,7 @@
             "h": 34,
             "w": 8,
             "x": 0,
-            "y": 37
+            "y": 30
           },
           "id": 85,
           "links": [
@@ -3967,7 +4199,7 @@
             "h": 8,
             "w": 12,
             "x": 9,
-            "y": 37
+            "y": 30
           },
           "id": 110,
           "options": {
@@ -4022,5 +4254,5 @@
   "timezone": "",
   "title": "PV_MOUX",
   "uid": "UwzXfgddfgkfdgserwer",
-  "version": 59
+  "version": 66
 }

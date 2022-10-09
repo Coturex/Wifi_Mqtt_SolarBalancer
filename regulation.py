@@ -336,7 +336,9 @@ def main():
 
     # This is a list of equipments by priority order (first one has the higher priority). As many equipments as needed
     # can be listed here.
-    equipment_water_heater = VariablePowerEquipment('water_heater', 2400, "regul/vload/ECS")
+    equipment_water_heater = VariablePowerEquipment('ECS', 2280, "regul/vload/ECS")
+
+    exit() 
     equipments = (
         ConstantPowerEquipment('e_bike_charger', 120, "regul/cload/bike" ),
         equipment_water_heater,

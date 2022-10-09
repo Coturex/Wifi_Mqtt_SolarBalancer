@@ -14,7 +14,7 @@ X = Y = None
 def readCSV(csv_file):
     global X, Y
     with open(csv_file) as file_name:
-        array = np.loadtxt(file_name, delimiter=",")
+        array = np.loadtxt(file_name, delimiter=";")
     # print(array)
     X = list(tuple(x[0] for x in array))
     Y = list(tuple(x[1] for x in array))
@@ -24,7 +24,9 @@ def main():
     try:
         if exists(sys.argv[1]):
             readCSV(sys.argv[1])
+        print ("opening csv : " + sys.argv[1])
     except:
+        print ("opening csv : power_calibration.csv")
         readCSV("power_calibration.csv")
     
     #  Algorithm (Polynomial) https://numpy.org/doc/stable/reference/generated/numpy.polyfit.html
@@ -36,16 +38,31 @@ def main():
     print("\n", poly_fit )
     print("\nCoef/Vector :") 
     print( poly_fit.c)
-    print("\nCalculate x = 10 -> P = ", poly_fit(10)) # evaluate at x=10
-    print("-----")
+    print("")
+
+    outfile = sys.argv[1] 
+    outfile = outfile.replace(".", "_poly.")
+
+    csv_file = open(outfile, "w") 
+    for percent in np.arange(100, -0.5, -0.5):
+        P = (poly_fit(percent))
+        #print("Calculate x = " + str(percent)+ " -> P = ", P) # evaluate at x='percent'
+        line = '{};{}\n'.format(percent, P)
+        line = line.replace(".", ",")
+        sys.stdout.flush()  
+        csv_file.write(line)
+
+    csv_file.close()   
+
+    print(" saved into -> ", outfile)
 
     # Plot data
-    xx = np.linspace(0, 20, 100)
+    xx = np.linspace(0, 100)
     plt.plot(xx, poly_fit(xx), c='r',linestyle='-')
     plt.title('Polynomial curve')
     plt.xlabel('X')
     plt.ylabel('Y')
-    plt.axis([0, 20, 0, 100])
+    #plt.axis([0, 100, 0, 100])
     plt.grid(True)
     plt.scatter(X, Y)
     plt.show()
