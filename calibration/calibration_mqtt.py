@@ -18,9 +18,9 @@ measuring = 0    # machine d'état
 avg_count = 0    # Comptage du nbre de mesure
 avg_power = 0    # moyenne (non pondérée)
 avg_samples = 12 # Nbre de mesures pour faire la moyenne des puissances
+end_power = 100    # Puissance de l'ECS après l'execution du pgm 
 step_stabilization = 10   # attente stabilisation en secondes de la puissance entre chaque seuil
 start_stabilization = 500 # attente premiere stabilisation à l'allumage de l'ECS à pleine puissance (environ 8 minutes)
-end_power = 100  # Puissance de l'ECS après l'execution du pgm 
 
 TOPIC_READ_POWER =  "smeter/pzem/ECS"
 TOPIC_SET_POWER = "regul/vload/ECS/cmd"
