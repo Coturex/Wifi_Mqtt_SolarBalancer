@@ -1,6 +1,7 @@
 import time
+from os.path import exists
 
-# Copyright (C) 2018-2019 Pierre Hébert
+# Copyright (C) 2018-2019 Pierre Hebert
 #                 Mods -> Coturex - F5RQG
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -50,12 +51,11 @@ X = Y = None
 def readCSV(csv_file):   # return MAX Power
     global X, Y
     with open(csv_file) as file_name:
-        array = np.loadtxt(file_name, delimiter=",")
+        array = np.loadtxt(file_name, delimiter=";")
     X = list(tuple(x[0] for x in array))
     Y = list(tuple(x[1] for x in array))
-    print("#####" + array[100])
-    # return array[100]
-
+    return(max(Y))
+    
 
 class Equipment:
     def __init__(self, name, topic):
@@ -128,16 +128,22 @@ class VariablePowerEquipment(Equipment):
     POLYREG_DEGREE = 5
 
     global X, Y
-    def __init__(self, name, max_power, topic):
+    def __init__(self, name, topic):
         Equipment.__init__(self, name,topic)
-        self.max_power = max_power
-        self.type = "variable"
+        #self.max_power = max_power
+        self.type = "variable"        
+        calibrationFile = "power_calibration_" + name +".csv"
         try:
-            readCSV("calibration/power_calibration_" + name +".csv")
-        except:
-            print ("exit : cannot open calibration/power_calibration_" + name +".csv")
+            print ("Opening CSV : " + calibrationFile)
+            self.max_power=readCSV(calibrationFile)
+            print(name + " max power : " + str(self.max_power))
+        except FileNotFoundError as fnf_error:
+            print(fnf_error)
             exit()
-        
+        except:
+            print (calibrationFile + " bad format, delimiter...")
+            exit()
+
         self.poly_reg = np.poly1d(np.polyfit(X,Y, VariablePowerEquipment.POLYREG_DEGREE))
 
     def set_current_power(self, power):

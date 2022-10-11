@@ -1,4 +1,5 @@
-# Copyright (C) 2018-2019 Pierre Hébert
+#
+# Copyright (C) 2018-2019 Pierre Hebert
 #                 Mods -> Coturex - F5RQG
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

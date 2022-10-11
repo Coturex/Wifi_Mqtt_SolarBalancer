@@ -1,5 +1,5 @@
-#!/usr/bin/python3
 #!/usr/bin/env python
+#!/usr/bin/python3
 
 # Copyright (C) 2018-2019 Pierre Hebert
 #                 Mods -> Coturex - F5RQG
@@ -328,17 +328,17 @@ def main():
     mqtt_client = mqtt.Client()
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_message
-
-    mqtt_client.connect(MQTT_BROKER, config['mqtt']['port'], 120)
+    
+    equipment.setup(mqtt_client, not SIMULATION)
+    equipment_water_heater = VariablePowerEquipment('ECS',"regul/vload/ECS")
+  
+    mqtt_client.connect(MQTT_BROKER, config['mqtt']['port'] , 120)
 
     # weather = Prediction("Chambery")
-    equipment.setup(mqtt_client, not SIMULATION)
 
     # This is a list of equipments by priority order (first one has the higher priority). As many equipments as needed
     # can be listed here.
-    equipment_water_heater = VariablePowerEquipment('ECS', 2280, "regul/vload/ECS")
 
-    exit() 
     equipments = (
         ConstantPowerEquipment('e_bike_charger', 120, "regul/cload/bike" ),
         equipment_water_heater,
@@ -346,6 +346,7 @@ def main():
     )
 
     # At startup, reset everything
+    
     for e in equipments:
         e.set_current_power(0)
 
