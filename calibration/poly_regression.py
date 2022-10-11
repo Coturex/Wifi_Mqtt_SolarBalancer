@@ -13,22 +13,24 @@ X = Y = None
 
 def readCSV(csv_file):
     global X, Y
+    print("reading CSV " + csv_file)
     with open(csv_file) as file_name:
         array = np.loadtxt(file_name, delimiter=";")
-    # print(array)
     X = list(tuple(x[0] for x in array))
     Y = list(tuple(x[1] for x in array))
     
-    
 def main():
+    calibrationFile = sys.argv[1]
     try:
-        if exists(sys.argv[1]):
-            readCSV(sys.argv[1])
-        print ("opening csv : " + sys.argv[1])
+        print ("opening csv : " + calibrationFile)
+        readCSV(calibrationFile)
+    except FileNotFoundError as fnf_error:
+        print(fnf_error)
+        exit()
     except:
-        print ("opening csv : power_calibration.csv")
-        readCSV("power_calibration.csv")
-    
+        print (calibrationFile + " bad format, delimiter...")
+        exit()
+
     #  Algorithm (Polynomial) https://numpy.org/doc/stable/reference/generated/numpy.polyfit.html
     degree = 5
     poly_fit = np.poly1d(np.polyfit(X,Y, degree))
