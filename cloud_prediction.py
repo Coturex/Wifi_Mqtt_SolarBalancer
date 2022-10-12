@@ -121,7 +121,7 @@ def main():
     config = configparser.ConfigParser()
     config.read('config.ini') 
     
-    weather = Prediction("Chambery",config['openweathermap']['key'])
+    weather = Prediction(config['openweathermap']['location'],config['openweathermap']['key'])
     weather.getCloudHour(TODAY,18)
     print(weather.getCloudAvg(TOMORROW))
     #weather.getRawData()
