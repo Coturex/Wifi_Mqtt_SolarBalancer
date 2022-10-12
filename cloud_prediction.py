@@ -22,9 +22,9 @@
 # Url public request 
 # https://openweathermap.org/city/3027422
 # Url API request - Today
-# https://api.openweathermap.org/data/2.5/weather?q=chambery&units=metric&appid=5b203696597154116db974003cef4259
+# https://api.openweathermap.org/data/2.5/weather?q=chambery&units=metric&appid=HERE_API_KEY_ID
 # Url API request - Forecast Prochaines heures
-# https://api.openweathermap.org/data/2.5/forecast?q=chambery&units=metric&appid=5b203696597154116db974003cef4259
+# https://api.openweathermap.org/data/2.5/forecast?q=chambery&units=metric&appid=HERE_API_KEY_ID
 
 import requests   
 import time
@@ -74,7 +74,7 @@ class Prediction:
             return -1
         else:
             avg = s/q
-            debug(1, "Cloud_prediction, Average : " +  str(avg))
+            debug(10, "Average : " +  str(avg) + " %")
             return (avg)        
 
     def getRawData(self):
@@ -95,14 +95,14 @@ class Prediction:
             #debug(0, "Cloud_prediction, url : " + url)
             wdata = requests.get(url).json()
             #pprint(wdata)
-            debug(0, "Cloud_prediction, Request : " + sdate)
+            debug(0, "Cloud_prediction, requesting " + sdate)
             for i in range(0,len(wdata['list'])):
                 datei  = wdata['list'][i]['dt_txt']
                 cloudi = wdata['list'][i]['clouds']['all']
                 #print(i, datei, cloudi, sdate)
                 if sdate == datei:  
                     #print(i, datei, sdate, cloudi)
-                    debug(1, "Cloud_prediction, Clouds : " + str(cloudi))
+                    debug(10, "Clouds : " + str(cloudi) + " %\n")
                     return cloudi
         except Exception as e:
             return -2
