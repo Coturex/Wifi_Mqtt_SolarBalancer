@@ -20,9 +20,9 @@ measuring = 0    # machine d'état
 avg_count = 0    # Comptage du nbre de mesure
 avg_power = 0    # moyenne (non pondérée)
 avg_samples = 12  # Nbre de mesures pour faire la moyenne des puissances
-end_power = 100    # Puissance de l'ECS après l'execution du pgm 
 step_stabilization = 10   # attente stabilisation en secondes de la puissance entre chaque seuil
 start_stabilization = 500 # attente premiere stabilisation à l'allumage de l'ECS à pleine puissance (environ 8 minutes)
+end_power = 0    # Puissance de l'ECS après l'execution du pgm, voir input dans le main 
 
 TOPIC_READ_POWER =  "smeter/pzem/ECS"
 TOPIC_SET_POWER = "regul/vload/ECS/cmd"
@@ -79,14 +79,21 @@ def signal_handler(signal, frame):
     time.sleep(5)
     log_file.close()
     csv_file.close()
-    print("Calibration results saved on out.csv") 
-    print ("Bye.") 
+    print("Calibration results saved on out.csv, out.log")
+    print("Bye.") 
     sys.exit(0)
     
 def main():
     global mqtt_client, csv_file, measuring, percent, avg_count, end_power, start_stabilization, step_stabilization
     signal.signal(signal.SIGINT, signal_handler) 
-
+    end_power = int(input("At the end of this programm set power % [0-100] :"))
+    if not (end_power >= 0 and end_power <=100):
+        print("bad")
+        exit()
+    log_file.write("start_stabilisation : " + start_stabilization + "\n")
+    log_file.write("step_stabilisation : " + step_stabilization + "\n")
+    log_file.write("Average nbr_of_samples : " + avg_samples + "\n")
+    
     mqtt_client = mqtt.Client()
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_pzem_message
