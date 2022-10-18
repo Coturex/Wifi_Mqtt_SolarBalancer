@@ -1,22 +1,26 @@
 [openweathermap]
-key = xxxxxxxxxxx
+key = 
 location = Moscou
 
 [mqtt]
-broker_ip = 3.3.3.3
+broker_ip = 10.3.141.1
 port = 1883 
 topic_cons = smeter/pzem/CONSOMMATION
 topic_prod = smeter/pzem/PRODUCTION
+topic_inject = regul/inject
 topic_mode = regul/mode
 topic_status = regul/status
 
 [evaluate]
 margin = 20
-period = 5
+period = 3
 balance_threshold = 20
+check_at = 16
+low_ecs_energy_two_days = 10000
+low_ecs_energy_today = 4000
 
 [debug]
-simulation = false
+simulation = true
 debug_file = "debug.log"
 log_file = "logfile.log"    
 

@@ -56,7 +56,8 @@ def readCSV(csv_file):   # return MAX Power
     Y = list(tuple(x[1] for x in array))
     return(max(Y))
     
-
+##########################################################################
+#PARENT CLASS 
 class Equipment:
     def __init__(self, name, topic):
         self.name = name
@@ -120,8 +121,8 @@ class Equipment:
 
         return previous_energy
 
-
-#class VariablePowerEquipment(object, Equipment):
+##########################################################################
+#CHILD CLASS 
 class VariablePowerEquipment(Equipment):
     MINIMUM_POWER = 150
     MINIMUM_PERCENT = 4
@@ -214,7 +215,8 @@ class VariablePowerEquipment(Equipment):
         super(VariablePowerEquipment, self).force(watt, duration)
         self.set_current_power(0 if watt is None else watt)
 
-#class ConstantPowerEquipment(object, Equipment):
+##########################################################################
+#CHILD CLASS 
 class ConstantPowerEquipment(Equipment):
     def __init__(self, name, nominal_power, topic):
         Equipment.__init__(self, name, topic)
@@ -259,7 +261,8 @@ class ConstantPowerEquipment(Equipment):
         else:
             self.set_current_power(0)
 
-
+##########################################################################
+#CHILD CLASS 
 class UnknownPowerEquipment(Equipment):
     def __init__(self, name, topic):
         Equipment.__init__(self, name, topic)

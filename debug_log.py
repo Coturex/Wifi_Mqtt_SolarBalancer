@@ -26,7 +26,7 @@ formatter = logging.Formatter('%(asctime)s - %(message)s')
 
 ch1 = logging.StreamHandler()
 ch1.setLevel(logging.DEBUG)
-#ch1 = logging.FileHandler('debug.log')
+ch1 = logging.FileHandler('debug.log')
 ch1.setFormatter(formatter)
 debugger.addHandler(ch1)
 

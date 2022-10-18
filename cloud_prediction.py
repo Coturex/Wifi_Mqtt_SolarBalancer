@@ -94,7 +94,7 @@ class Prediction:
             url = "https://api.openweathermap.org/data/2.5/forecast?q={}&units=metric&appid={}".format(self.location, self.apiKey)
             #debug(0, "Cloud_prediction, url : " + url)
             wdata = requests.get(url).json()
-            #pprint(wdata)
+            # pprint(wdata)
             debug(0, "Cloud_prediction, requesting " + sdate)
             for i in range(0,len(wdata['list'])):
                 datei  = wdata['list'][i]['dt_txt']
@@ -123,6 +123,7 @@ def main():
     
     weather = Prediction(config['openweathermap']['location'],config['openweathermap']['key'])
     weather.getCloudHour(TODAY,18)
+    print ("-----------")
     print(weather.getCloudAvg(TOMORROW))
     #weather.getRawData()
    
