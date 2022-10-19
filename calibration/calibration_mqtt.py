@@ -19,8 +19,8 @@ percent = None   # Fixe la Valeur en Pourcentage [0..100] du variateur de puissa
 measuring = 0    # machine d'état
 avg_count = 0    # Comptage du nbre de mesure
 avg_power = 0    # moyenne (non pondérée)
-avg_samples = 12  # Nbre de mesures pour faire la moyenne des puissances
-step_stabilization = 10   # attente stabilisation en secondes de la puissance entre chaque seuil
+avg_samples = 6  # Nbre de mesures pour faire la moyenne des puissances
+step_stabilization = 6   # attente stabilisation en secondes de la puissance entre chaque seuil
 start_stabilization = 500 # attente premiere stabilisation à l'allumage de l'ECS à pleine puissance (environ 8 minutes)
 end_power = 0    # Puissance de l'ECS après l'execution du pgm, voir input dans le main 
 
@@ -90,9 +90,9 @@ def main():
     if not (end_power >= 0 and end_power <=100):
         print("bad")
         exit()
-    log_file.write("start_stabilisation : " + start_stabilization + "\n")
-    log_file.write("step_stabilisation : " + step_stabilization + "\n")
-    log_file.write("Average nbr_of_samples : " + avg_samples + "\n")
+    log_file.write("start_stabilisation : " + str(start_stabilization) + "\n")
+    log_file.write("step_stabilisation : " + str(step_stabilization) + "\n")
+    log_file.write("Average nbr_of_samples : " + str(avg_samples) + "\n")
     
     mqtt_client = mqtt.Client()
     mqtt_client.on_connect = on_connect

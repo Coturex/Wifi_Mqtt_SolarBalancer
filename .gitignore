@@ -4,4 +4,4 @@ doc/.~lock.mqtt_pvrouter_archi.odg#
 config.ini
 info.log
 debug.log
-calibration/*_poly.csv
+*_poly.csv

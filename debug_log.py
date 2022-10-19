@@ -14,6 +14,8 @@
 # limitations under the License.
 
 import logging
+from mimetypes import init
+from regulation import config
 
 debugger = logging.getLogger('regulation_debug')
 debugger.setLevel(logging.DEBUG)
@@ -37,10 +39,14 @@ ch2.setFormatter(formatter)
 logger.addHandler(ch2)
 
 def debug(indent, msg):
-    debugger.debug(('  '*indent)+str(msg))
+    global config
+    if (config['debug']['debug']):
+        debugger.debug(('  '*indent)+str(msg))
 
 def log(indent, msg):
-    logger.info(('  '*indent)+str(msg))
+    global config
+    if (config['debug']['log']):
+        logger.info(('  '*indent)+str(msg))
 
 
 def main():

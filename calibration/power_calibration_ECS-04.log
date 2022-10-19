@@ -1,0 +1,1812 @@
+start_stabilisation : 500
+step_stabilisation : 6
+Average nbr_of_samples : 6
+
+# set power to 100.0%
+[on_pzem_message] # read 2298 W
+[on_pzem_message] # read 2297 W
+[on_pzem_message] # read 2300 W
+[on_pzem_message] # read 2298 W
+[on_pzem_message] # read 2299 W
+[on_pzem_message] # read 2299 W
+ # power,average : 100,0;2298,5
+
+# set power to 99.5%
+[on_pzem_message] # read 2297 W
+[on_pzem_message] # read 2294 W
+[on_pzem_message] # read 2294 W
+[on_pzem_message] # read 2294 W
+[on_pzem_message] # read 2289 W
+[on_pzem_message] # read 2289 W
+ # power,average : 99,5;2292,8333333333335
+
+# set power to 99.0%
+[on_pzem_message] # read 2287 W
+[on_pzem_message] # read 2288 W
+[on_pzem_message] # read 2289 W
+[on_pzem_message] # read 2291 W
+[on_pzem_message] # read 2290 W
+[on_pzem_message] # read 2290 W
+ # power,average : 99,0;2289,1666666666665
+
+# set power to 98.5%
+[on_pzem_message] # read 2291 W
+[on_pzem_message] # read 2286 W
+[on_pzem_message] # read 2291 W
+[on_pzem_message] # read 2287 W
+[on_pzem_message] # read 2286 W
+[on_pzem_message] # read 2288 W
+ # power,average : 98,5;2288,1666666666665
+
+# set power to 98.0%
+[on_pzem_message] # read 2291 W
+[on_pzem_message] # read 2289 W
+[on_pzem_message] # read 2289 W
+[on_pzem_message] # read 2288 W
+[on_pzem_message] # read 2288 W
+[on_pzem_message] # read 2291 W
+ # power,average : 98,0;2289,3333333333335
+
+# set power to 97.5%
+[on_pzem_message] # read 2292 W
+[on_pzem_message] # read 2297 W
+[on_pzem_message] # read 2296 W
+[on_pzem_message] # read 2291 W
+[on_pzem_message] # read 2293 W
+[on_pzem_message] # read 2294 W
+ # power,average : 97,5;2293,8333333333335
+
+# set power to 97.0%
+[on_pzem_message] # read 2291 W
+[on_pzem_message] # read 2294 W
+[on_pzem_message] # read 2296 W
+[on_pzem_message] # read 2295 W
+[on_pzem_message] # read 2295 W
+[on_pzem_message] # read 2295 W
+ # power,average : 97,0;2294,3333333333335
+
+# set power to 96.5%
+[on_pzem_message] # read 2296 W
+[on_pzem_message] # read 2298 W
+[on_pzem_message] # read 2297 W
+[on_pzem_message] # read 2300 W
+[on_pzem_message] # read 2300 W
+[on_pzem_message] # read 2298 W
+ # power,average : 96,5;2298,1666666666665
+
+# set power to 96.0%
+[on_pzem_message] # read 2296 W
+[on_pzem_message] # read 2300 W
+[on_pzem_message] # read 2301 W
+[on_pzem_message] # read 2301 W
+[on_pzem_message] # read 2301 W
+[on_pzem_message] # read 2304 W
+ # power,average : 96,0;2300,5
+
+# set power to 95.5%
+[on_pzem_message] # read 2295 W
+[on_pzem_message] # read 2293 W
+[on_pzem_message] # read 2294 W
+[on_pzem_message] # read 2295 W
+[on_pzem_message] # read 2293 W
+[on_pzem_message] # read 2293 W
+ # power,average : 95,5;2293,8333333333335
+
+# set power to 95.0%
+[on_pzem_message] # read 2293 W
+[on_pzem_message] # read 2294 W
+[on_pzem_message] # read 2295 W
+[on_pzem_message] # read 2294 W
+[on_pzem_message] # read 2290 W
+[on_pzem_message] # read 2295 W
+ # power,average : 95,0;2293,5
+
+# set power to 94.5%
+[on_pzem_message] # read 2292 W
+[on_pzem_message] # read 2291 W
+[on_pzem_message] # read 2293 W
+[on_pzem_message] # read 2295 W
+[on_pzem_message] # read 2296 W
+[on_pzem_message] # read 2299 W
+ # power,average : 94,5;2294,3333333333335
+
+# set power to 94.0%
+[on_pzem_message] # read 2295 W
+[on_pzem_message] # read 2296 W
+[on_pzem_message] # read 2295 W
+[on_pzem_message] # read 2295 W
+[on_pzem_message] # read 2295 W
+[on_pzem_message] # read 2296 W
+ # power,average : 94,0;2295,3333333333335
+
+# set power to 93.5%
+[on_pzem_message] # read 2297 W
+[on_pzem_message] # read 2294 W
+[on_pzem_message] # read 2293 W
+[on_pzem_message] # read 2296 W
+[on_pzem_message] # read 2291 W
+[on_pzem_message] # read 2292 W
+ # power,average : 93,5;2293,8333333333335
+
+# set power to 93.0%
+[on_pzem_message] # read 2290 W
+[on_pzem_message] # read 2291 W
+[on_pzem_message] # read 2290 W
+[on_pzem_message] # read 2280 W
+[on_pzem_message] # read 2289 W
+[on_pzem_message] # read 2293 W
+ # power,average : 93,0;2288,8333333333335
+
+# set power to 92.5%
+[on_pzem_message] # read 2293 W
+[on_pzem_message] # read 2287 W
+[on_pzem_message] # read 2284 W
+[on_pzem_message] # read 2288 W
+[on_pzem_message] # read 2290 W
+[on_pzem_message] # read 2288 W
+ # power,average : 92,5;2288,3333333333335
+
+# set power to 92.0%
+[on_pzem_message] # read 2286 W
+[on_pzem_message] # read 2284 W
+[on_pzem_message] # read 2291 W
+[on_pzem_message] # read 2291 W
+[on_pzem_message] # read 2291 W
+[on_pzem_message] # read 2290 W
+ # power,average : 92,0;2288,8333333333335
+
+# set power to 91.5%
+[on_pzem_message] # read 2285 W
+[on_pzem_message] # read 2287 W
+[on_pzem_message] # read 2284 W
+[on_pzem_message] # read 2285 W
+[on_pzem_message] # read 2286 W
+[on_pzem_message] # read 2285 W
+ # power,average : 91,5;2285,3333333333335
+
+# set power to 91.0%
+[on_pzem_message] # read 2288 W
+[on_pzem_message] # read 2283 W
+[on_pzem_message] # read 2282 W
+[on_pzem_message] # read 2281 W
+[on_pzem_message] # read 2278 W
+[on_pzem_message] # read 2280 W
+ # power,average : 91,0;2282,0
+
+# set power to 90.5%
+[on_pzem_message] # read 2277 W
+[on_pzem_message] # read 2276 W
+[on_pzem_message] # read 2277 W
+[on_pzem_message] # read 2280 W
+[on_pzem_message] # read 2280 W
+[on_pzem_message] # read 2286 W
+ # power,average : 90,5;2279,3333333333335
+
+# set power to 90.0%
+[on_pzem_message] # read 2280 W
+[on_pzem_message] # read 2281 W
+[on_pzem_message] # read 2284 W
+[on_pzem_message] # read 2283 W
+[on_pzem_message] # read 2280 W
+[on_pzem_message] # read 2281 W
+ # power,average : 90,0;2281,5
+
+# set power to 89.5%
+[on_pzem_message] # read 2274 W
+[on_pzem_message] # read 2274 W
+[on_pzem_message] # read 2275 W
+[on_pzem_message] # read 2274 W
+[on_pzem_message] # read 2273 W
+[on_pzem_message] # read 2272 W
+ # power,average : 89,5;2273,6666666666665
+
+# set power to 89.0%
+[on_pzem_message] # read 2270 W
+[on_pzem_message] # read 2271 W
+[on_pzem_message] # read 2269 W
+[on_pzem_message] # read 2265 W
+[on_pzem_message] # read 2267 W
+[on_pzem_message] # read 2269 W
+ # power,average : 89,0;2268,5
+
+# set power to 88.5%
+[on_pzem_message] # read 2259 W
+[on_pzem_message] # read 2260 W
+[on_pzem_message] # read 2262 W
+[on_pzem_message] # read 2263 W
+[on_pzem_message] # read 2264 W
+[on_pzem_message] # read 2263 W
+ # power,average : 88,5;2261,8333333333335
+
+# set power to 88.0%
+[on_pzem_message] # read 2262 W
+[on_pzem_message] # read 2262 W
+[on_pzem_message] # read 2262 W
+[on_pzem_message] # read 2263 W
+[on_pzem_message] # read 2262 W
+[on_pzem_message] # read 2265 W
+ # power,average : 88,0;2262,6666666666665
+
+# set power to 87.5%
+[on_pzem_message] # read 2262 W
+[on_pzem_message] # read 2261 W
+[on_pzem_message] # read 2258 W
+[on_pzem_message] # read 2260 W
+[on_pzem_message] # read 2257 W
+[on_pzem_message] # read 2257 W
+ # power,average : 87,5;2259,1666666666665
+
+# set power to 87.0%
+[on_pzem_message] # read 2248 W
+[on_pzem_message] # read 2254 W
+[on_pzem_message] # read 2256 W
+[on_pzem_message] # read 2255 W
+[on_pzem_message] # read 2252 W
+[on_pzem_message] # read 2255 W
+ # power,average : 87,0;2253,3333333333335
+
+# set power to 86.5%
+[on_pzem_message] # read 2249 W
+[on_pzem_message] # read 2245 W
+[on_pzem_message] # read 2246 W
+[on_pzem_message] # read 2246 W
+[on_pzem_message] # read 2248 W
+[on_pzem_message] # read 2247 W
+ # power,average : 86,5;2246,8333333333335
+
+# set power to 86.0%
+[on_pzem_message] # read 2248 W
+[on_pzem_message] # read 2249 W
+[on_pzem_message] # read 2250 W
+[on_pzem_message] # read 2249 W
+[on_pzem_message] # read 2247 W
+[on_pzem_message] # read 2249 W
+ # power,average : 86,0;2248,6666666666665
+
+# set power to 85.5%
+[on_pzem_message] # read 2233 W
+[on_pzem_message] # read 2236 W
+[on_pzem_message] # read 2234 W
+[on_pzem_message] # read 2230 W
+[on_pzem_message] # read 2225 W
+[on_pzem_message] # read 2226 W
+ # power,average : 85,5;2230,6666666666665
+
+# set power to 85.0%
+[on_pzem_message] # read 2237 W
+[on_pzem_message] # read 2238 W
+[on_pzem_message] # read 2234 W
+[on_pzem_message] # read 2233 W
+[on_pzem_message] # read 2233 W
+[on_pzem_message] # read 2234 W
+ # power,average : 85,0;2234,8333333333335
+
+# set power to 84.5%
+[on_pzem_message] # read 2214 W
+[on_pzem_message] # read 2214 W
+[on_pzem_message] # read 2216 W
+[on_pzem_message] # read 2217 W
+[on_pzem_message] # read 2217 W
+[on_pzem_message] # read 2218 W
+ # power,average : 84,5;2216,0
+
+# set power to 84.0%
+[on_pzem_message] # read 2222 W
+[on_pzem_message] # read 2224 W
+[on_pzem_message] # read 2220 W
+[on_pzem_message] # read 2218 W
+[on_pzem_message] # read 2218 W
+[on_pzem_message] # read 2218 W
+ # power,average : 84,0;2220,0
+
+# set power to 83.5%
+[on_pzem_message] # read 2210 W
+[on_pzem_message] # read 2209 W
+[on_pzem_message] # read 2210 W
+[on_pzem_message] # read 2211 W
+[on_pzem_message] # read 2208 W
+[on_pzem_message] # read 2208 W
+ # power,average : 83,5;2209,3333333333335
+
+# set power to 83.0%
+[on_pzem_message] # read 2210 W
+[on_pzem_message] # read 2212 W
+[on_pzem_message] # read 2211 W
+[on_pzem_message] # read 2211 W
+[on_pzem_message] # read 2213 W
+[on_pzem_message] # read 2215 W
+ # power,average : 83,0;2212,0
+
+# set power to 82.5%
+[on_pzem_message] # read 2201 W
+[on_pzem_message] # read 2201 W
+[on_pzem_message] # read 2205 W
+[on_pzem_message] # read 2203 W
+[on_pzem_message] # read 2201 W
+[on_pzem_message] # read 2201 W
+ # power,average : 82,5;2202,0
+
+# set power to 82.0%
+[on_pzem_message] # read 2202 W
+[on_pzem_message] # read 2203 W
+[on_pzem_message] # read 2203 W
+[on_pzem_message] # read 2202 W
+[on_pzem_message] # read 2201 W
+[on_pzem_message] # read 2209 W
+ # power,average : 82,0;2203,3333333333335
+
+# set power to 81.5%
+[on_pzem_message] # read 2194 W
+[on_pzem_message] # read 2195 W
+[on_pzem_message] # read 2191 W
+[on_pzem_message] # read 2188 W
+[on_pzem_message] # read 2188 W
+[on_pzem_message] # read 2188 W
+ # power,average : 81,5;2190,6666666666665
+
+# set power to 81.0%
+[on_pzem_message] # read 2189 W
+[on_pzem_message] # read 2186 W
+[on_pzem_message] # read 2185 W
+[on_pzem_message] # read 2186 W
+[on_pzem_message] # read 2187 W
+[on_pzem_message] # read 2186 W
+ # power,average : 81,0;2186,5
+
+# set power to 80.5%
+[on_pzem_message] # read 2168 W
+[on_pzem_message] # read 2168 W
+[on_pzem_message] # read 2166 W
+[on_pzem_message] # read 2167 W
+[on_pzem_message] # read 2169 W
+[on_pzem_message] # read 2168 W
+ # power,average : 80,5;2167,6666666666665
+
+# set power to 80.0%
+[on_pzem_message] # read 2177 W
+[on_pzem_message] # read 2175 W
+[on_pzem_message] # read 2174 W
+[on_pzem_message] # read 2175 W
+[on_pzem_message] # read 2175 W
+[on_pzem_message] # read 2172 W
+ # power,average : 80,0;2174,6666666666665
+
+# set power to 79.5%
+[on_pzem_message] # read 2158 W
+[on_pzem_message] # read 2157 W
+[on_pzem_message] # read 2158 W
+[on_pzem_message] # read 2160 W
+[on_pzem_message] # read 2158 W
+[on_pzem_message] # read 2163 W
+ # power,average : 79,5;2159,0
+
+# set power to 79.0%
+[on_pzem_message] # read 2167 W
+[on_pzem_message] # read 2168 W
+[on_pzem_message] # read 2166 W
+[on_pzem_message] # read 2164 W
+[on_pzem_message] # read 2165 W
+[on_pzem_message] # read 2166 W
+ # power,average : 79,0;2166,0
+
+# set power to 78.5%
+[on_pzem_message] # read 2146 W
+[on_pzem_message] # read 2149 W
+[on_pzem_message] # read 2149 W
+[on_pzem_message] # read 2145 W
+[on_pzem_message] # read 2150 W
+[on_pzem_message] # read 2152 W
+ # power,average : 78,5;2148,5
+
+# set power to 78.0%
+[on_pzem_message] # read 2152 W
+[on_pzem_message] # read 2150 W
+[on_pzem_message] # read 2151 W
+[on_pzem_message] # read 2154 W
+[on_pzem_message] # read 2153 W
+[on_pzem_message] # read 2153 W
+ # power,average : 78,0;2152,1666666666665
+
+# set power to 77.5%
+[on_pzem_message] # read 2131 W
+[on_pzem_message] # read 2135 W
+[on_pzem_message] # read 2133 W
+[on_pzem_message] # read 2134 W
+[on_pzem_message] # read 2135 W
+[on_pzem_message] # read 2133 W
+ # power,average : 77,5;2133,5
+
+# set power to 77.0%
+[on_pzem_message] # read 2137 W
+[on_pzem_message] # read 2134 W
+[on_pzem_message] # read 2135 W
+[on_pzem_message] # read 2134 W
+[on_pzem_message] # read 2133 W
+[on_pzem_message] # read 2134 W
+ # power,average : 77,0;2134,5
+
+# set power to 76.5%
+[on_pzem_message] # read 2112 W
+[on_pzem_message] # read 2112 W
+[on_pzem_message] # read 2111 W
+[on_pzem_message] # read 2101 W
+[on_pzem_message] # read 2104 W
+[on_pzem_message] # read 2108 W
+ # power,average : 76,5;2108,0
+
+# set power to 76.0%
+[on_pzem_message] # read 2111 W
+[on_pzem_message] # read 2109 W
+[on_pzem_message] # read 2110 W
+[on_pzem_message] # read 2111 W
+[on_pzem_message] # read 2111 W
+[on_pzem_message] # read 2109 W
+ # power,average : 76,0;2110,1666666666665
+
+# set power to 75.5%
+[on_pzem_message] # read 2096 W
+[on_pzem_message] # read 2093 W
+[on_pzem_message] # read 2093 W
+[on_pzem_message] # read 2092 W
+[on_pzem_message] # read 2089 W
+[on_pzem_message] # read 2090 W
+ # power,average : 75,5;2092,1666666666665
+
+# set power to 75.0%
+[on_pzem_message] # read 2090 W
+[on_pzem_message] # read 2091 W
+[on_pzem_message] # read 2091 W
+[on_pzem_message] # read 2089 W
+[on_pzem_message] # read 2088 W
+[on_pzem_message] # read 2090 W
+ # power,average : 75,0;2089,8333333333335
+
+# set power to 74.5%
+[on_pzem_message] # read 2064 W
+[on_pzem_message] # read 2066 W
+[on_pzem_message] # read 2066 W
+[on_pzem_message] # read 2069 W
+[on_pzem_message] # read 2069 W
+[on_pzem_message] # read 2067 W
+ # power,average : 74,5;2066,8333333333335
+
+# set power to 74.0%
+[on_pzem_message] # read 2068 W
+[on_pzem_message] # read 2067 W
+[on_pzem_message] # read 2056 W
+[on_pzem_message] # read 2067 W
+[on_pzem_message] # read 2067 W
+[on_pzem_message] # read 2068 W
+ # power,average : 74,0;2065,5
+
+# set power to 73.5%
+[on_pzem_message] # read 2041 W
+[on_pzem_message] # read 2041 W
+[on_pzem_message] # read 2042 W
+[on_pzem_message] # read 2042 W
+[on_pzem_message] # read 2039 W
+[on_pzem_message] # read 2040 W
+ # power,average : 73,5;2040,8333333333333
+
+# set power to 73.0%
+[on_pzem_message] # read 2042 W
+[on_pzem_message] # read 2046 W
+[on_pzem_message] # read 2044 W
+[on_pzem_message] # read 2044 W
+[on_pzem_message] # read 2042 W
+[on_pzem_message] # read 2042 W
+ # power,average : 73,0;2043,3333333333333
+
+# set power to 72.5%
+[on_pzem_message] # read 2019 W
+[on_pzem_message] # read 2018 W
+[on_pzem_message] # read 2016 W
+[on_pzem_message] # read 2017 W
+[on_pzem_message] # read 2018 W
+[on_pzem_message] # read 2016 W
+ # power,average : 72,5;2017,3333333333333
+
+# set power to 72.0%
+[on_pzem_message] # read 2016 W
+[on_pzem_message] # read 2017 W
+[on_pzem_message] # read 2017 W
+[on_pzem_message] # read 2015 W
+[on_pzem_message] # read 2015 W
+[on_pzem_message] # read 2014 W
+ # power,average : 72,0;2015,6666666666667
+
+# set power to 71.5%
+[on_pzem_message] # read 1986 W
+[on_pzem_message] # read 1985 W
+[on_pzem_message] # read 1984 W
+[on_pzem_message] # read 1985 W
+[on_pzem_message] # read 1983 W
+[on_pzem_message] # read 1982 W
+ # power,average : 71,5;1984,1666666666667
+
+# set power to 71.0%
+[on_pzem_message] # read 1985 W
+[on_pzem_message] # read 1985 W
+[on_pzem_message] # read 1987 W
+[on_pzem_message] # read 1985 W
+[on_pzem_message] # read 1985 W
+[on_pzem_message] # read 1987 W
+ # power,average : 71,0;1985,6666666666667
+
+# set power to 70.5%
+[on_pzem_message] # read 1959 W
+[on_pzem_message] # read 1958 W
+[on_pzem_message] # read 1959 W
+[on_pzem_message] # read 1960 W
+[on_pzem_message] # read 1960 W
+[on_pzem_message] # read 1960 W
+ # power,average : 70,5;1959,3333333333333
+
+# set power to 70.0%
+[on_pzem_message] # read 1963 W
+[on_pzem_message] # read 1967 W
+[on_pzem_message] # read 1964 W
+[on_pzem_message] # read 1963 W
+[on_pzem_message] # read 1963 W
+[on_pzem_message] # read 1964 W
+ # power,average : 70,0;1964,0
+
+# set power to 69.5%
+[on_pzem_message] # read 1931 W
+[on_pzem_message] # read 1930 W
+[on_pzem_message] # read 1932 W
+[on_pzem_message] # read 1931 W
+[on_pzem_message] # read 1932 W
+[on_pzem_message] # read 1932 W
+ # power,average : 69,5;1931,3333333333333
+
+# set power to 69.0%
+[on_pzem_message] # read 1930 W
+[on_pzem_message] # read 1932 W
+[on_pzem_message] # read 1932 W
+[on_pzem_message] # read 1930 W
+[on_pzem_message] # read 1930 W
+[on_pzem_message] # read 1930 W
+ # power,average : 69,0;1930,6666666666667
+
+# set power to 68.5%
+[on_pzem_message] # read 1898 W
+[on_pzem_message] # read 1897 W
+[on_pzem_message] # read 1896 W
+[on_pzem_message] # read 1895 W
+[on_pzem_message] # read 1896 W
+[on_pzem_message] # read 1898 W
+ # power,average : 68,5;1896,6666666666667
+
+# set power to 68.0%
+[on_pzem_message] # read 1894 W
+[on_pzem_message] # read 1894 W
+[on_pzem_message] # read 1897 W
+[on_pzem_message] # read 1896 W
+[on_pzem_message] # read 1894 W
+[on_pzem_message] # read 1897 W
+ # power,average : 68,0;1895,3333333333333
+
+# set power to 67.5%
+[on_pzem_message] # read 1866 W
+[on_pzem_message] # read 1863 W
+[on_pzem_message] # read 1868 W
+[on_pzem_message] # read 1867 W
+[on_pzem_message] # read 1865 W
+[on_pzem_message] # read 1864 W
+ # power,average : 67,5;1865,5
+
+# set power to 67.0%
+[on_pzem_message] # read 1868 W
+[on_pzem_message] # read 1869 W
+[on_pzem_message] # read 1871 W
+[on_pzem_message] # read 1870 W
+[on_pzem_message] # read 1869 W
+[on_pzem_message] # read 1868 W
+ # power,average : 67,0;1869,1666666666667
+
+# set power to 66.5%
+[on_pzem_message] # read 1837 W
+[on_pzem_message] # read 1832 W
+[on_pzem_message] # read 1833 W
+[on_pzem_message] # read 1832 W
+[on_pzem_message] # read 1834 W
+[on_pzem_message] # read 1833 W
+ # power,average : 66,5;1833,5
+
+# set power to 66.0%
+[on_pzem_message] # read 1832 W
+[on_pzem_message] # read 1832 W
+[on_pzem_message] # read 1834 W
+[on_pzem_message] # read 1832 W
+[on_pzem_message] # read 1834 W
+[on_pzem_message] # read 1835 W
+ # power,average : 66,0;1833,1666666666667
+
+# set power to 65.5%
+[on_pzem_message] # read 1794 W
+[on_pzem_message] # read 1795 W
+[on_pzem_message] # read 1794 W
+[on_pzem_message] # read 1793 W
+[on_pzem_message] # read 1793 W
+[on_pzem_message] # read 1792 W
+ # power,average : 65,5;1793,5
+
+# set power to 65.0%
+[on_pzem_message] # read 1792 W
+[on_pzem_message] # read 1789 W
+[on_pzem_message] # read 1788 W
+[on_pzem_message] # read 1787 W
+[on_pzem_message] # read 1789 W
+[on_pzem_message] # read 1790 W
+ # power,average : 65,0;1789,1666666666667
+
+# set power to 64.5%
+[on_pzem_message] # read 1748 W
+[on_pzem_message] # read 1745 W
+[on_pzem_message] # read 1740 W
+[on_pzem_message] # read 1747 W
+[on_pzem_message] # read 1748 W
+[on_pzem_message] # read 1748 W
+ # power,average : 64,5;1746,0
+
+# set power to 64.0%
+[on_pzem_message] # read 1747 W
+[on_pzem_message] # read 1748 W
+[on_pzem_message] # read 1747 W
+[on_pzem_message] # read 1748 W
+[on_pzem_message] # read 1746 W
+[on_pzem_message] # read 1741 W
+ # power,average : 64,0;1746,1666666666667
+
+# set power to 63.5%
+[on_pzem_message] # read 1702 W
+[on_pzem_message] # read 1704 W
+[on_pzem_message] # read 1702 W
+[on_pzem_message] # read 1704 W
+[on_pzem_message] # read 1703 W
+[on_pzem_message] # read 1703 W
+ # power,average : 63,5;1703,0
+
+# set power to 63.0%
+[on_pzem_message] # read 1706 W
+[on_pzem_message] # read 1702 W
+[on_pzem_message] # read 1703 W
+[on_pzem_message] # read 1701 W
+[on_pzem_message] # read 1700 W
+[on_pzem_message] # read 1704 W
+ # power,average : 63,0;1702,6666666666667
+
+# set power to 62.5%
+[on_pzem_message] # read 1661 W
+[on_pzem_message] # read 1661 W
+[on_pzem_message] # read 1661 W
+[on_pzem_message] # read 1661 W
+[on_pzem_message] # read 1663 W
+[on_pzem_message] # read 1662 W
+ # power,average : 62,5;1661,5
+
+# set power to 62.0%
+[on_pzem_message] # read 1666 W
+[on_pzem_message] # read 1665 W
+[on_pzem_message] # read 1665 W
+[on_pzem_message] # read 1668 W
+[on_pzem_message] # read 1667 W
+[on_pzem_message] # read 1665 W
+ # power,average : 62,0;1666,0
+
+# set power to 61.5%
+[on_pzem_message] # read 1624 W
+[on_pzem_message] # read 1624 W
+[on_pzem_message] # read 1623 W
+[on_pzem_message] # read 1625 W
+[on_pzem_message] # read 1624 W
+[on_pzem_message] # read 1621 W
+ # power,average : 61,5;1623,5
+
+# set power to 61.0%
+[on_pzem_message] # read 1625 W
+[on_pzem_message] # read 1623 W
+[on_pzem_message] # read 1623 W
+[on_pzem_message] # read 1625 W
+[on_pzem_message] # read 1624 W
+[on_pzem_message] # read 1623 W
+ # power,average : 61,0;1623,8333333333333
+
+# set power to 60.5%
+[on_pzem_message] # read 1582 W
+[on_pzem_message] # read 1580 W
+[on_pzem_message] # read 1582 W
+[on_pzem_message] # read 1580 W
+[on_pzem_message] # read 1584 W
+[on_pzem_message] # read 1583 W
+ # power,average : 60,5;1581,8333333333333
+
+# set power to 60.0%
+[on_pzem_message] # read 1583 W
+[on_pzem_message] # read 1583 W
+[on_pzem_message] # read 1584 W
+[on_pzem_message] # read 1583 W
+[on_pzem_message] # read 1581 W
+[on_pzem_message] # read 1585 W
+ # power,average : 60,0;1583,1666666666667
+
+# set power to 59.5%
+[on_pzem_message] # read 1539 W
+[on_pzem_message] # read 1540 W
+[on_pzem_message] # read 1539 W
+[on_pzem_message] # read 1540 W
+[on_pzem_message] # read 1543 W
+[on_pzem_message] # read 1546 W
+ # power,average : 59,5;1541,1666666666667
+
+# set power to 59.0%
+[on_pzem_message] # read 1547 W
+[on_pzem_message] # read 1546 W
+[on_pzem_message] # read 1546 W
+[on_pzem_message] # read 1545 W
+[on_pzem_message] # read 1547 W
+[on_pzem_message] # read 1545 W
+ # power,average : 59,0;1546,0
+
+# set power to 58.5%
+[on_pzem_message] # read 1501 W
+[on_pzem_message] # read 1502 W
+[on_pzem_message] # read 1503 W
+[on_pzem_message] # read 1502 W
+[on_pzem_message] # read 1501 W
+[on_pzem_message] # read 1503 W
+ # power,average : 58,5;1502,0
+
+# set power to 58.0%
+[on_pzem_message] # read 1501 W
+[on_pzem_message] # read 1505 W
+[on_pzem_message] # read 1503 W
+[on_pzem_message] # read 1502 W
+[on_pzem_message] # read 1500 W
+[on_pzem_message] # read 1501 W
+ # power,average : 58,0;1502,0
+
+# set power to 57.5%
+[on_pzem_message] # read 1461 W
+[on_pzem_message] # read 1459 W
+[on_pzem_message] # read 1460 W
+[on_pzem_message] # read 1459 W
+[on_pzem_message] # read 1458 W
+[on_pzem_message] # read 1460 W
+ # power,average : 57,5;1459,5
+
+# set power to 57.0%
+[on_pzem_message] # read 1459 W
+[on_pzem_message] # read 1460 W
+[on_pzem_message] # read 1457 W
+[on_pzem_message] # read 1457 W
+[on_pzem_message] # read 1461 W
+[on_pzem_message] # read 1459 W
+ # power,average : 57,0;1458,8333333333333
+
+# set power to 56.5%
+[on_pzem_message] # read 1413 W
+[on_pzem_message] # read 1415 W
+[on_pzem_message] # read 1414 W
+[on_pzem_message] # read 1415 W
+[on_pzem_message] # read 1416 W
+[on_pzem_message] # read 1417 W
+ # power,average : 56,5;1415,0
+
+# set power to 56.0%
+[on_pzem_message] # read 1415 W
+[on_pzem_message] # read 1415 W
+[on_pzem_message] # read 1414 W
+[on_pzem_message] # read 1413 W
+[on_pzem_message] # read 1413 W
+[on_pzem_message] # read 1413 W
+ # power,average : 56,0;1413,8333333333333
+
+# set power to 55.5%
+[on_pzem_message] # read 1372 W
+[on_pzem_message] # read 1370 W
+[on_pzem_message] # read 1373 W
+[on_pzem_message] # read 1371 W
+[on_pzem_message] # read 1371 W
+[on_pzem_message] # read 1373 W
+ # power,average : 55,5;1371,6666666666667
+
+# set power to 55.0%
+[on_pzem_message] # read 1371 W
+[on_pzem_message] # read 1372 W
+[on_pzem_message] # read 1374 W
+[on_pzem_message] # read 1373 W
+[on_pzem_message] # read 1373 W
+[on_pzem_message] # read 1372 W
+ # power,average : 55,0;1372,5
+
+# set power to 54.5%
+[on_pzem_message] # read 1328 W
+[on_pzem_message] # read 1329 W
+[on_pzem_message] # read 1328 W
+[on_pzem_message] # read 1327 W
+[on_pzem_message] # read 1328 W
+[on_pzem_message] # read 1328 W
+ # power,average : 54,5;1328,0
+
+# set power to 54.0%
+[on_pzem_message] # read 1328 W
+[on_pzem_message] # read 1330 W
+[on_pzem_message] # read 1328 W
+[on_pzem_message] # read 1329 W
+[on_pzem_message] # read 1329 W
+[on_pzem_message] # read 1329 W
+ # power,average : 54,0;1328,8333333333333
+
+# set power to 53.5%
+[on_pzem_message] # read 1284 W
+[on_pzem_message] # read 1284 W
+[on_pzem_message] # read 1284 W
+[on_pzem_message] # read 1283 W
+[on_pzem_message] # read 1286 W
+[on_pzem_message] # read 1285 W
+ # power,average : 53,5;1284,3333333333333
+
+# set power to 53.0%
+[on_pzem_message] # read 1285 W
+[on_pzem_message] # read 1284 W
+[on_pzem_message] # read 1283 W
+[on_pzem_message] # read 1283 W
+[on_pzem_message] # read 1283 W
+[on_pzem_message] # read 1283 W
+ # power,average : 53,0;1283,5
+
+# set power to 52.5%
+[on_pzem_message] # read 1239 W
+[on_pzem_message] # read 1235 W
+[on_pzem_message] # read 1235 W
+[on_pzem_message] # read 1235 W
+[on_pzem_message] # read 1236 W
+[on_pzem_message] # read 1236 W
+ # power,average : 52,5;1236,0
+
+# set power to 52.0%
+[on_pzem_message] # read 1236 W
+[on_pzem_message] # read 1237 W
+[on_pzem_message] # read 1234 W
+[on_pzem_message] # read 1235 W
+[on_pzem_message] # read 1237 W
+[on_pzem_message] # read 1237 W
+ # power,average : 52,0;1236,0
+
+# set power to 51.5%
+[on_pzem_message] # read 1193 W
+[on_pzem_message] # read 1193 W
+[on_pzem_message] # read 1192 W
+[on_pzem_message] # read 1193 W
+[on_pzem_message] # read 1191 W
+[on_pzem_message] # read 1193 W
+ # power,average : 51,5;1192,5
+
+# set power to 51.0%
+[on_pzem_message] # read 1193 W
+[on_pzem_message] # read 1194 W
+[on_pzem_message] # read 1192 W
+[on_pzem_message] # read 1192 W
+[on_pzem_message] # read 1193 W
+[on_pzem_message] # read 1193 W
+ # power,average : 51,0;1192,8333333333333
+
+# set power to 50.5%
+[on_pzem_message] # read 1148 W
+[on_pzem_message] # read 1148 W
+[on_pzem_message] # read 1149 W
+[on_pzem_message] # read 1148 W
+[on_pzem_message] # read 1150 W
+[on_pzem_message] # read 1152 W
+ # power,average : 50,5;1149,1666666666667
+
+# set power to 50.0%
+[on_pzem_message] # read 1149 W
+[on_pzem_message] # read 1149 W
+[on_pzem_message] # read 1150 W
+[on_pzem_message] # read 1151 W
+[on_pzem_message] # read 1150 W
+[on_pzem_message] # read 1151 W
+ # power,average : 50,0;1150,0
+
+# set power to 49.5%
+[on_pzem_message] # read 1109 W
+[on_pzem_message] # read 1108 W
+[on_pzem_message] # read 1107 W
+[on_pzem_message] # read 1108 W
+[on_pzem_message] # read 1110 W
+[on_pzem_message] # read 1109 W
+ # power,average : 49,5;1108,5
+
+# set power to 49.0%
+[on_pzem_message] # read 1111 W
+[on_pzem_message] # read 1110 W
+[on_pzem_message] # read 1111 W
+[on_pzem_message] # read 1111 W
+[on_pzem_message] # read 1111 W
+[on_pzem_message] # read 1112 W
+ # power,average : 49,0;1111,0
+
+# set power to 48.5%
+[on_pzem_message] # read 1065 W
+[on_pzem_message] # read 1066 W
+[on_pzem_message] # read 1066 W
+[on_pzem_message] # read 1066 W
+[on_pzem_message] # read 1066 W
+[on_pzem_message] # read 1064 W
+ # power,average : 48,5;1065,5
+
+# set power to 48.0%
+[on_pzem_message] # read 1065 W
+[on_pzem_message] # read 1066 W
+[on_pzem_message] # read 1064 W
+[on_pzem_message] # read 1066 W
+[on_pzem_message] # read 1064 W
+[on_pzem_message] # read 1066 W
+ # power,average : 48,0;1065,1666666666667
+
+# set power to 47.5%
+[on_pzem_message] # read 1021 W
+[on_pzem_message] # read 1020 W
+[on_pzem_message] # read 1020 W
+[on_pzem_message] # read 1020 W
+[on_pzem_message] # read 1019 W
+[on_pzem_message] # read 1019 W
+ # power,average : 47,5;1019,8333333333334
+
+# set power to 47.0%
+[on_pzem_message] # read 1018 W
+[on_pzem_message] # read 1018 W
+[on_pzem_message] # read 1019 W
+[on_pzem_message] # read 1020 W
+[on_pzem_message] # read 1019 W
+[on_pzem_message] # read 1019 W
+ # power,average : 47,0;1018,8333333333334
+
+# set power to 46.5%
+[on_pzem_message] # read 974 W
+[on_pzem_message] # read 976 W
+[on_pzem_message] # read 975 W
+[on_pzem_message] # read 975 W
+[on_pzem_message] # read 975 W
+[on_pzem_message] # read 976 W
+ # power,average : 46,5;975,1666666666666
+
+# set power to 46.0%
+[on_pzem_message] # read 977 W
+[on_pzem_message] # read 973 W
+[on_pzem_message] # read 976 W
+[on_pzem_message] # read 974 W
+[on_pzem_message] # read 976 W
+[on_pzem_message] # read 977 W
+ # power,average : 46,0;975,5
+
+# set power to 45.5%
+[on_pzem_message] # read 931 W
+[on_pzem_message] # read 932 W
+[on_pzem_message] # read 932 W
+[on_pzem_message] # read 931 W
+[on_pzem_message] # read 931 W
+[on_pzem_message] # read 932 W
+ # power,average : 45,5;931,5
+
+# set power to 45.0%
+[on_pzem_message] # read 932 W
+[on_pzem_message] # read 934 W
+[on_pzem_message] # read 933 W
+[on_pzem_message] # read 933 W
+[on_pzem_message] # read 925 W
+[on_pzem_message] # read 931 W
+ # power,average : 45,0;931,3333333333334
+
+# set power to 44.5%
+[on_pzem_message] # read 886 W
+[on_pzem_message] # read 886 W
+[on_pzem_message] # read 886 W
+[on_pzem_message] # read 886 W
+[on_pzem_message] # read 886 W
+[on_pzem_message] # read 887 W
+ # power,average : 44,5;886,1666666666666
+
+# set power to 44.0%
+[on_pzem_message] # read 887 W
+[on_pzem_message] # read 888 W
+[on_pzem_message] # read 887 W
+[on_pzem_message] # read 888 W
+[on_pzem_message] # read 888 W
+[on_pzem_message] # read 888 W
+ # power,average : 44,0;887,6666666666666
+
+# set power to 43.5%
+[on_pzem_message] # read 845 W
+[on_pzem_message] # read 844 W
+[on_pzem_message] # read 844 W
+[on_pzem_message] # read 844 W
+[on_pzem_message] # read 843 W
+[on_pzem_message] # read 845 W
+ # power,average : 43,5;844,1666666666666
+
+# set power to 43.0%
+[on_pzem_message] # read 839 W
+[on_pzem_message] # read 845 W
+[on_pzem_message] # read 845 W
+[on_pzem_message] # read 843 W
+[on_pzem_message] # read 845 W
+[on_pzem_message] # read 845 W
+ # power,average : 43,0;843,6666666666666
+
+# set power to 42.5%
+[on_pzem_message] # read 800 W
+[on_pzem_message] # read 800 W
+[on_pzem_message] # read 802 W
+[on_pzem_message] # read 801 W
+[on_pzem_message] # read 800 W
+[on_pzem_message] # read 800 W
+ # power,average : 42,5;800,5
+
+# set power to 42.0%
+[on_pzem_message] # read 802 W
+[on_pzem_message] # read 801 W
+[on_pzem_message] # read 801 W
+[on_pzem_message] # read 801 W
+[on_pzem_message] # read 802 W
+[on_pzem_message] # read 801 W
+ # power,average : 42,0;801,3333333333334
+
+# set power to 41.5%
+[on_pzem_message] # read 758 W
+[on_pzem_message] # read 759 W
+[on_pzem_message] # read 758 W
+[on_pzem_message] # read 758 W
+[on_pzem_message] # read 760 W
+[on_pzem_message] # read 758 W
+ # power,average : 41,5;758,5
+
+# set power to 41.0%
+[on_pzem_message] # read 759 W
+[on_pzem_message] # read 759 W
+[on_pzem_message] # read 760 W
+[on_pzem_message] # read 759 W
+[on_pzem_message] # read 759 W
+[on_pzem_message] # read 760 W
+ # power,average : 41,0;759,3333333333334
+
+# set power to 40.5%
+[on_pzem_message] # read 716 W
+[on_pzem_message] # read 716 W
+[on_pzem_message] # read 715 W
+[on_pzem_message] # read 715 W
+[on_pzem_message] # read 715 W
+[on_pzem_message] # read 717 W
+ # power,average : 40,5;715,6666666666666
+
+# set power to 40.0%
+[on_pzem_message] # read 717 W
+[on_pzem_message] # read 717 W
+[on_pzem_message] # read 717 W
+[on_pzem_message] # read 717 W
+[on_pzem_message] # read 716 W
+[on_pzem_message] # read 716 W
+ # power,average : 40,0;716,6666666666666
+
+# set power to 39.5%
+[on_pzem_message] # read 674 W
+[on_pzem_message] # read 674 W
+[on_pzem_message] # read 674 W
+[on_pzem_message] # read 674 W
+[on_pzem_message] # read 675 W
+[on_pzem_message] # read 675 W
+ # power,average : 39,5;674,3333333333334
+
+# set power to 39.0%
+[on_pzem_message] # read 676 W
+[on_pzem_message] # read 677 W
+[on_pzem_message] # read 676 W
+[on_pzem_message] # read 676 W
+[on_pzem_message] # read 676 W
+[on_pzem_message] # read 676 W
+ # power,average : 39,0;676,1666666666666
+
+# set power to 38.5%
+[on_pzem_message] # read 637 W
+[on_pzem_message] # read 636 W
+[on_pzem_message] # read 637 W
+[on_pzem_message] # read 637 W
+[on_pzem_message] # read 637 W
+[on_pzem_message] # read 639 W
+ # power,average : 38,5;637,1666666666666
+
+# set power to 38.0%
+[on_pzem_message] # read 642 W
+[on_pzem_message] # read 642 W
+[on_pzem_message] # read 642 W
+[on_pzem_message] # read 639 W
+[on_pzem_message] # read 639 W
+[on_pzem_message] # read 639 W
+ # power,average : 38,0;640,5
+
+# set power to 37.5%
+[on_pzem_message] # read 597 W
+[on_pzem_message] # read 598 W
+[on_pzem_message] # read 597 W
+[on_pzem_message] # read 596 W
+[on_pzem_message] # read 598 W
+[on_pzem_message] # read 597 W
+ # power,average : 37,5;597,1666666666666
+
+# set power to 37.0%
+[on_pzem_message] # read 597 W
+[on_pzem_message] # read 597 W
+[on_pzem_message] # read 596 W
+[on_pzem_message] # read 596 W
+[on_pzem_message] # read 596 W
+[on_pzem_message] # read 595 W
+ # power,average : 37,0;596,1666666666666
+
+# set power to 36.5%
+[on_pzem_message] # read 556 W
+[on_pzem_message] # read 556 W
+[on_pzem_message] # read 557 W
+[on_pzem_message] # read 556 W
+[on_pzem_message] # read 558 W
+[on_pzem_message] # read 558 W
+ # power,average : 36,5;556,8333333333334
+
+# set power to 36.0%
+[on_pzem_message] # read 558 W
+[on_pzem_message] # read 558 W
+[on_pzem_message] # read 560 W
+[on_pzem_message] # read 558 W
+[on_pzem_message] # read 559 W
+[on_pzem_message] # read 560 W
+ # power,average : 36,0;558,8333333333334
+
+# set power to 35.5%
+[on_pzem_message] # read 521 W
+[on_pzem_message] # read 520 W
+[on_pzem_message] # read 521 W
+[on_pzem_message] # read 522 W
+[on_pzem_message] # read 521 W
+[on_pzem_message] # read 522 W
+ # power,average : 35,5;521,1666666666666
+
+# set power to 35.0%
+[on_pzem_message] # read 522 W
+[on_pzem_message] # read 523 W
+[on_pzem_message] # read 522 W
+[on_pzem_message] # read 522 W
+[on_pzem_message] # read 523 W
+[on_pzem_message] # read 522 W
+ # power,average : 35,0;522,3333333333334
+
+# set power to 34.5%
+[on_pzem_message] # read 485 W
+[on_pzem_message] # read 487 W
+[on_pzem_message] # read 486 W
+[on_pzem_message] # read 486 W
+[on_pzem_message] # read 487 W
+[on_pzem_message] # read 487 W
+ # power,average : 34,5;486,3333333333333
+
+# set power to 34.0%
+[on_pzem_message] # read 486 W
+[on_pzem_message] # read 487 W
+[on_pzem_message] # read 487 W
+[on_pzem_message] # read 487 W
+[on_pzem_message] # read 487 W
+[on_pzem_message] # read 488 W
+ # power,average : 34,0;487,0
+
+# set power to 33.5%
+[on_pzem_message] # read 452 W
+[on_pzem_message] # read 452 W
+[on_pzem_message] # read 450 W
+[on_pzem_message] # read 452 W
+[on_pzem_message] # read 451 W
+[on_pzem_message] # read 450 W
+ # power,average : 33,5;451,1666666666667
+
+# set power to 33.0%
+[on_pzem_message] # read 450 W
+[on_pzem_message] # read 450 W
+[on_pzem_message] # read 451 W
+[on_pzem_message] # read 451 W
+[on_pzem_message] # read 451 W
+[on_pzem_message] # read 452 W
+ # power,average : 33,0;450,8333333333333
+
+# set power to 32.5%
+[on_pzem_message] # read 417 W
+[on_pzem_message] # read 416 W
+[on_pzem_message] # read 416 W
+[on_pzem_message] # read 417 W
+[on_pzem_message] # read 417 W
+[on_pzem_message] # read 416 W
+ # power,average : 32,5;416,5
+
+# set power to 32.0%
+[on_pzem_message] # read 416 W
+[on_pzem_message] # read 415 W
+[on_pzem_message] # read 415 W
+[on_pzem_message] # read 414 W
+[on_pzem_message] # read 415 W
+[on_pzem_message] # read 415 W
+ # power,average : 32,0;415,0
+
+# set power to 31.5%
+[on_pzem_message] # read 381 W
+[on_pzem_message] # read 381 W
+[on_pzem_message] # read 382 W
+[on_pzem_message] # read 382 W
+[on_pzem_message] # read 381 W
+[on_pzem_message] # read 382 W
+ # power,average : 31,5;381,5
+
+# set power to 31.0%
+[on_pzem_message] # read 382 W
+[on_pzem_message] # read 382 W
+[on_pzem_message] # read 382 W
+[on_pzem_message] # read 382 W
+[on_pzem_message] # read 382 W
+[on_pzem_message] # read 382 W
+ # power,average : 31,0;382,0
+
+# set power to 30.5%
+[on_pzem_message] # read 350 W
+[on_pzem_message] # read 350 W
+[on_pzem_message] # read 350 W
+[on_pzem_message] # read 350 W
+[on_pzem_message] # read 350 W
+[on_pzem_message] # read 350 W
+ # power,average : 30,5;350,0
+
+# set power to 30.0%
+[on_pzem_message] # read 352 W
+[on_pzem_message] # read 352 W
+[on_pzem_message] # read 350 W
+[on_pzem_message] # read 350 W
+[on_pzem_message] # read 350 W
+[on_pzem_message] # read 350 W
+ # power,average : 30,0;350,6666666666667
+
+# set power to 29.5%
+[on_pzem_message] # read 320 W
+[on_pzem_message] # read 319 W
+[on_pzem_message] # read 320 W
+[on_pzem_message] # read 320 W
+[on_pzem_message] # read 319 W
+[on_pzem_message] # read 319 W
+ # power,average : 29,5;319,5
+
+# set power to 29.0%
+[on_pzem_message] # read 320 W
+[on_pzem_message] # read 319 W
+[on_pzem_message] # read 320 W
+[on_pzem_message] # read 320 W
+[on_pzem_message] # read 320 W
+[on_pzem_message] # read 320 W
+ # power,average : 29,0;319,8333333333333
+
+# set power to 28.5%
+[on_pzem_message] # read 291 W
+[on_pzem_message] # read 290 W
+[on_pzem_message] # read 290 W
+[on_pzem_message] # read 290 W
+[on_pzem_message] # read 290 W
+[on_pzem_message] # read 290 W
+ # power,average : 28,5;290,1666666666667
+
+# set power to 28.0%
+[on_pzem_message] # read 290 W
+[on_pzem_message] # read 289 W
+[on_pzem_message] # read 290 W
+[on_pzem_message] # read 291 W
+[on_pzem_message] # read 290 W
+[on_pzem_message] # read 291 W
+ # power,average : 28,0;290,1666666666667
+
+# set power to 27.5%
+[on_pzem_message] # read 262 W
+[on_pzem_message] # read 262 W
+[on_pzem_message] # read 262 W
+[on_pzem_message] # read 262 W
+[on_pzem_message] # read 262 W
+[on_pzem_message] # read 261 W
+ # power,average : 27,5;261,8333333333333
+
+# set power to 27.0%
+[on_pzem_message] # read 262 W
+[on_pzem_message] # read 262 W
+[on_pzem_message] # read 263 W
+[on_pzem_message] # read 263 W
+[on_pzem_message] # read 263 W
+[on_pzem_message] # read 263 W
+ # power,average : 27,0;262,6666666666667
+
+# set power to 26.5%
+[on_pzem_message] # read 235 W
+[on_pzem_message] # read 236 W
+[on_pzem_message] # read 237 W
+[on_pzem_message] # read 236 W
+[on_pzem_message] # read 237 W
+[on_pzem_message] # read 237 W
+ # power,average : 26,5;236,33333333333334
+
+# set power to 26.0%
+[on_pzem_message] # read 238 W
+[on_pzem_message] # read 238 W
+[on_pzem_message] # read 238 W
+[on_pzem_message] # read 237 W
+[on_pzem_message] # read 238 W
+[on_pzem_message] # read 238 W
+ # power,average : 26,0;237,83333333333334
+
+# set power to 25.5%
+[on_pzem_message] # read 211 W
+[on_pzem_message] # read 211 W
+[on_pzem_message] # read 210 W
+[on_pzem_message] # read 211 W
+[on_pzem_message] # read 211 W
+[on_pzem_message] # read 211 W
+ # power,average : 25,5;210,83333333333334
+
+# set power to 25.0%
+[on_pzem_message] # read 210 W
+[on_pzem_message] # read 209 W
+[on_pzem_message] # read 210 W
+[on_pzem_message] # read 209 W
+[on_pzem_message] # read 210 W
+[on_pzem_message] # read 209 W
+ # power,average : 25,0;209,5
+
+# set power to 24.5%
+[on_pzem_message] # read 187 W
+[on_pzem_message] # read 187 W
+[on_pzem_message] # read 187 W
+[on_pzem_message] # read 186 W
+[on_pzem_message] # read 186 W
+[on_pzem_message] # read 186 W
+ # power,average : 24,5;186,5
+
+# set power to 24.0%
+[on_pzem_message] # read 186 W
+[on_pzem_message] # read 186 W
+[on_pzem_message] # read 187 W
+[on_pzem_message] # read 187 W
+[on_pzem_message] # read 187 W
+[on_pzem_message] # read 186 W
+ # power,average : 24,0;186,5
+
+# set power to 23.5%
+[on_pzem_message] # read 164 W
+[on_pzem_message] # read 164 W
+[on_pzem_message] # read 164 W
+[on_pzem_message] # read 164 W
+[on_pzem_message] # read 164 W
+[on_pzem_message] # read 164 W
+ # power,average : 23,5;164,0
+
+# set power to 23.0%
+[on_pzem_message] # read 163 W
+[on_pzem_message] # read 163 W
+[on_pzem_message] # read 164 W
+[on_pzem_message] # read 164 W
+[on_pzem_message] # read 164 W
+[on_pzem_message] # read 164 W
+ # power,average : 23,0;163,66666666666666
+
+# set power to 22.5%
+[on_pzem_message] # read 144 W
+[on_pzem_message] # read 144 W
+[on_pzem_message] # read 144 W
+[on_pzem_message] # read 144 W
+[on_pzem_message] # read 144 W
+[on_pzem_message] # read 144 W
+ # power,average : 22,5;144,0
+
+# set power to 22.0%
+[on_pzem_message] # read 144 W
+[on_pzem_message] # read 145 W
+[on_pzem_message] # read 145 W
+[on_pzem_message] # read 144 W
+[on_pzem_message] # read 144 W
+[on_pzem_message] # read 144 W
+ # power,average : 22,0;144,33333333333334
+
+# set power to 21.5%
+[on_pzem_message] # read 127 W
+[on_pzem_message] # read 127 W
+[on_pzem_message] # read 132 W
+[on_pzem_message] # read 133 W
+[on_pzem_message] # read 133 W
+[on_pzem_message] # read 133 W
+ # power,average : 21,5;130,83333333333334
+
+# set power to 21.0%
+[on_pzem_message] # read 133 W
+[on_pzem_message] # read 133 W
+[on_pzem_message] # read 133 W
+[on_pzem_message] # read 133 W
+[on_pzem_message] # read 134 W
+[on_pzem_message] # read 134 W
+ # power,average : 21,0;133,33333333333334
+
+# set power to 20.5%
+[on_pzem_message] # read 117 W
+[on_pzem_message] # read 116 W
+[on_pzem_message] # read 116 W
+[on_pzem_message] # read 116 W
+[on_pzem_message] # read 116 W
+[on_pzem_message] # read 116 W
+ # power,average : 20,5;116,16666666666667
+
+# set power to 20.0%
+[on_pzem_message] # read 116 W
+[on_pzem_message] # read 116 W
+[on_pzem_message] # read 117 W
+[on_pzem_message] # read 116 W
+[on_pzem_message] # read 115 W
+[on_pzem_message] # read 116 W
+ # power,average : 20,0;116,0
+
+# set power to 19.5%
+[on_pzem_message] # read 100 W
+[on_pzem_message] # read 99 W
+[on_pzem_message] # read 99 W
+[on_pzem_message] # read 99 W
+[on_pzem_message] # read 99 W
+[on_pzem_message] # read 100 W
+ # power,average : 19,5;99,33333333333333
+
+# set power to 19.0%
+[on_pzem_message] # read 99 W
+[on_pzem_message] # read 99 W
+[on_pzem_message] # read 99 W
+[on_pzem_message] # read 99 W
+[on_pzem_message] # read 99 W
+[on_pzem_message] # read 99 W
+ # power,average : 19,0;99,0
+
+# set power to 18.5%
+[on_pzem_message] # read 81 W
+[on_pzem_message] # read 81 W
+[on_pzem_message] # read 81 W
+[on_pzem_message] # read 81 W
+[on_pzem_message] # read 81 W
+[on_pzem_message] # read 81 W
+ # power,average : 18,5;81,0
+
+# set power to 18.0%
+[on_pzem_message] # read 82 W
+[on_pzem_message] # read 81 W
+[on_pzem_message] # read 81 W
+[on_pzem_message] # read 81 W
+[on_pzem_message] # read 81 W
+[on_pzem_message] # read 81 W
+ # power,average : 18,0;81,16666666666667
+
+# set power to 17.5%
+[on_pzem_message] # read 69 W
+[on_pzem_message] # read 69 W
+[on_pzem_message] # read 69 W
+[on_pzem_message] # read 69 W
+[on_pzem_message] # read 69 W
+[on_pzem_message] # read 69 W
+ # power,average : 17,5;69,0
+
+# set power to 17.0%
+[on_pzem_message] # read 69 W
+[on_pzem_message] # read 68 W
+[on_pzem_message] # read 68 W
+[on_pzem_message] # read 68 W
+[on_pzem_message] # read 68 W
+[on_pzem_message] # read 68 W
+ # power,average : 17,0;68,16666666666667
+
+# set power to 16.5%
+[on_pzem_message] # read 58 W
+[on_pzem_message] # read 58 W
+[on_pzem_message] # read 58 W
+[on_pzem_message] # read 58 W
+[on_pzem_message] # read 58 W
+[on_pzem_message] # read 58 W
+ # power,average : 16,5;58,0
+
+# set power to 16.0%
+[on_pzem_message] # read 57 W
+[on_pzem_message] # read 57 W
+[on_pzem_message] # read 58 W
+[on_pzem_message] # read 57 W
+[on_pzem_message] # read 58 W
+[on_pzem_message] # read 57 W
+ # power,average : 16,0;57,333333333333336
+
+# set power to 15.5%
+[on_pzem_message] # read 48 W
+[on_pzem_message] # read 48 W
+[on_pzem_message] # read 48 W
+[on_pzem_message] # read 48 W
+[on_pzem_message] # read 48 W
+[on_pzem_message] # read 48 W
+ # power,average : 15,5;48,0
+
+# set power to 15.0%
+[on_pzem_message] # read 48 W
+[on_pzem_message] # read 48 W
+[on_pzem_message] # read 48 W
+[on_pzem_message] # read 48 W
+[on_pzem_message] # read 48 W
+[on_pzem_message] # read 48 W
+ # power,average : 15,0;48,0
+
+# set power to 14.5%
+[on_pzem_message] # read 39 W
+[on_pzem_message] # read 39 W
+[on_pzem_message] # read 39 W
+[on_pzem_message] # read 39 W
+[on_pzem_message] # read 39 W
+[on_pzem_message] # read 39 W
+ # power,average : 14,5;39,0
+
+# set power to 14.0%
+[on_pzem_message] # read 39 W
+[on_pzem_message] # read 39 W
+[on_pzem_message] # read 39 W
+[on_pzem_message] # read 39 W
+[on_pzem_message] # read 39 W
+[on_pzem_message] # read 39 W
+ # power,average : 14,0;39,0
+
+# set power to 13.5%
+[on_pzem_message] # read 32 W
+[on_pzem_message] # read 32 W
+[on_pzem_message] # read 32 W
+[on_pzem_message] # read 32 W
+[on_pzem_message] # read 32 W
+[on_pzem_message] # read 32 W
+ # power,average : 13,5;32,0
+
+# set power to 13.0%
+[on_pzem_message] # read 32 W
+[on_pzem_message] # read 32 W
+[on_pzem_message] # read 32 W
+[on_pzem_message] # read 32 W
+[on_pzem_message] # read 32 W
+[on_pzem_message] # read 32 W
+ # power,average : 13,0;32,0
+
+# set power to 12.5%
+[on_pzem_message] # read 25 W
+[on_pzem_message] # read 25 W
+[on_pzem_message] # read 25 W
+[on_pzem_message] # read 25 W
+[on_pzem_message] # read 25 W
+[on_pzem_message] # read 25 W
+ # power,average : 12,5;25,0
+
+# set power to 12.0%
+[on_pzem_message] # read 25 W
+[on_pzem_message] # read 25 W
+[on_pzem_message] # read 25 W
+[on_pzem_message] # read 25 W
+[on_pzem_message] # read 25 W
+[on_pzem_message] # read 25 W
+ # power,average : 12,0;25,0
+
+# set power to 11.5%
+[on_pzem_message] # read 19 W
+[on_pzem_message] # read 19 W
+[on_pzem_message] # read 19 W
+[on_pzem_message] # read 19 W
+[on_pzem_message] # read 20 W
+[on_pzem_message] # read 19 W
+ # power,average : 11,5;19,166666666666668
+
+# set power to 11.0%
+[on_pzem_message] # read 19 W
+[on_pzem_message] # read 19 W
+[on_pzem_message] # read 20 W
+[on_pzem_message] # read 19 W
+[on_pzem_message] # read 20 W
+[on_pzem_message] # read 19 W
+ # power,average : 11,0;19,333333333333332
+
+# set power to 10.5%
+[on_pzem_message] # read 15 W
+[on_pzem_message] # read 15 W
+[on_pzem_message] # read 15 W
+[on_pzem_message] # read 15 W
+[on_pzem_message] # read 15 W
+[on_pzem_message] # read 15 W
+ # power,average : 10,5;15,0
+
+# set power to 10.0%
+[on_pzem_message] # read 14 W
+[on_pzem_message] # read 15 W
+[on_pzem_message] # read 14 W
+[on_pzem_message] # read 14 W
+[on_pzem_message] # read 14 W
+[on_pzem_message] # read 15 W
+ # power,average : 10,0;14,333333333333334
+
+# set power to 9.5%
+[on_pzem_message] # read 11 W
+[on_pzem_message] # read 11 W
+[on_pzem_message] # read 11 W
+[on_pzem_message] # read 11 W
+[on_pzem_message] # read 11 W
+[on_pzem_message] # read 11 W
+ # power,average : 9,5;11,0
+
+# set power to 9.0%
+[on_pzem_message] # read 10 W
+[on_pzem_message] # read 10 W
+[on_pzem_message] # read 11 W
+[on_pzem_message] # read 10 W
+[on_pzem_message] # read 11 W
+[on_pzem_message] # read 11 W
+ # power,average : 9,0;10,5
+
+# set power to 8.5%
+[on_pzem_message] # read 8 W
+[on_pzem_message] # read 8 W
+[on_pzem_message] # read 7 W
+[on_pzem_message] # read 7 W
+[on_pzem_message] # read 8 W
+[on_pzem_message] # read 8 W
+ # power,average : 8,5;7,666666666666667
+
+# set power to 8.0%
+[on_pzem_message] # read 7 W
+[on_pzem_message] # read 7 W
+[on_pzem_message] # read 7 W
+[on_pzem_message] # read 7 W
+[on_pzem_message] # read 7 W
+[on_pzem_message] # read 7 W
+ # power,average : 8,0;7,0
+
+# set power to 7.5%
+[on_pzem_message] # read 5 W
+[on_pzem_message] # read 5 W
+[on_pzem_message] # read 5 W
+[on_pzem_message] # read 5 W
+[on_pzem_message] # read 5 W
+[on_pzem_message] # read 5 W
+ # power,average : 7,5;5,0
+
+# set power to 7.0%
+[on_pzem_message] # read 5 W
+[on_pzem_message] # read 5 W
+[on_pzem_message] # read 5 W
+[on_pzem_message] # read 5 W
+[on_pzem_message] # read 5 W
+[on_pzem_message] # read 5 W
+ # power,average : 7,0;5,0
+
+# set power to 6.5%
+[on_pzem_message] # read 3 W
+[on_pzem_message] # read 4 W
+[on_pzem_message] # read 4 W
+[on_pzem_message] # read 3 W
+[on_pzem_message] # read 4 W
+[on_pzem_message] # read 4 W
+ # power,average : 6,5;3,6666666666666665
+
+# set power to 6.0%
+[on_pzem_message] # read 3 W
+[on_pzem_message] # read 4 W
+[on_pzem_message] # read 4 W
+[on_pzem_message] # read 4 W
+[on_pzem_message] # read 4 W
+[on_pzem_message] # read 4 W
+ # power,average : 6,0;3,8333333333333335
+
+# set power to 5.5%
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+ # power,average : 5,5;2,0
+
+# set power to 5.0%
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+ # power,average : 5,0;2,0
+
+# set power to 4.5%
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+ # power,average : 4,5;2,0
+
+# set power to 4.0%
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+[on_pzem_message] # read 2 W
+ # power,average : 4,0;2,0
+
+# set power to 3.5%
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+ # power,average : 3,5;1,0
+
+# set power to 3.0%
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+ # power,average : 3,0;1,0
+
+# set power to 2.5%
+[on_pzem_message] # read 39 W
+[on_pzem_message] # read 48 W
+[on_pzem_message] # read 154 W
+[on_pzem_message] # read 20 W
+[on_pzem_message] # read 39 W
+[on_pzem_message] # read 58 W
+ # power,average : 2,5;59,666666666666664
+
+# set power to 2.0%
+[on_pzem_message] # read 67 W
+[on_pzem_message] # read 116 W
+[on_pzem_message] # read 18 W
+[on_pzem_message] # read 69 W
+[on_pzem_message] # read 86 W
+[on_pzem_message] # read 58 W
+ # power,average : 2,0;69,0
+
+# set power to 1.5%
+[on_pzem_message] # read 54 W
+[on_pzem_message] # read 75 W
+[on_pzem_message] # read 63 W
+[on_pzem_message] # read 41 W
+[on_pzem_message] # read 34 W
+[on_pzem_message] # read 39 W
+ # power,average : 1,5;51,0
+
+# set power to 1.0%
+[on_pzem_message] # read 58 W
+[on_pzem_message] # read 58 W
+[on_pzem_message] # read 82 W
+[on_pzem_message] # read 64 W
+[on_pzem_message] # read 37 W
+[on_pzem_message] # read 80 W
+ # power,average : 1,0;63,166666666666664
+
+# set power to 0.5%
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+ # power,average : 0,5;1,0
+
+# set power to 0.0%
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+[on_pzem_message] # read 1 W
+ # power,average : 0,0;1,0

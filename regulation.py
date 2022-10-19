@@ -73,33 +73,28 @@ weather = Prediction(config['openweathermap']['location'],config['openweathermap
 ###############################################################
 # MQTT      
 mqtt_client = None
-MQTT_BROKER = config['mqtt']['broker_ip'] 
-
 prefix = 'simu/' if SIMULATION else ''
+MQTT_BROKER = config['mqtt']['broker_ip'] 
 TOPIC_SENSOR_CONSUMPTION = prefix + config['mqtt']['topic_cons'] 
 TOPIC_SENSOR_PRODUCTION = prefix + config['mqtt']['topic_prod'] 
 TOPIC_REGULATION_MODE = prefix + config['mqtt']['topic_mode']  # forced/unforced duration - Can be bind to domotics device topic 
 # TOPIC_REGULATION_MODE = "domoticz/out"            
 TOPIC_STATUS = prefix + config['mqtt']['topic_status'] 
 TOPIC_INJECT = prefix + config['mqtt']['topic_inject'] 
+
 ###############################################################
 # EVELUATION
-
 # The comparison between power consumption and production is done every N seconds, it must be above the measurement
 # rate, which is currently 4s with the PZEM-004t module.
 EVALUATION_PERIOD = config['evaluate']['period']
-
 # Consider powers are balanced when the difference is below this value (watts). This helps prevent fluctuations.
 BALANCE_THRESHOLD = config['evaluate']['balance_threshold']
-
 # Keep this margin (in watts) between the power production and consumption. This helps in reducing grid consumption
 # knowing that there may be measurement inaccuracy.
 MARGIN = config['evaluate']['margin']
 LOW_ECS_ENERGY_TWO_DAYS = config['evaluate']['low_ecs_energy_two_days']  # minimal power on two days
 LOW_ECS_ENERGY_TODAY = config['evaluate']['low_ecs_energy_today'] # minimal power for today
 CHECK_AT = 16  # hour
-
-
 
 ###############################################################
 ###############################################################
@@ -166,28 +161,17 @@ def low_energy_fallback():
 
     # This is a custom and very specific fallback method which aim is to turn on the water heater should the daily
     # solar energy income be below a minimum threshold. We want the water to stay warm.
-    # The check is done everyday at time 'CHECK_DATE'
+    # The check is done everyday
 
     global ECS_energy_yesterday, ECS_energy_today, CLOUD_forecast, power_production
 
-    t = now_ts()
-    if last_evaluation_date is not None:
-
-        d1 = datetime.datetime.fromtimestamp(last_evaluation_date)
-        d2 = datetime.datetime.fromtimestamp(t)
-
-        ECS_energy_today = equipment_water_heater.get_energy()
-
-        #if d1.hour == CHECK_AT - 1 and d2.hour == CHECK_AT:
-
-        max_power = equipment_water_heater.max_power
-        if (ECS_energy_yesterday + ECS_energy_today) < LOW_ECS_ENERGY_TWO_DAYS and ECS_energy_today < LOW_ECS_ENERGY_TODAY:
-            duration = 3600 * (LOW_ECS_ENERGY_TODAY - ECS_energy_today) / max_power
-            debug(0, '')
-            debug(0, '[low_energy_fallback] ECS Energy Yesterday / Today / Sum : {} / {} / {}'.format(ECS_energy_yesterday, ECS_energy_today, ECS_energy_yesterday + ECS_energy_today))
-            debug(1, 'daily energy fallback: forcing equipment {} to {}W for {} seconds'.format(
-                equipment_water_heater.name, max_power, duration))
-            equipment_water_heater.force(max_power, duration)
+    max_power = equipment_water_heater.max_power
+    if (ECS_energy_yesterday + ECS_energy_today) < LOW_ECS_ENERGY_TWO_DAYS and ECS_energy_today < LOW_ECS_ENERGY_TODAY:
+        duration = 3600 * (LOW_ECS_ENERGY_TODAY - ECS_energy_today) / max_power
+        debug(0, '')
+        debug(0, '[low_energy_fallback] ECS Energy Yesterday / Today / Sum : {} / {} / {}'.format(ECS_energy_yesterday, ECS_energy_today, ECS_energy_yesterday + ECS_energy_today))
+        debug(1, 'daily energy fallback: forcing equipment {} to {}W for {} seconds'.format(equipment_water_heater.name, max_power, duration))
+        equipment_water_heater.force(max_power, duration)
             
         # save the energy so that it can be used in the fallback check tomorrow
         ECS_energy_yesterday = ECS_energy_today
@@ -208,14 +192,14 @@ def evaluate():
             if d1.day != d2.day:
                 ECS_energy_today = equipment_water_heater.get_energy()
                 log(0,"")
-                log(0,"[evaluate] Clouds / Production Today : " + CLOUD_forecast + "% / " + ECS_energy_today)
+                log(0,"[evaluate] Clouds / Production : " + CLOUD_forecast + "% / " + ECS_energy_today)
                 CLOUD_forecast = weather.getCloudAvg(TOMORROW)
-                log(0,"[evaluate] Clouds Forecast Tomorrow : ", CLOUD_forecast)
-                
-                # ensure that water stays warm enough
+                log(0,"[evaluate] Clouds Forecast : ", CLOUD_forecast)
+
                 for e in equipments:
                     e.reset_energy()
                     
+                # ensure that water stays warm enough
                 low_energy_fallback()
 
             # ensure there's a minimum duration between two evaluations
@@ -314,7 +298,7 @@ def evaluate():
             'date_str': datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d %H:%M:%S'),
             'power_consumption': power_consumption,
             'power_production': power_production,
-            'injection':,
+            'injection' : 0
         }
         es = []
         for e in equipments:
@@ -359,8 +343,8 @@ def main():
     # At startup, reset everything
 
     for e in equipments:
-        e.set_current_power(0)
-        log(1, e.name +" : "+e.max_power " W")
+        e.set_current_power(0) 
+        log(1,  str(e.name) + " : " + str(e.max_power) + " W" )
 
     mqtt_client.loop_forever()
 
