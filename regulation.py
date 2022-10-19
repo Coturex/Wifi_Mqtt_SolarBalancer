@@ -51,6 +51,7 @@ import equipment
 from equipment import ConstantPowerEquipment, UnknownPowerEquipment, VariablePowerEquipment
 
 import configparser
+status_ = configparser.ConfigParser()
 config = configparser.ConfigParser()
 config.read('config.ini')
 
@@ -73,6 +74,10 @@ power_consumption = None
 
 equipments = None
 equipment_water_heater = None
+
+ECS_energy_yesterday = 0
+ECS_energy_today = 0
+CLOUD_forecast = None  
 
 weather = Prediction(config['openweathermap']['location'],config['openweathermap']['key'])
 
@@ -181,7 +186,7 @@ def on_message(client, userdata, msg):
                     debug(0, 'not forcing equipment {} anymore'.format(name))
                     e.force(None)
                     evaluate()
-        else: # This is an equipment's topic_status msg, but which one ?
+        else: # This is topic_status msg, which equipment need to check 'over loaded'  ?
             for e in equipments:
                 if (e.topic_status != None):
                     if (msg.topic == e.topic_status):
@@ -190,18 +195,31 @@ def on_message(client, userdata, msg):
         print("[on message]         error, message badly formated (e.g. pzem error...)") if SDEBUG else ''
     
 def signal_handler(signal, frame):
+    """ End of program handler, set equipments 0W and save status"""
     global equipments
     print ("   !! Ctrl+C pressed !!")
     log(0, "   !! Ctrl+C pressed !!") 
     for e in equipments:
         e.set_current_power(0) 
         log(4, e.name + " : set power to 0") 
-    time.sleep(5) 
+    time.sleep(2)
+    saveStatus()
     sys.exit(0)
 
-ECS_energy_yesterday = 0
-ECS_energy_today = 0
-CLOUD_forecast = 999  # undefined
+def saveStatus():
+    global status_
+    log(0, "TBD: saving status of equipments, and regulation")
+    status_.write()
+
+def loadStatus():
+    global status_
+    log(0, "TBD: loading status of equipments, and regulation")
+    status_.read('status.ini')
+
+def reloadStatus():
+    """Reload status on signal handler"""
+    # TO BE DONE
+    pass
 
 def low_energy_fallback():
     """ Fallback, when the amount of energy today went below a minimum"""
