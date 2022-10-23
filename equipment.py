@@ -1,6 +1,3 @@
-import time
-from os.path import exists
-
 # Copyright (C) 2018-2019 Pierre Hebert
 #                 Mods -> Coturex - F5RQG
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,9 +26,20 @@ from os.path import exists
 # - ConstantPowerEquipment: an equipment which load is fixed and known. It can be controlled like a switch.
 #       ConstantPowerEquipment is essentially an optimization of UnknownPowerEquipment as it will allow the regulation
 #       loop to match power consumption and production faster.
-
+import time
+from os.path import exists
+from debug_log import log as log
+from debug_log import debug as debug
 import numpy as np
 from debug_log import debug as debug
+
+import configparser
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+if (config['debug']['equipment_debug'].lower() == "true"): 
+    EDEBUG = True 
+else: EDEBUG = False
 
 _mqtt_client = None
 _send_commands = True
@@ -46,15 +54,6 @@ def setup(mqtt_client, send_commands):
 def now_ts():
     return time.time()
 
-X = Y = None
-
-def readCSV(csv_file):   # return MAX Power
-    global X, Y
-    with open(csv_file) as file_name:
-        array = np.loadtxt(file_name, delimiter=";")
-    X = list(tuple(x[0] for x in array))
-    Y = list(tuple(x[1] for x in array))
-    return(max(Y))
     
 ##########################################################################
 #PARENT CLASS 
@@ -128,45 +127,120 @@ class VariablePowerEquipment(Equipment):
     MINIMUM_PERCENT = 4
     POLYREG_DEGREE = 5
 
-    global X, Y
+    X = Y = None
+
     def __init__(self, name, topic):
         Equipment.__init__(self, name,topic)
-        #self.max_power = max_power
+        self.power_tab = []
+        self.topic_set_power = self.topic + "/cmd"
         self.type = "variable"        
         calibrationFile = "power_calibration_" + name +".csv"
         try:
-            print ("Opening CSV : " + calibrationFile)
-            self.max_power=readCSV(calibrationFile)
-            print(name + " max power : " + str(self.max_power))
+            log(0,"Opening CSV : " + calibrationFile)
+            #self.max_power = readCSV(calibrationFile)
+            self.readCSV(calibrationFile)
         except FileNotFoundError as fnf_error:
             print(fnf_error)
+            log(1,fnf_error)
             exit()
-        except:
-            print (calibrationFile + " bad format, delimiter...")
+        except Exception as e:
+            print(calibrationFile + " bad format, delimiter...")
+            print(e)
+            log(1,calibrationFile + " bad format, delimiter...")
+            log(1,e)
             exit()
-
+        global X, Y
         self.poly_reg = np.poly1d(np.polyfit(X,Y, VariablePowerEquipment.POLYREG_DEGREE))
+        self.max_power= int(self.poly_reg(100))
+        # Remplissage du tableau de puissance 
+        for percent in np.arange(100, -0.5, -0.5):
+            P = (self.poly_reg(percent))
+            self.power_tab.append(P)
+        self.power_tab.reverse()    
+        if EDEBUG:
+            print(self.power_tab)  
+            time.sleep(5)
+
+    def readCSV(self, csv_file):   # return MAX Power
+        global X, Y
+        with open(csv_file) as file_name:
+            array = np.loadtxt(file_name, delimiter=";")
+        X = list(tuple(x[0] for x in array))
+        Y = list(tuple(x[1] for x in array))
+        return(max(Y))
+        
+    def power_to_percent(self, value):
+        # search nearest value in array using dichotomic method
+        # and interpolate return value
+        x = int(value)
+        n = len(self.power_tab)
+        lo = 0
+        hi = n - 1
+        mid = 0
+        if x < 0: return 0
+        while lo <= hi:
+            mid = (hi + lo) // 2
+            if self.power_tab[mid] < x:
+                lo = mid + 1
+                adj = 1
+            elif self.power_tab[mid] > x:
+                hi = mid - 1
+                adj = 0
+            else:
+                break
+        i = mid + adj
+        print("Adj = " + str(adj)) if EDEBUG else ''
+        if (i >= n): 
+            return 100
+        else:
+            dist = self.power_tab[i] - self.power_tab[i-1]
+            print(dist)  if EDEBUG else ''
+            r = 0.5 / (dist / (int(value) - self.power_tab[i-1] ))
+            print(r)  if EDEBUG else ''
+            print(str(self.power_tab[i]) + " - " + str(self.power_tab[i-1])) if EDEBUG else ''
+            print(str(i/2) + " - " + str((i-1)/2)) if EDEBUG else ''
+            print("i = " + str(i))
+            return (((i-1)/2+r))
+
+    def power_to_percent_BRUT(self, value):
+        for i in range(200):
+            if (int(value) < self.power_tab[i]): break
+        else:
+            print("not found")    
+        if (self.power_tab[200] < int(value)): return 100
+        else:
+            dist = self.power_tab[i] - self.power_tab[i-1]
+            print(dist)  if EDEBUG else ''
+            r = 0.5 / (dist / (int(value) - self.power_tab[i-1] ))
+            print(r)  if EDEBUG else ''
+            print(str(self.power_tab[i]) + " - " + str(self.power_tab[i-1])) if EDEBUG else ''
+            print(str(i/2) + " - " + str((i-1)/2)) if EDEBUG else ''
+            return (((i-1)/2+r))
 
     def set_current_power(self, power):
         super(VariablePowerEquipment, self).set_current_power(power)
-
+        debug(4, "[CHILD: set-current_power] " + self.name ) if EDEBUG else ''
         if self.current_power == 0:
             percent = 0
-        else:
-            z = self.current_power / float(self.max_power)
-            percent = self.poly_reg(z)
 
-        # issue with the regulator, don't go below 4
+        else: 
+            debug(4,"[CHILD: set_current_power] z :" + str(z)) if EDEBUG else ''
+            percent = self.power_to_percent(power)
+
+        # issue with the regulator, don't go below 4 and force to 0
         if percent < VariablePowerEquipment.MINIMUM_PERCENT:
-            percent = VariablePowerEquipment.MINIMUM_PERCENT 
+            percent = 0
         if percent > 100:
             percent = 100
 
+        debug(4, "MQTT Publish :")  if EDEBUG else ''  
+        debug(5, "sending power command {}W ({}%) for {}".format(int(self.current_power), str(percent), self.name))
+        debug(5, "on topic : " + self.topic_set_power) if EDEBUG else ''
         if _send_commands:
-            _mqtt_client.publish(self.topic, str(percent))
-        debug(4, "sending power command {}W ({}%) for {}".format(self.current_power, percent, self.name))
+            _mqtt_client.publish(self.topic_set_power, str(percent))
 
     def decrease_power_by(self, watt):
+
         if watt >= self.current_power:
             decrease = self.current_power
         else:
@@ -180,32 +254,33 @@ class VariablePowerEquipment(Equipment):
             old = self.current_power
             new = self.current_power - decrease
             self.set_current_power(new)
-            debug(4, "decreasing power consumption of {} by {}W, from {} to {}".format(self.name, decrease, old, new))
+            debug(4, "decreasing power consumption of {} by {}W, from {} to {}".format(self.name, int(decrease), int(old), int(new)))
         else:
             debug(4, "not decreasing power of {} because it is already at 0W".format(self.name))
 
         return decrease
 
     def increase_power_by(self, watt):
+        debug(4, "[PARENT: increase power by]") if EDEBUG else ''
+        debug(5, "{} currently {}, increase by {} W".format(self.name, self.current_power, int(watt))) if EDEBUG else ''
         if self.current_power + watt >= self.max_power:
             increase = self.max_power - self.current_power
             remaining = watt - increase
         else:
             increase = watt
             remaining = 0
-
         if self.current_power + increase < VariablePowerEquipment.MINIMUM_POWER:
             debug(4, "not increasing power because it doesn't reach the minimal power: "+str(VariablePowerEquipment.MINIMUM_POWER))
             increase = 0
             remaining = watt
-
+        debug(5, "increase {}, remaining {}".format(int(increase), int(remaining))) if EDEBUG else ''
         if increase == 0:
             debug(4, "status quo")
         elif increase > 0:
             old = self.current_power
             new = self.current_power + increase
             self.set_current_power(new)
-            debug(4, "increasing power consumption of {} by {}W, from {} to {}".format(self.name, increase, old, new))
+            debug(4, "increasing power consumption of {} by {}W, from {} to {}".format(self.name, int(increase) , int(old), int(new)))
         else:
             debug(4, "not increasing power of {} because it is already at maximum power {}W".format(self.name, self.max_power))
 
@@ -242,6 +317,7 @@ class ConstantPowerEquipment(Equipment):
             return 0
 
     def increase_power_by(self, watt):
+        debug(4, "[CHILD: increase power by]") if EDEBUG else ''
         if self.is_on:
             debug(4, "{} with a power of {}W is already on".format(self.name, self.nominal_power))
             return watt

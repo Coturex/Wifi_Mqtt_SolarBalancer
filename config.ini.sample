@@ -7,9 +7,10 @@ broker_ip = 10.3.141.1
 port = 1883 
 topic_cons = smeter/pzem/CONSOMMATION
 topic_prod = smeter/pzem/PRODUCTION
-topic_inject = regul/inject
-topic_mode = regul/mode
-topic_status = regul/status
+topic_regul= regul
+
+[domoticz]
+idx_injection = 648
 
 [evaluate]
 margin = 20
@@ -21,11 +22,20 @@ low_ecs_energy_today = 4000
 
 [debug]
 simulation = true
-debug_file = "debug.log"
-log_file = "logfile.log"    
+debug_file = true
+log_file = true
+debug_file_name = pv_debug.log
+log_file_name = pv.log    
+equipment_debug = false
+regulation_debug = false
 
 [equipment]
 eq_1_name = water_heater
 eq_1_pwr = 2400
 eq_1_topic = regul/vload/ECS
 eq_1_type = variable
+
+[init]
+ECS_energy_today = 0
+ECS_energy_yesterday = 0
+CLOUD_forecast = 999

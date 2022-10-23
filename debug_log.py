@@ -15,7 +15,10 @@
 
 import logging
 from mimetypes import init
-from regulation import config
+
+import configparser
+config = configparser.ConfigParser()
+config.read('config.ini')
 
 debugger = logging.getLogger('regulation_debug')
 debugger.setLevel(logging.DEBUG)
@@ -28,24 +31,24 @@ formatter = logging.Formatter('%(asctime)s - %(message)s')
 
 ch1 = logging.StreamHandler()
 ch1.setLevel(logging.DEBUG)
-ch1 = logging.FileHandler('debug.log')
+ch1 = logging.FileHandler(config['debug']['debug_file_name'])
 ch1.setFormatter(formatter)
 debugger.addHandler(ch1)
 
 ch2 = logging.StreamHandler()
 ch2.setLevel(logging.INFO)
-ch2 = logging.FileHandler('info.log')
+ch2 = logging.FileHandler(config['debug']['log_file_name'])
 ch2.setFormatter(formatter)
 logger.addHandler(ch2)
 
 def debug(indent, msg):
     global config
-    if (config['debug']['debug']):
+    if (config['debug']['debug_file']):
         debugger.debug(('  '*indent)+str(msg))
 
 def log(indent, msg):
     global config
-    if (config['debug']['log']):
+    if (config['debug']['log_file']):
         logger.info(('  '*indent)+str(msg))
 
 
