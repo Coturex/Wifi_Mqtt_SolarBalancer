@@ -217,21 +217,6 @@ class VariablePowerEquipment(Equipment):
             print("i = " + str(i))
             return (((i-1)/2+r))
 
-    def power_to_percent_BRUT(self, value):
-        for i in range(200):
-            if (int(value) < self.power_tab[i]): break
-        else:
-            print("not found")    
-        if (self.power_tab[200] < int(value)): return 100
-        else:
-            dist = self.power_tab[i] - self.power_tab[i-1]
-            print(dist)  if EDEBUG else ''
-            r = 0.5 / (dist / (int(value) - self.power_tab[i-1] ))
-            print(r)  if EDEBUG else ''
-            print(str(self.power_tab[i]) + " - " + str(self.power_tab[i-1])) if EDEBUG else ''
-            print(str(i/2) + " - " + str((i-1)/2)) if EDEBUG else ''
-            return (((i-1)/2+r))
-
     def set_current_power(self, power):
         super(VariablePowerEquipment, self).set_current_power(power)
         debug(4, "[CHILD: set-current_power] " + self.name ) if EDEBUG else ''
