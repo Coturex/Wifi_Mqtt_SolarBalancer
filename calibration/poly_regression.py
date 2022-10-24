@@ -15,7 +15,7 @@ X = Y = None
 power_tab = []
 
 def dichotomic_search(value):
-    # search nearest value in array using dichotomic method
+    # search nearest value in array using DICHOTOMIC METHOD
     # and interpolate return value
     global power_tab
     x = int(value)
@@ -49,7 +49,7 @@ def dichotomic_search(value):
     return (((i-1)/2+r))
 
 def power_to_percent(value):
-    # search nearest value in array using brut force method
+    # search nearest value in array using BRUT SEARCH method
     # and interpolate return value
     global power_tab
     if int(value) < 0: return 0
@@ -118,13 +118,12 @@ def main():
 
     power_tab.reverse()
     print (power_tab)
-    print (power_tab[0])
-    print (power_tab[1])
-    print (power_tab[199])
-    print (power_tab[200])
+    print ("p[0]   : " + str(power_tab[0]))
+    print ("p[1]   : " + str(power_tab[1]))
+    print ("p[199] : " + str(power_tab[199]))
+    print ("p[200] : " + str(power_tab[200]))
     
     csv_file.close()   
-
     print(" saved into -> ", outfile)
 
     # Plot data

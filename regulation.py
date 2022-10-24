@@ -101,7 +101,7 @@ IDX_INJECTION = config['domoticz']['idx_injection']
 ###############################################################
 # EVELUATION
 # The comparison between power consumption and production is done every N seconds, it must be above the measurement
-# rate, which is currently 4s with the PZEM-004t module.
+# rate, which is currently 2.5s with PZEM-004t v3.0  module.
 EVALUATION_PERIOD = int(config['evaluate']['period'])
 # Consider powers are balanced when the difference is below this value (watts). This helps prevent fluctuations.
 BALANCE_THRESHOLD = int(config['evaluate']['balance_threshold'])
@@ -365,7 +365,7 @@ def evaluate():
             domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"" + str(injection) + "\"}"
             print (domoticz) if SDEBUG else ''
             mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_INJECTION else ''
-        else: # Send 0 injection only if last_injection wasn't zero in order to avoid repetition
+        else: # Send 0 injection only if last_injection wasn't zero in order to avoid too many repetition
             injection = 0
             if last_injection != 0:
                 domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"" + str(injection) + "\"}"
@@ -415,7 +415,7 @@ def main():
     # As many equipments as needed can be listed here.
     equipments = (
         equipment_water_heater,
-        #ConstantPowerEquipment('e_bike_charger', 120, "regul/cload/bike" ),
+        # ConstantPowerEquipment('e_bike_charger', 120, "regul/cload/bike" ),
         # UnknownPowerEquipment('plug_1', "regul/uload/topic")
     )
 
