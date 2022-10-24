@@ -28,6 +28,7 @@
 #       loop to match power consumption and production faster.
 import time
 from os.path import exists
+from calibration.poly_regression import readCSV
 from debug_log import log as log
 from debug_log import debug as debug
 import numpy as np
@@ -62,10 +63,17 @@ class Equipment:
         self.name = name
         self.topic = topic
         self.is_forced_ = False
+        self.is_over_ = False
         self.force_end_date = None
         self.energy = 0
         self.current_power = None
         self.last_power_change_date = None
+        try:
+            self.topic_status = config[self.name]['topic_status']
+            if (self.topic_status == "None"):
+                self.topic_status = None
+        except Exception:
+            self.topic_status = None
 
     def decrease_power_by(self, watt):
         """ Return the amount of power that has been canceled, None if unknown """
@@ -105,6 +113,17 @@ class Equipment:
                 self.force_end_date = None
         return self.is_forced_
 
+    def over(self):
+        self.is_over_ = True
+
+    def unover(self):
+        self.is_over_ = False
+    
+    def is_over(self):
+        """ The equipment cannot absorbe energy anymore, e.g. thermostat control by the equipment"""
+        # implement in subclasses, watt may be ignored
+        return self.is_over_
+
     def get_energy(self):
         return self.energy
 
@@ -123,22 +142,27 @@ class Equipment:
 ##########################################################################
 #CHILD CLASS 
 class VariablePowerEquipment(Equipment):
-    MINIMUM_POWER = 150
-    MINIMUM_PERCENT = 4
     POLYREG_DEGREE = 5
-
     X = Y = None
 
     def __init__(self, name, topic):
         Equipment.__init__(self, name,topic)
         self.power_tab = []
+        self.MIN_POWER = int(config[self.name]['min_power'])
+        self.MIN_PERCENT = int(config[self.name]['min_percent'])
         self.topic_set_power = self.topic + "/cmd"
         self.type = "variable"        
-        calibrationFile = "power_calibration_" + name +".csv"
+        self.readCalibration("power_calibration_" + name +".csv")
+
+    def readCalibration(self, calibrationFile):
+        X = Y = None
         try:
             log(0,"Opening CSV : " + calibrationFile)
-            #self.max_power = readCSV(calibrationFile)
-            self.readCSV(calibrationFile)
+            #self.MAX_POWER = readCSV(calibrationFile)
+            with open(calibrationFile) as file_name:
+                array = np.loadtxt(file_name, delimiter=";")
+            X = list(tuple(x[0] for x in array))
+            Y = list(tuple(x[1] for x in array))
         except FileNotFoundError as fnf_error:
             print(fnf_error)
             log(1,fnf_error)
@@ -149,9 +173,8 @@ class VariablePowerEquipment(Equipment):
             log(1,calibrationFile + " bad format, delimiter...")
             log(1,e)
             exit()
-        global X, Y
         self.poly_reg = np.poly1d(np.polyfit(X,Y, VariablePowerEquipment.POLYREG_DEGREE))
-        self.max_power= int(self.poly_reg(100))
+        self.MAX_POWER= int(self.poly_reg(100))
         # Remplissage du tableau de puissance 
         for percent in np.arange(100, -0.5, -0.5):
             P = (self.poly_reg(percent))
@@ -160,15 +183,7 @@ class VariablePowerEquipment(Equipment):
         if EDEBUG:
             print(self.power_tab)  
             time.sleep(5)
-
-    def readCSV(self, csv_file):   # return MAX Power
-        global X, Y
-        with open(csv_file) as file_name:
-            array = np.loadtxt(file_name, delimiter=";")
-        X = list(tuple(x[0] for x in array))
-        Y = list(tuple(x[1] for x in array))
-        return(max(Y))
-        
+      
     def power_to_percent(self, value):
         # search nearest value in array using dichotomic method
         # and interpolate return value
@@ -224,11 +239,11 @@ class VariablePowerEquipment(Equipment):
             percent = 0
 
         else: 
-            debug(4,"[CHILD: set_current_power] z :" + str(z)) if EDEBUG else ''
+            debug(4,"[CHILD: set_current_power] :" + str(power)) if EDEBUG else ''
             percent = self.power_to_percent(power)
 
         # issue with the regulator, don't go below 4 and force to 0
-        if percent < VariablePowerEquipment.MINIMUM_PERCENT:
+        if percent < self.MIN_PERCENT:
             percent = 0
         if percent > 100:
             percent = 100
@@ -246,8 +261,8 @@ class VariablePowerEquipment(Equipment):
         else:
             decrease = watt
 
-        if self.current_power - decrease < VariablePowerEquipment.MINIMUM_POWER:
-            debug(4, "turning off power because it is below the minimum power: "+str(VariablePowerEquipment.MINIMUM_POWER))
+        if self.current_power - decrease < self.MIN_POWER:
+            debug(4, "turning off power because it is below the minimum power: "+str(self.MIN_POWER))
             decrease = self.current_power
 
         if decrease > 0:
@@ -263,14 +278,14 @@ class VariablePowerEquipment(Equipment):
     def increase_power_by(self, watt):
         debug(4, "[PARENT: increase power by]") if EDEBUG else ''
         debug(5, "{} currently {}, increase by {} W".format(self.name, self.current_power, int(watt))) if EDEBUG else ''
-        if self.current_power + watt >= self.max_power:
-            increase = self.max_power - self.current_power
+        if self.current_power + watt >= self.MAX_POWER:
+            increase = self.MAX_POWER - self.current_power
             remaining = watt - increase
         else:
             increase = watt
             remaining = 0
-        if self.current_power + increase < VariablePowerEquipment.MINIMUM_POWER:
-            debug(4, "not increasing power because it doesn't reach the minimal power: "+str(VariablePowerEquipment.MINIMUM_POWER))
+        if self.current_power + increase < self.MIN_POWER:
+            debug(4, "not increasing power because it doesn't reach the minimal power: "+str(self.MIN_POWER))
             increase = 0
             remaining = watt
         debug(5, "increase {}, remaining {}".format(int(increase), int(remaining))) if EDEBUG else ''
@@ -282,7 +297,7 @@ class VariablePowerEquipment(Equipment):
             self.set_current_power(new)
             debug(4, "increasing power consumption of {} by {}W, from {} to {}".format(self.name, int(increase) , int(old), int(new)))
         else:
-            debug(4, "not increasing power of {} because it is already at maximum power {}W".format(self.name, self.max_power))
+            debug(4, "not increasing power of {} because it is already at maximum power {}W".format(self.name, self.MAX_POWER))
 
         return remaining
 

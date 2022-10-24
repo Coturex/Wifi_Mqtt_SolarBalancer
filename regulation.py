@@ -38,7 +38,7 @@
 import datetime
 import json
 import time
-
+import signal, sys
 import paho.mqtt.client as mqtt
 
 from debug_log import log as log
@@ -58,6 +58,7 @@ config.read('config.ini')
 if (config['debug']['simulation'].lower() == "true"):
         SIMULATION = True
         print("**** SIMULATION IS SET")
+        SIM_PROD = int(config['debug']['sim_prod'])
 else:
         SIMULATION = False
 
@@ -84,7 +85,7 @@ PORT = int(config['mqtt']['port'])
 TOPIC_SENSOR_CONSUMPTION =  config['mqtt']['topic_cons'] 
 TOPIC_SENSOR_PRODUCTION = config['mqtt']['topic_prod'] 
 TOPIC_REGULATION = prefix + config['mqtt']['topic_regul'] 
-TOPIC_REGULATION_MODE = "NOT_YET_IMPLEMENTED" # forced/unforced duration - Can be bind to domotics device topic 
+TOPIC_FORCE = config['mqtt']['topic_force'] # forced/unforced duration - Can be bind to domotics device topic 
 TOPIC_STATUS = config['mqtt']['topic_regul'] + "/status"
  
 ###############################################################
@@ -104,6 +105,9 @@ BALANCE_THRESHOLD = int(config['evaluate']['balance_threshold'])
 MARGIN = int(config['evaluate']['margin'])
 LOW_ECS_ENERGY_TWO_DAYS = int(config['evaluate']['low_ecs_energy_two_days'])  # minimal power on two days
 LOW_ECS_ENERGY_TODAY = int(config['evaluate']['low_ecs_energy_today']) # minimal power for today
+if (config['evaluate']['send_injection'].lower() == "true"): 
+    SEND_INJECTION = True 
+else: SEND_INJECTION = False
 
 ###############################################################
 # FUNCTIONS
@@ -124,23 +128,35 @@ def on_connect(client, userdata, flags, rc):
     #debug(1, "Subscribing " + TOPIC_REGULATION_MODE)
     client.subscribe(TOPIC_SENSOR_CONSUMPTION)
     client.subscribe(TOPIC_SENSOR_PRODUCTION)
-    #client.subscribe(TOPIC_REGULATION_MODE)
+    client.subscribe("smeter/pzem/ECS")
+    if(TOPIC_FORCE != "None"):
+        debug(1, "Subscribing " + TOPIC_FORCE)
+    global equipments
+    for e in equipments:
+        if (e.topic_status != None):
+            debug(1, "Subscribing " + str(e.topic_status))
 
 def on_message(client, userdata, msg):
     # Receive power consumption and production values and triggers the evaluation. We also take into account manual
     # control messages in case we want to turn on/off a given equipment.
     global power_production, power_consumption
+    
     print("[on message] topic : " + msg.topic) if SDEBUG else ''
     try:
         if msg.topic == TOPIC_SENSOR_CONSUMPTION:
+            print("[on message]         conso : " + str(power_consumption) + ", prod : " + str(power_production)) if SDEBUG else ''
             j = json.loads(msg.payload.decode())
             power_consumption = int(j['power'])
             evaluate()
         elif msg.topic == TOPIC_SENSOR_PRODUCTION:
+            print("[on message]         conso : " + str(power_consumption) + ", prod : " + str(power_production)) if SDEBUG else ''
             j = json.loads(msg.payload.decode())
             power_production = int(j['power'])
+            if SIMULATION:
+                power_production = SIM_PROD
             evaluate()
-        elif msg.topic == TOPIC_REGULATION_MODE: #NOT YET IMPLEMENTED
+        elif msg.topic == TOPIC_FORCE: 
+            print("[on message]         Forcing...") 
             j = json.loads(msg.payload.decode())
             command = j['command']
             name = j['name']
@@ -165,11 +181,23 @@ def on_message(client, userdata, msg):
                     debug(0, 'not forcing equipment {} anymore'.format(name))
                     e.force(None)
                     evaluate()
-        print("[on message] conso : " + str(power_consumption) + ", prod : " + str(power_production)) if SDEBUG else ''
+        else: # This is an equipment's topic_status msg, but which one ?
+            for e in equipments:
+                if (e.topic_status != None):
+                    if (msg.topic == e.topic_status):
+                        print("[on message]         "+ e.name + "is Over ? ") if SDEBUG else ''
     except:
-        print("[on message] error, message not formated (PZEM ERROR...)") if SDEBUG else ''
+        print("[on message]         error, message badly formated (e.g. pzem error...)") if SDEBUG else ''
     
-    # print(j)
+def signal_handler(signal, frame):
+    global equipments
+    print ("   !! Ctrl+C pressed !!")
+    log(0, "   !! Ctrl+C pressed !!") 
+    for e in equipments:
+        e.set_current_power(0) 
+        log(4, e.name + " : set power to 0") 
+    time.sleep(5) 
+    sys.exit(0)
 
 ECS_energy_yesterday = 0
 ECS_energy_today = 0
@@ -211,7 +239,7 @@ def evaluate():
             if d1.day != d2.day:
                 ECS_energy_today = equipment_water_heater.get_energy()
                 log(0,"")
-                log(0,"[evaluate] Clouds / Production : " + CLOUD_forecast + "% / " + ECS_energy_today)
+                log(0,"[evaluate] TODAY Clouds / Production : " + CLOUD_forecast + "% / " + ECS_energy_today)
                 CLOUD_forecast = weather.getCloudAvg(TOMORROW)
                 log(0,"[evaluate] Clouds Forecast : ", CLOUD_forecast)
 
@@ -318,13 +346,13 @@ def evaluate():
         if injection < 0:
             domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"" + str(injection) + "\"}"
             print (domoticz) if SDEBUG else ''
-            mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz)
+            mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_INJECTION else ''
         else: # Send 0 injection only if last_injection wasn't zero in order to avoid repetition
             injection = 0
             if last_injection != 0:
                 domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"" + str(injection) + "\"}"
                 print (domoticz) if SDEBUG else ''
-                mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz)
+                mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_INJECTION else ''
         last_injection = injection
         ##########
         # Build a status message
@@ -356,15 +384,11 @@ def evaluate():
 
 def main():
     global mqtt_client, equipments, equipment_water_heater
- 
+    signal.signal(signal.SIGINT, signal_handler) 
+
     debug(0,"")
     log(0,"")
     log(0,"[Main] Starting PV Power Regulation @" + config['openweathermap']['location'])
-
-    mqtt_client = mqtt.Client()
-    mqtt_client.on_connect = on_connect
-    mqtt_client.on_message = on_message
-    mqtt_client.connect(MQTT_BROKER, PORT , 120)
 
     equipment.setup(mqtt_client, not SIMULATION)
     equipment_water_heater = VariablePowerEquipment('ECS', TOPIC_REGULATION + "/vload/ECS")
@@ -382,8 +406,15 @@ def main():
     for e in equipments:
         e.set_current_power(0) 
         log(1, str(e.name) + " power topic : " + e.topic_set_power)
-        log(1, str(e.name) + " power max : " + str(e.max_power) + " W" )
+        log(1, str(e.name) + " power topic : " + str(e.topic_status))
+        log(1, str(e.name) + " power max : " + str(e.MAX_POWER) + " W" )
+        log(1, str(e.name) + " power min : " + str(e.MIN_POWER) + " W" )
+        log(1, str(e.name) + " percent min : " + str(e.MIN_PERCENT) + " W" )
 
+    mqtt_client = mqtt.Client()
+    mqtt_client.on_connect = on_connect
+    mqtt_client.on_message = on_message
+    mqtt_client.connect(MQTT_BROKER, PORT , 120)
     mqtt_client.loop_forever()
 
 if __name__ == '__main__':

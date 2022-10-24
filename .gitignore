@@ -2,6 +2,5 @@
 calibration/out.csv
 doc/.~lock.mqtt_pvrouter_archi.odg#
 config.ini
-info.log
-debug.log
-*_poly.csv
+*.log
+*.csv

@@ -8,6 +8,7 @@ port = 1883
 topic_cons = smeter/pzem/CONSOMMATION
 topic_prod = smeter/pzem/PRODUCTION
 topic_regul= regul
+topic_force= None
 
 [domoticz]
 idx_injection = 648
@@ -19,23 +20,24 @@ balance_threshold = 20
 check_at = 16
 low_ecs_energy_two_days = 10000
 low_ecs_energy_today = 4000
+send_injection = false
 
 [debug]
 simulation = true
+sim_prod = 700
 debug_file = true
 log_file = true
 debug_file_name = pv_debug.log
 log_file_name = pv.log    
-equipment_debug = false
-regulation_debug = false
-
-[equipment]
-eq_1_name = water_heater
-eq_1_pwr = 2400
-eq_1_topic = regul/vload/ECS
-eq_1_type = variable
+equipment_debug = true
+regulation_debug = true
 
 [init]
 ECS_energy_today = 0
 ECS_energy_yesterday = 0
 CLOUD_forecast = 999
+
+[ECS]
+min_power = 145
+min_percent = 4
+topic_status = None
