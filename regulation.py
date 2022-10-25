@@ -186,24 +186,25 @@ def on_message(client, userdata, msg):
                     debug(0, 'not forcing equipment {} anymore'.format(name))
                     e.force(None)
                     evaluate()
-        else: # This is topic_status msg, which equipment need to check 'over loaded'  ?
+        else: # This is topic_status msg. Which equipment is 'over loaded'  ?
             for e in equipments:
-                if (e.topic_status != None):
+                if (e.topic_status != None) and (not e.is_overed):
                     if (msg.topic == e.topic_status):
-                        print("[on message]         "+ e.name + "is Over ? ") if SDEBUG else ''
+                        print("[on message]         "+ e.name + " is Overed ? ") if SDEBUG else ''
     except:
         print("[on message]         error, message badly formated (e.g. pzem error...)") if SDEBUG else ''
+
     
 def signal_handler(signal, frame):
     """ End of program handler, set equipments 0W and save status"""
     global equipments
     print ("   !! Ctrl+C pressed !!")
-    log(0, "   !! Ctrl+C pressed !!") 
+    log(2, "!! Ctrl+C pressed !!") 
     for e in equipments:
         e.set_current_power(0) 
-        log(4, e.name + " : set power to 0") 
+        log(2, e.name + " : set power to 0") 
     time.sleep(2)
-    saveStatus()
+    #saveStatus()
     sys.exit(0)
 
 def saveStatus():
@@ -263,6 +264,7 @@ def evaluate():
 
                 for e in equipments:
                     e.reset_energy()
+                    e.unset_over()
                     
                 # ensure that water stays warm enough
                 low_energy_fallback()
@@ -286,6 +288,9 @@ def evaluate():
             debug(0, "[evaluate] decreasing global power consumption by {}W".format(excess_power))
             for e in reversed(equipments):
                 debug(2, "1. examining " + e.name)
+                if e.is_overed():
+                    debug(4, "skipping this equipment because it's already full loaded for today")
+                    continue
                 if e.is_forced():
                     debug(4, "skipping this equipment because it's in forced state")
                     continue
@@ -307,11 +312,24 @@ def evaluate():
             # There's PV POWER IN EXCESS, try to increase the load to consume this available power
             available_power = power_production - MARGIN - power_consumption
             debug(0, "[evaluate] increasing global power consumption by {}W".format(available_power))
-            for i, e in enumerate(equipments):
+            for i, e in enumerate(equipments):                
                 if available_power <= 0:
                     debug(2, "no more available power")
                     break
                 debug(2, "2. examining " + e.name)
+
+                # Check if this equpment is over loaded, this is a temporaly workaround 
+                # overloaded if (e.current_power > prod) and (prod < e.max_power)
+                if ((e.get_current_power() > power_production) and (power_production < e.MAX_POWER)):
+                    debug(4, "this equipment is overed, it cannot load power anymore "+str(e.MIN_POWER))
+                    log(2, e.name + " is fully loaded for today") if (not e.is_overed()) else ''
+                    e.set_current_power(0)
+                    e.set_over()
+                    continue
+
+                if e.is_overed():
+                    debug(4, "skipping this equipment because it's already full loaded for today")
+                    continue
                 if e.is_forced():
                     debug(4, "skipping this equipment because it's in forced state")
                     continue
@@ -363,13 +381,13 @@ def evaluate():
         print("[evaluate]                    CALCULATED INJECTION :", injection) if SDEBUG else ''
         if injection < 0:
             domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"" + str(injection) + "\"}"
-            print (domoticz) if SDEBUG else ''
+            print ("                              " + domoticz) if SDEBUG else ''
             mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_INJECTION else ''
         else: # Send 0 injection only if last_injection wasn't zero in order to avoid too many repetition
             injection = 0
             if last_injection != 0:
                 domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"" + str(injection) + "\"}"
-                print (domoticz) if SDEBUG else ''
+                print ("                              " + domoticz) if SDEBUG else ''
                 mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_INJECTION else ''
         last_injection = injection
         ##########
@@ -392,9 +410,9 @@ def evaluate():
             })
         status['equipments'] = es
         mqtt_client.publish(TOPIC_STATUS, json.dumps(status))
-
     except Exception as e:
         debug(0,"[evaluate exception]") 
+        debug(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
         debug(1, e)
 
 ###############################################################

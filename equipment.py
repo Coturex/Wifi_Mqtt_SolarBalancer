@@ -26,9 +26,8 @@
 # - ConstantPowerEquipment: an equipment which load is fixed and known. It can be controlled like a switch.
 #       ConstantPowerEquipment is essentially an optimization of UnknownPowerEquipment as it will allow the regulation
 #       loop to match power consumption and production faster.
-import time
+import time, sys
 from os.path import exists
-from calibration.poly_regression import readCSV
 from debug_log import log as log
 from debug_log import debug as debug
 import numpy as np
@@ -113,13 +112,13 @@ class Equipment:
                 self.force_end_date = None
         return self.is_forced_
 
-    def over(self):
+    def set_over(self):
         self.is_over_ = True
 
-    def unover(self):
+    def unset_over(self):
         self.is_over_ = False
     
-    def is_over(self):
+    def is_overed(self):
         """ The equipment cannot absorbe energy anymore, e.g. thermostat control by the equipment"""
         # implement in subclasses, watt may be ignored
         return self.is_over_
@@ -172,6 +171,7 @@ class VariablePowerEquipment(Equipment):
             print(e)
             log(1,calibrationFile + " bad format, delimiter...")
             log(1,e)
+            debug(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
             exit()
         self.poly_reg = np.poly1d(np.polyfit(X,Y, VariablePowerEquipment.POLYREG_DEGREE))
         self.MAX_POWER= int(self.poly_reg(100))
@@ -233,9 +233,7 @@ class VariablePowerEquipment(Equipment):
         if percent > 100:
             percent = 100
 
-        debug(4, "MQTT Publish :")  if EDEBUG else ''  
-        debug(5, "sending power command {}W ({}%) for {}".format(int(self.current_power), str(percent), self.name))
-        debug(5, "on topic : " + self.topic_set_power) if EDEBUG else ''
+        debug(4, "MQTT sending power command {}W ({}%) for {} ({})".format(int(self.current_power), str(percent), self.name, self.topic_set_power))
         if _send_commands:
             _mqtt_client.publish(self.topic_set_power, str(percent))
 
@@ -263,6 +261,7 @@ class VariablePowerEquipment(Equipment):
     def increase_power_by(self, watt):
         debug(4, "[PARENT: increase power by]") if EDEBUG else ''
         debug(5, "{} currently {}, increase by {} W".format(self.name, self.current_power, int(watt))) if EDEBUG else ''
+        
         if self.current_power + watt >= self.MAX_POWER:
             increase = self.MAX_POWER - self.current_power
             remaining = watt - increase
