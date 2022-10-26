@@ -53,6 +53,7 @@ from equipment import ConstantPowerEquipment, UnknownPowerEquipment, VariablePow
 import configparser
 status_ = configparser.ConfigParser()
 config = configparser.ConfigParser()
+mem = configparser.ConfigParser()
 config.read('config.ini')
 
 # A debug switch to toggle simulation (uses distinct MQTT topics for instance)
@@ -68,7 +69,8 @@ if (config['debug']['regulation_debug'].lower() == "true"):
 else: SDEBUG = False
 
 last_evaluation_date = None
-last_injection = -1
+last_injection = None
+last_grid = None
 power_production = None
 power_consumption = None
 
@@ -97,6 +99,7 @@ TOPIC_STATUS = config['mqtt']['topic_regul'] + "/status"
 # DOMOTICZ
 TOPIC_DOMOTICZ_IN = "domoticz/in"
 IDX_INJECTION = config['domoticz']['idx_injection']
+IDX_GRID = config['domoticz']['idx_grid']
 
 ###############################################################
 # EVELUATION
@@ -113,6 +116,9 @@ LOW_ECS_ENERGY_TODAY = int(config['evaluate']['low_ecs_energy_today']) # minimal
 if (config['evaluate']['send_injection'].lower() == "true"): 
     SEND_INJECTION = True 
 else: SEND_INJECTION = False
+if (config['evaluate']['send_grid'].lower() == "true"): 
+    SEND_GRID = True 
+else: SEND_GRID = False
 
 ###############################################################
 # FUNCTIONS
@@ -206,19 +212,38 @@ def signal_handler(signal, frame):
         e.set_current_power(0) 
         log(2, e.name + " : set power to 0") 
     time.sleep(2)
-    #saveStatus()
+    saveStatus() if (config['debug']['use_persistent'].lower() == "true") else ''
     sys.exit(0)
 
 def saveStatus():
-    global status_
-    log(0, "TBD: saving status of equipments, and regulation")
-    status_.write()
+    global mem, CLOUD_forecast, ECS_energy_today, ECS_energy_yesterday, equipment_water_heater
+    log(0, "[loadStatus] saving status")
+    try:
+        mem['CLOUD_forecast'] = CLOUD_forecast
+        mem['ECS_energy_today'] = ECS_energy_today
+        mem['ECS_energy_yesterday'] = int(ECS_energy_yesterday)
+        mem['ECS_overloaded'] = int(equipment_water_heater.is_overed())
+        mem.write('status.ini')
+    except:
+        log(0, "[loadStatus] cannot load status.ini")
+        pass
 
 def loadStatus():
-    global status_
-    log(0, "TBD: loading status of equipments, and regulation")
-    status_.read('status.ini')
-
+    global mem, CLOUD_forecast, ECS_energy_today, ECS_energy_yesterday, equipment_water_heater
+    log(0, "[loadStatus] loading status")
+    try:
+        mem.read('status.ini')
+        CLOUD_forecast = int(mem['CLOUD_forecast'])
+        ECS_energy_today = int(mem['ECS_energy_today'])
+        ECS_energy_yesterday = int(mem['ECS_energy_yesterday'])
+        if int(mem['ECS_overloaded']):
+            equipment_water_heater.set_over()
+        else:
+            equipment_water_heater.unset_over()
+    except:
+        log(0, "[loadStatus] cannot load status.ini")
+        pass
+    
 def reloadStatus():
     """Reload status on signal handler"""
     # TO BE DONE
@@ -234,15 +259,17 @@ def low_energy_fallback():
     global ECS_energy_yesterday, ECS_energy_today, CLOUD_forecast, power_production
 
     max_power = equipment_water_heater.max_power
-    if (ECS_energy_yesterday + ECS_energy_today) < LOW_ECS_ENERGY_TWO_DAYS and ECS_energy_today < LOW_ECS_ENERGY_TODAY:
+    log(0, '[low_energy_fallback] ECS Energy Yesterday / Today / Sum : {} / {} / {}'.format(ECS_energy_yesterday, ECS_energy_today, ECS_energy_yesterday + ECS_energy_today))
+    if (equipment_water_heater.is_overed):
+        log(4, 'ECS Energy Overloaded today')
+        ECS_energy_yesterday = ECS_energy_today = 0
+    elif (ECS_energy_yesterday + ECS_energy_today) < LOW_ECS_ENERGY_TWO_DAYS and ECS_energy_today < LOW_ECS_ENERGY_TODAY:
         duration = 3600 * (LOW_ECS_ENERGY_TODAY - ECS_energy_today) / max_power
-        debug(0, '')
-        debug(0, '[low_energy_fallback] ECS Energy Yesterday / Today / Sum : {} / {} / {}'.format(ECS_energy_yesterday, ECS_energy_today, ECS_energy_yesterday + ECS_energy_today))
-        debug(1, 'daily energy fallback: forcing equipment {} to {}W for {} seconds'.format(equipment_water_heater.name, max_power, duration))
+        log(4, 'daily energy fallback: forcing equipment {} to {}W for {} seconds'.format(equipment_water_heater.name, max_power, duration))
         equipment_water_heater.force(max_power, duration)
-            
-        # save the energy so that it can be used in the fallback check tomorrow
-        ECS_energy_yesterday = ECS_energy_today
+        debug(0, "--")    
+    # save the energy so that it can be used in the fallback check tomorrow
+    ECS_energy_yesterday = ECS_energy_today
         
 def evaluate():
     # This is where all the magic happen. This function takes decision according to the current power measurements.
@@ -257,20 +284,22 @@ def evaluate():
             # reset energy counters every day
             d1 = datetime.datetime.fromtimestamp(last_evaluation_date)
             d2 = datetime.datetime.fromtimestamp(t)
-            if d1.day != d2.day:
-                ECS_energy_today = equipment_water_heater.get_energy()
+            if d1.hour == 22 and d2.hour == 23:
                 log(0,"")
                 log(0,"[evaluate] TODAY Clouds / Production : " + CLOUD_forecast + "% / " + ECS_energy_today)
                 CLOUD_forecast = weather.getCloudAvg(TOMORROW)
                 log(0,"[evaluate] Clouds Forecast : ", CLOUD_forecast)
 
-                for e in equipments:
-                    e.reset_energy()
-                    e.unset_over()
-                    
+            if d1.day != d2.day: # AT MINUIT
+                ECS_energy_today = equipment_water_heater.get_energy()
+                equipment_water_heater.reset_energy()
+                
                 # ensure that water stays warm enough
                 low_energy_fallback()
 
+                for e in equipments:
+                    e.unset_over()
+                    
             # ensure there's a minimum duration between two evaluations
             if t - last_evaluation_date < EVALUATION_PERIOD:
                 return
@@ -377,20 +406,27 @@ def evaluate():
             debug(2, "no more equipment to check")
         
         ##########  
-        # Build a Domoticz Injection  message 
+        # Build Domoticz Messages (Energy Counter Injection and/or Grid) then InfluxDB will be updated too
         injection = (power_consumption - power_production) 
-        print("[evaluate]                    CALCULATED INJECTION :", injection) if SDEBUG else ''
-        if injection < 0:
+        if injection < 0: # Prepare Injection message
+            grid = 0
+            if last_grid != 0: # Send 0 grid only if last_grid wasn't zero in order to avoid too many repetitions
+                domoticz = "{ \"idx\": " + IDX_GRID + ", \"nvalue\": 0, \"svalue\": \"" + str(grid) + "\"}"
+                mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_GRID else ''
             domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"" + str(injection) + "\"}"
-            print ("                              " + domoticz) if SDEBUG else ''
             mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_INJECTION else ''
-        else: # Send 0 injection only if last_injection wasn't zero in order to avoid too many repetition
+        else: # Prepare Grid Message, and Zero Injection message   
+            grid = injection
             injection = 0
-            if last_injection != 0:
+            if last_injection != 0: # Send 0 injection only if last_injection wasn't zero in order to avoid too many repetitions
                 domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"" + str(injection) + "\"}"
-                print ("                              " + domoticz) if SDEBUG else ''
                 mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_INJECTION else ''
+            domoticz = "{ \"idx\": " + IDX_GRID + ", \"nvalue\": 0, \"svalue\": \"" + str(grid) + "\"}"
+            mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_GRID else ''   
+        print("[evaluate]                    CALCULATED INJECTION :", injection) if SDEBUG else ''
+        print("[evaluate]                    CALCULATED GRID      :", grid) if SDEBUG else ''        
         last_injection = injection
+        last_grid = grid
         ##########
         # Build a status message
         status = {
@@ -398,7 +434,8 @@ def evaluate():
             'date_str': datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d %H:%M:%S'),
             'power_consumption': power_consumption,
             'power_production': power_production,
-            'injection' : injection
+            'injection' : injection,
+            'grid' : grid
         }
         es = []
         for e in equipments:
@@ -434,20 +471,22 @@ def main():
     # As many equipments as needed can be listed here.
     equipments = (
         equipment_water_heater,
-        # ConstantPowerEquipment('e_bike_charger', 120, "regul/cload/bike" ),
-        # UnknownPowerEquipment('plug_1', "regul/uload/topic")
+        # ConstantPowerEquipment('Resille'),
+        # UnknownPowerEquipment('plug_1')
     )
 
     log(0, "Equipments :")
     # At startup, reset everything - Mandatory !
     for e in equipments:
         e.set_current_power(0) 
-        log(1, str(e.name) + " power topic : " + e.topic_set_power)
-        log(1, str(e.name) + " power topic : " + str(e.topic_status))
+        log(1, str(e.name) + " set power topic : " + e.topic_set_power)
+        log(1, str(e.name) + " read power topic : " + e.topic_status)
         log(1, str(e.name) + " power max : " + str(e.MAX_POWER) + " W" )
         log(1, str(e.name) + " power min : " + str(e.MIN_POWER) + " W" )
         log(1, str(e.name) + " percent min : " + str(e.MIN_PERCENT) + " W" )
-
+    
+    loadStatus() if (config['debug']['use_persistent'].lower() == "true") else ''
+        
     mqtt_client = mqtt.Client()
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_message
