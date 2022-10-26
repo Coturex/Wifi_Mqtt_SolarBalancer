@@ -37,7 +37,7 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.ini')
 
-if (config['debug']['equipment_debug'].lower() == "true"): 
+if (config['debug']['equipment_stdout'].lower() == "true"): 
     EDEBUG = True 
 else: EDEBUG = False
 
@@ -70,11 +70,11 @@ class Equipment:
         self.current_power = None
         self.last_power_change_date = None
         try:
-            self.topic_status = config[self.name]['topic_status']
-            if (self.topic_status == "None"):
-                self.topic_status = None
+            self.topic_read_power = config[self.name]['topic_read_power']
+            if (self.topic_read_power == "None"):
+                self.topic_read_power = None
         except Exception:
-            self.topic_status = None
+            self.topic_read_power = None
 
     def decrease_power_by(self, watt):
         """ Return the amount of power that has been canceled, None if unknown """
@@ -117,11 +117,11 @@ class Equipment:
     def set_over(self):
         self.is_over_ = True
         self.set_current_power(0)
-        log(0, self.name + " over loaded is set")
+        log(1, self.name + " over load is set")
 
     def unset_over(self):
         self.is_over_ = False
-        log(0, self.name + " over loaded is unset")
+        log(1, self.name + " over load is unset")
 
     def is_overed(self):
         """ The equipment cannot absorbe energy anymore, e.g. thermostat control by the equipment"""
@@ -162,7 +162,7 @@ class VariablePowerEquipment(Equipment):
     X = Y = None
 
     def __init__(self, name):
-        Equipment.__init__(self, name,topic)
+        Equipment.__init__(self, name)
         self.power_tab = []
         self.MIN_POWER = int(config[self.name]['min_power'])
         self.MIN_PERCENT = int(config[self.name]['min_percent'])
@@ -231,7 +231,7 @@ class VariablePowerEquipment(Equipment):
             print(r)  if EDEBUG else ''
             print(str(self.power_tab[i]) + " - " + str(self.power_tab[i-1])) if EDEBUG else ''
             print(str(i/2) + " - " + str((i-1)/2)) if EDEBUG else ''
-            print("i = " + str(i))
+            print("i = " + str(i)) if EDEBUG else ''
             return (((i-1)/2+r))
 
     def set_current_power(self, power):
@@ -312,7 +312,7 @@ class VariablePowerEquipment(Equipment):
 #CHILD CLASS 
 class ConstantPowerEquipment(Equipment):
     def __init__(self, name, nominal_power):
-        Equipment.__init__(self, name, topic)
+        Equipment.__init__(self, name)
         self.MAX_POWER = int(config[self.name]['max_power'])
         self.MIN_POWER = self.MAX_POWER
         self.nominal_power = nominal_power

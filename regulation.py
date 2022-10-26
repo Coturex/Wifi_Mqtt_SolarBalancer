@@ -48,7 +48,7 @@ import cloud_prediction
 from cloud_prediction import TOMORROW, Prediction
 
 import equipment
-from equipment import ConstantPowerEquipment, UnknownPowerEquipment, VariablePowerEquipment
+from equipment import ConstantPowerEquipment, VariablePowerEquipment
 
 import configparser
 status_ = configparser.ConfigParser()
@@ -64,7 +64,7 @@ if (config['debug']['simulation'].lower() == "true"):
 else:
         SIMULATION = False
 
-if (config['debug']['regulation_debug'].lower() == "true"): 
+if (config['debug']['regulation_stdout'].lower() == "true"): 
     SDEBUG = True 
 else: SDEBUG = False
 
@@ -93,7 +93,7 @@ TOPIC_SENSOR_CONSUMPTION =  config['mqtt']['topic_cons']
 TOPIC_SENSOR_PRODUCTION = config['mqtt']['topic_prod'] 
 TOPIC_REGULATION = prefix + config['mqtt']['topic_regul'] 
 TOPIC_FORCE = config['mqtt']['topic_force'] # forced/unforced duration - Can be bind to domotics device topic 
-TOPIC_STATUS = config['mqtt']['topic_regul'] + "/status"
+topic_read_power = config['mqtt']['topic_regul'] + "/status"
  
 ###############################################################
 # DOMOTICZ
@@ -144,8 +144,8 @@ def on_connect(client, userdata, flags, rc):
         debug(1, "Subscribing " + TOPIC_FORCE)
     global equipments
     for e in equipments:
-        if (e.topic_status != None):
-            debug(1, "Subscribing " + str(e.topic_status))
+        if (e.topic_read_power != None):
+            debug(1, "Subscribing " + str(e.topic_read_power))
 
 def on_message(client, userdata, msg):
     # Receive power consumption and production values and triggers the evaluation. We also take into account manual
@@ -192,10 +192,10 @@ def on_message(client, userdata, msg):
                     debug(0, 'not forcing equipment {} anymore'.format(name))
                     e.force(None)
                     evaluate()
-        else: # This is topic_status msg. Which equipment is 'over loaded'  ?
+        else: # This is topic_read_power msg. Which equipment is 'over loaded'  ?
             for e in equipments:
-                if (e.topic_status != None) and (not e.is_overed):
-                    if (msg.topic == e.topic_status):
+                if (e.topic_read_power != None) and (not e.is_overed):
+                    if (msg.topic == e.topic_read_power):
                         print("[on message]         "+ e.name + " is Overed ? ") if SDEBUG else ''
                         j = json.loads(msg.payload.decode())
                         e.check_over(int(j['power']))
@@ -213,35 +213,40 @@ def signal_handler(signal, frame):
         log(2, e.name + " : set power to 0") 
     time.sleep(2)
     saveStatus() if (config['debug']['use_persistent'].lower() == "true") else ''
+    log(0, "Bye")
     sys.exit(0)
-
-def saveStatus():
-    global mem, CLOUD_forecast, ECS_energy_today, ECS_energy_yesterday, equipment_water_heater
-    log(0, "[loadStatus] saving status")
-    try:
-        mem['CLOUD_forecast'] = CLOUD_forecast
-        mem['ECS_energy_today'] = ECS_energy_today
-        mem['ECS_energy_yesterday'] = int(ECS_energy_yesterday)
-        mem['ECS_overloaded'] = int(equipment_water_heater.is_overed())
-        mem.write('status.ini')
-    except:
-        log(0, "[loadStatus] cannot load status.ini")
-        pass
 
 def loadStatus():
     global mem, CLOUD_forecast, ECS_energy_today, ECS_energy_yesterday, equipment_water_heater
     log(0, "[loadStatus] loading status")
     try:
         mem.read('status.ini')
-        CLOUD_forecast = int(mem['CLOUD_forecast'])
-        ECS_energy_today = int(mem['ECS_energy_today'])
-        ECS_energy_yesterday = int(mem['ECS_energy_yesterday'])
-        if int(mem['ECS_overloaded']):
+        CLOUD_forecast = int(mem['init']['CLOUD_forecast'])
+        ECS_energy_today = int(mem['init']['ECS_energy_today'])
+        ECS_energy_yesterday = int(mem['init']['ECS_energy_yesterday'])
+        if(mem['init']['ECS_overloaded'].lower() == "true"):
             equipment_water_heater.set_over()
         else:
             equipment_water_heater.unset_over()
-    except:
-        log(0, "[loadStatus] cannot load status.ini")
+    except Exception as e:
+        log(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+        log(1, e)
+        log(2, "cannot load status.ini")
+
+def saveStatus():
+    global mem, CLOUD_forecast, ECS_energy_today, ECS_energy_yesterday, equipment_water_heater
+    log(0, "[saveStatus] saving status")
+    try:
+        mem['init']['CLOUD_forecast'] = str(CLOUD_forecast)
+        mem['init']['ECS_energy_today'] = str(ECS_energy_today)
+        mem['init']['ECS_energy_yesterday'] = str(ECS_energy_yesterday)
+        mem['init']['ECS_overloaded'] = str(equipment_water_heater.is_overed())
+        with open('status.ini', 'w') as status:
+            mem.write(status)
+    except Exception as e:
+        log(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+        log(1, e)
+        log(2, "cannot save status.ini")
         pass
     
 def reloadStatus():
@@ -276,7 +281,7 @@ def evaluate():
     # It examines the list of equipments by priority order, their current state and computes which one should be
     # turned on/off.
 
-    global last_evaluation_date, ECS_energy_today, last_injection, CLOUD_forecast
+    global last_evaluation_date, ECS_energy_today, last_injection, last_grid, CLOUD_forecast
 
     try:
         t = now_ts()
@@ -353,7 +358,7 @@ def evaluate():
                 # overloaded if (e.current_power > prod) and (prod < e.max_power)
                 if ((e.get_current_power() > power_production) and (power_production < e.MAX_POWER)):
                     debug(4, "[evaluate] this equipment is overed, it cannot load power anymore "+str(e.MIN_POWER))
-                    log(2, e.name + " is fully loaded for today") if (not e.is_overed()) else ''
+                    log(1, e.name + " is fully loaded for today") if (not e.is_overed()) else ''
                     e.set_over()
                     continue
 
@@ -447,7 +452,7 @@ def evaluate():
                 'forced': e.is_forced()
             })
         status['equipments'] = es
-        mqtt_client.publish(TOPIC_STATUS, json.dumps(status))
+        mqtt_client.publish(topic_read_power, json.dumps(status))
     except Exception as e:
         debug(0,"[evaluate exception]") 
         debug(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
@@ -480,7 +485,7 @@ def main():
     for e in equipments:
         e.set_current_power(0) 
         log(1, str(e.name) + " set power topic : " + e.topic_set_power)
-        log(1, str(e.name) + " read power topic : " + e.topic_status)
+        log(1, str(e.name) + " read power topic : " + e.topic_read_power)
         log(1, str(e.name) + " power max : " + str(e.MAX_POWER) + " W" )
         log(1, str(e.name) + " power min : " + str(e.MIN_POWER) + " W" )
         log(1, str(e.name) + " percent min : " + str(e.MIN_PERCENT) + " W" )

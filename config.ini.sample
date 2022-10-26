@@ -12,6 +12,7 @@ topic_force= None
 
 [domoticz]
 idx_injection = 648
+idx_grid = 9999
 
 [evaluate]
 margin = 20
@@ -21,23 +22,42 @@ check_at = 16
 low_ecs_energy_two_days = 10000
 low_ecs_energy_today = 4000
 send_injection = false
+send_grid = false
 
 [debug]
 simulation = true
-sim_prod = 700
+sim_prod = 2000
 debug_file = true
 log_file = true
 debug_file_name = pv_debug.log
 log_file_name = pv.log    
 equipment_debug = true
 regulation_debug = true
-
-[init]
-ECS_energy_today = 0
-ECS_energy_yesterday = 0
-CLOUD_forecast = 999
+use_persistent = false
 
 [ECS]
-min_power = 145
+power_type = variable
+min_power = 101
 min_percent = 4
-topic_status = None
+topic_set_power = regul/vload/ECS/cmd
+topic_read_power = smeter/pzem/ECS
+json_read_power = power
+json_set_power = None
+
+[Resille]
+power_type = constant
+max_power = 596
+topic_set_power = domoticz/out/Resille_Couloir
+json_set_power = nvalue
+topic_read_power = domoticz/out/Resille_Watt
+json_read_power = svalue1
+
+[Soufflant_A]
+power_type = constant
+max_power = 500
+topic_set_power = None
+json_set_power = None
+topic_read_power = None
+json_read_power = None
+
+
