@@ -117,10 +117,12 @@ class Equipment:
     def set_over(self):
         self.is_over_ = True
         self.set_current_power(0)
+        log(0, self.name + " over loaded is set")
 
     def unset_over(self):
         self.is_over_ = False
-    
+        log(0, self.name + " over loaded is unset")
+
     def is_overed(self):
         """ The equipment cannot absorbe energy anymore, e.g. thermostat control by the equipment"""
         # implement in subclasses, watt may be ignored
