@@ -191,10 +191,12 @@ def on_message(client, userdata, msg):
                 if (e.topic_status != None) and (not e.is_overed):
                     if (msg.topic == e.topic_status):
                         print("[on message]         "+ e.name + " is Overed ? ") if SDEBUG else ''
+                        j = json.loads(msg.payload.decode())
+                        e.check_over(int(j['power']))
+
     except:
         print("[on message]         error, message badly formated (e.g. pzem error...)") if SDEBUG else ''
 
-    
 def signal_handler(signal, frame):
     """ End of program handler, set equipments 0W and save status"""
     global equipments
@@ -321,9 +323,8 @@ def evaluate():
                 # Check if this equpment is over loaded, this is a temporaly workaround 
                 # overloaded if (e.current_power > prod) and (prod < e.max_power)
                 if ((e.get_current_power() > power_production) and (power_production < e.MAX_POWER)):
-                    debug(4, "this equipment is overed, it cannot load power anymore "+str(e.MIN_POWER))
+                    debug(4, "[evaluate] this equipment is overed, it cannot load power anymore "+str(e.MIN_POWER))
                     log(2, e.name + " is fully loaded for today") if (not e.is_overed()) else ''
-                    e.set_current_power(0)
                     e.set_over()
                     continue
 
@@ -427,7 +428,7 @@ def main():
     log(0,"[Main] Starting PV Power Regulation @" + config['openweathermap']['location'])
 
     equipment.setup(mqtt_client, not SIMULATION)
-    equipment_water_heater = VariablePowerEquipment('ECS', TOPIC_REGULATION + "/vload/ECS")
+    equipment_water_heater = VariablePowerEquipment('ECS')
     
     # This is a list of EQUIPMENTS BY PRIORITY OREDER (first one has the higher priority). 
     # As many equipments as needed can be listed here.

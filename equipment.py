@@ -58,11 +58,13 @@ def now_ts():
 ##########################################################################
 #PARENT CLASS 
 class Equipment:
-    def __init__(self, name, topic):
+    def __init__(self, name):
         self.name = name
-        self.topic = topic
+        self.topic = config[self.name]['topic_set_power'] 
         self.is_forced_ = False
         self.is_over_ = False
+        self.check_counter = 0
+        self.last_check_ts = None
         self.force_end_date = None
         self.energy = 0
         self.current_power = None
@@ -91,7 +93,7 @@ class Equipment:
             self.energy += self.current_power * delta / 3600.0
 
         self.current_power = power
-        self.last_power_change_date = now_ts()
+        self.last_power_change_date = now_ts() 
 
     def get_current_power(self):
         return self.current_power
@@ -114,6 +116,7 @@ class Equipment:
 
     def set_over(self):
         self.is_over_ = True
+        self.set_current_power(0)
 
     def unset_over(self):
         self.is_over_ = False
@@ -123,6 +126,18 @@ class Equipment:
         # implement in subclasses, watt may be ignored
         return self.is_over_
 
+    def check_over(self, power):
+            COUNTER_LIMIT = 5  
+            if (power < 5  and self.get_current_power() >= self.MIN_POWER):
+                ts = now_ts()
+                if self.last_check_ts is not None:
+                    if ts - self.last_check_ts < 10: # if last_check is < 10s
+                        self.check_counter += 1
+                    if self.check_counter > COUNTER_LIMIT:  # if power measure near 0-5W many times (5)
+                        self.set_over()
+                        debug(0, "[PARENT: check_over]" + self.name + " OVER LOADED : pzem detect 0-5W and current_power is " + self.get_current_power())
+                self.last_check_ts = ts 
+ 
     def get_energy(self):
         return self.energy
 
@@ -144,7 +159,7 @@ class VariablePowerEquipment(Equipment):
     POLYREG_DEGREE = 5
     X = Y = None
 
-    def __init__(self, name, topic):
+    def __init__(self, name):
         Equipment.__init__(self, name,topic)
         self.power_tab = []
         self.MIN_POWER = int(config[self.name]['min_power'])
@@ -218,6 +233,7 @@ class VariablePowerEquipment(Equipment):
             return (((i-1)/2+r))
 
     def set_current_power(self, power):
+        # Super -> Call Parent function 
         super(VariablePowerEquipment, self).set_current_power(power)
         debug(4, "[CHILD: set-current_power] " + self.name ) if EDEBUG else ''
         if self.current_power == 0:
@@ -286,19 +302,23 @@ class VariablePowerEquipment(Equipment):
         return remaining
 
     def force(self, watt, duration=None):
+        # Super -> Call Parent function
         super(VariablePowerEquipment, self).force(watt, duration)
-        self.set_current_power(0 if watt is None else watt)
-
+        self.set_current_power(0 if watt is None else watt)   
+            
 ##########################################################################
 #CHILD CLASS 
 class ConstantPowerEquipment(Equipment):
-    def __init__(self, name, nominal_power, topic):
+    def __init__(self, name, nominal_power):
         Equipment.__init__(self, name, topic)
+        self.MAX_POWER = int(config[self.name]['max_power'])
+        self.MIN_POWER = self.MAX_POWER
         self.nominal_power = nominal_power
         self.is_on = False
         self.type = "constant"
 
     def set_current_power(self, power):
+        # Super -> Call Parent function 
         super(ConstantPowerEquipment, self).set_current_power(power)
         self.is_on = power != 0
         msg = '1' if self.is_on else '0'
@@ -330,47 +350,10 @@ class ConstantPowerEquipment(Equipment):
                 return watt
 
     def force(self, watt, duration=None):
+        # Super -> Call Parent function 
         super(ConstantPowerEquipment, self).force(watt, duration)
         if watt is not None and watt >= self.nominal_power:
             self.set_current_power(self.nominal_power)
         else:
             self.set_current_power(0)
 
-##########################################################################
-#CHILD CLASS 
-class UnknownPowerEquipment(Equipment):
-    def __init__(self, name, topic):
-        Equipment.__init__(self, name, topic)
-        self.is_on = False
-        self.type = "unknow"
-
-    def send_power_command(self):
-        debug(4, "sending power command {} for {}".format(self.is_on, self.name))
-        pass
-
-    def decrease_power_by(self, watt):
-        if self.is_on:
-            self.is_on = False
-            debug(4, "shutting down {} with an unknown consumption to recover {}W".format(self.name, watt))
-            return None
-        else:
-            debug(4, "{} with an unknown power is already off".format(self.name))
-            return 0
-
-    def increase_power_by(self, watt):
-        if self.is_on:
-            debug(4, "{} with an unknown power is already on".format(self.name))
-            return watt
-        else:
-            self.is_on = True
-            debug(4, "turning on {} with an unknown consumption use {}W".format(self.name, watt))
-            return None
-
-    def force(self, watt, duration=None):
-        super(UnknownPowerEquipment, self).force(watt, duration)
-        if watt is None:
-            self.is_on = False
-            self.set_current_power(0)
-        else:
-            self.is_on = True
-            self.set_current_power(watt)
