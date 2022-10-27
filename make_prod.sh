@@ -5,4 +5,3 @@ mkdir prod
 cp *py prod
 mv prod/regulation.py prod/regulation_prod.py
 cp archives/$ts/*.ini prod
-

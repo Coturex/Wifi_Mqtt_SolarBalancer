@@ -92,7 +92,7 @@ TOPIC_SENSOR_CONSUMPTION =  config['mqtt']['topic_cons']
 TOPIC_SENSOR_PRODUCTION = config['mqtt']['topic_prod'] 
 TOPIC_REGULATION = prefix + config['mqtt']['topic_regul'] 
 TOPIC_FORCE = prefix + config['mqtt']['topic_force'] # forced/unforced duration - Can be bind to domotics device topic 
-topic_read_power = config['mqtt']['topic_regul'] + "/status"
+TOPIC_STATUS = prefix + config['mqtt']['topic_status']
  
 ###############################################################
 # DOMOTICZ
@@ -458,17 +458,22 @@ def evaluate():
             'injection' : injection,
             'grid' : grid
         }
-        es = []
+        power_equipments = 0
+        eq = []
         for e in equipments:
-            p = e.get_current_power()
-            es.append({
+            p = e.get_current_power()        
+            power_equipments = power_equipments + p             
+            eq.append({
                 'name': e.name,
                 'current_power': 'unknown' if p is None else p,
                 'energy': e.get_energy(),
+                'over' : e.is_overed(),
                 'forced': e.is_forced()
             })
-        status['equipments'] = es
-        mqtt_client.publish(topic_read_power, json.dumps(status))
+        status['power_equipments'] = power_equipments
+        status['power_house'] = power_consumption - power_equipments
+        status['equipments'] = eq
+        mqtt_client.publish(TOPIC_STATUS, json.dumps(status))
     except Exception as e:
         debug(0,"[evaluate exception]") 
         debug(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
