@@ -280,15 +280,23 @@ def low_energy_fallback():
     global ECS_energy_yesterday, ECS_energy_today, CLOUD_forecast, power_production
 
     max_power = equipment_water_heater.max_power
-    log(0, '[low_energy_fallback] ECS Energy Yesterday / Today / Sum : {} / {} / {}'.format(ECS_energy_yesterday, ECS_energy_today, ECS_energy_yesterday + ECS_energy_today))
+    two_days_nrj = ECS_energy_today + ECS_energy_yesterday
+    log(0, '[low_energy_fallback] ECS Energy Yesterday / Today / Sum : {} / {} / {}'.format(ECS_energy_yesterday, ECS_energy_today, two_days_nrj))
+    log(4, "Cloud forecast : " + str(CLOUD_forecast))
     if (equipment_water_heater.is_overed):
-        log(4, 'ECS Energy Overloaded today')
-        ECS_energy_yesterday = ECS_energy_today = 0
-    elif (ECS_energy_yesterday + ECS_energy_today) < LOW_ECS_ENERGY_TWO_DAYS and ECS_energy_today < LOW_ECS_ENERGY_TODAY:
-        duration = 3600 * (LOW_ECS_ENERGY_TODAY - ECS_energy_today) / max_power
-        log(4, 'daily energy fallback: forcing equipment {} to {}W for {} seconds'.format(equipment_water_heater.name, max_power, duration))
-        equipment_water_heater.force(max_power, duration)
-        debug(0, "--")    
+        log(4, 'ECS Energy has been overloaded today')
+        ECS_energy_today = LOW_ECS_ENERGY_TWO_DAYS
+    if (ECS_energy_today) < LOW_ECS_ENERGY_TODAY:
+        if CLOUD_forecast < 20 and two_days_nrj > LOW_ECS_ENERGY_TWO_DAYS:
+            log(4, 'there is enough energy stored over 2 days : {}'.format(two_days_nrj))
+            log(4, 'and clouds forecast is good : {}'.format(CLOUD_forecast))
+            log(4, 'cancelling fallback')
+        else:    
+            duration = 3600 * (LOW_ECS_ENERGY_TODAY - ECS_energy_today) / max_power
+            log(4, 'energy fallback: forcing equipment {} to {}W for {} seconds'.format(equipment_water_heater.name, max_power, duration))
+            equipment_water_heater.force(max_power, duration)
+            debug(0, "--")    
+
     # save the energy so that it can be used in the fallback check tomorrow
     ECS_energy_yesterday = ECS_energy_today
         
@@ -297,7 +305,7 @@ def evaluate():
     # It examines the list of equipments by priority order, their current state and computes which one should be
     # turned on/off.
 
-    global last_evaluation_date, ECS_energy_today, last_injection, last_grid, CLOUD_forecast
+    global last_evaluation_date, ECS_energy_today, last_injection, last_grid, CLOUD_forecast, equipments, equipment_water_heater
 
     try:
         t = now_ts()
@@ -305,6 +313,9 @@ def evaluate():
             # reset energy counters every day
             d1 = datetime.datetime.fromtimestamp(last_evaluation_date)
             d2 = datetime.datetime.fromtimestamp(t)
+            if d1.hour == 8 and d2.hour == 9: # maybe it has been forced this night (low_energy_fallback)
+                equipment_water_heater.unset_overed()
+
             if d1.hour == 22 and d2.hour == 23:
                 log(0,"")
                 log(0,"[evaluate] TODAY Clouds / Production : " + CLOUD_forecast + "% / " + ECS_energy_today)

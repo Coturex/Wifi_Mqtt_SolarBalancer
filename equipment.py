@@ -242,12 +242,10 @@ class VariablePowerEquipment(Equipment):
     def set_current_power(self, power):
         # Super -> Call Parent function 
         super(VariablePowerEquipment, self).set_current_power(power)
-        debug(4, "[CHILD: set-current_power] " + self.name ) if EDEBUG else ''
         if self.current_power == 0:
             percent = 0
 
         else: 
-            debug(4,"[CHILD: set_current_power] :" + str(power)) if EDEBUG else ''
             percent = self.power_to_percent(power)
 
         # issue with the regulator, don't go below 4 and force to 0
@@ -256,7 +254,8 @@ class VariablePowerEquipment(Equipment):
         if percent > 100:
             percent = 100
 
-        debug(4, "MQTT sending power command {}W ({}%) for {} ({})".format(int(self.current_power), str(percent), self.name, self.topic_set_power))
+        debug(4, "MQTT sending power command {}W ({}%) for {}".format(int(self.current_power), str(percent), self.name))
+        debug(8, "in topic {}".format(self.topic_set_power))
         if _send_commands:
             _mqtt_client.publish(self.topic_set_power, str(percent))
 
@@ -274,8 +273,8 @@ class VariablePowerEquipment(Equipment):
         if decrease > 0:
             old = self.current_power
             new = self.current_power - decrease
-            self.set_current_power(new)
             debug(4, "decreasing power consumption of {} by {}W, from {} to {}".format(self.name, int(decrease), int(old), int(new)))
+            self.set_current_power(new)
         else:
             debug(4, "not decreasing power of {} because it is already at 0W".format(self.name))
 
@@ -301,8 +300,8 @@ class VariablePowerEquipment(Equipment):
         elif increase > 0:
             old = self.current_power
             new = self.current_power + increase
-            self.set_current_power(new)
             debug(4, "increasing power consumption of {} by {}W, from {} to {}".format(self.name, int(increase) , int(old), int(new)))
+            self.set_current_power(new)
         else:
             debug(4, "not increasing power of {} because it is already at maximum power {}W".format(self.name, self.MAX_POWER))
 
@@ -343,7 +342,6 @@ class ConstantPowerEquipment(Equipment):
             return 0
 
     def increase_power_by(self, watt):
-        debug(4, "[CHILD: increase power by]") if EDEBUG else ''
         if self.is_on:
             debug(4, "{} with a power of {}W is already on".format(self.name, self.nominal_power))
             return watt
