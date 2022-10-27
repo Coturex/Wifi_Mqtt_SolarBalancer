@@ -1,5 +1,5 @@
 [openweathermap]
-key = 
+key = xxxxxxxxxxxxxxxxxxxx
 location = Moscou
 
 [mqtt]
@@ -8,32 +8,33 @@ port = 1883
 topic_cons = smeter/pzem/CONSOMMATION
 topic_prod = smeter/pzem/PRODUCTION
 topic_regul= regul
+topic_status = regul/status
 topic_force= None
 
 [domoticz]
 idx_injection = 648
-idx_grid = 9999
+idx_grid = 651
 
 [evaluate]
 margin = 20
 period = 3
 balance_threshold = 20
 check_at = 16
-low_ecs_energy_two_days = 10000
-low_ecs_energy_today = 4000
-send_injection = false
-send_grid = false
+low_ecs_energy_two_days = 11000
+low_ecs_energy_today = 7000
+send_injection = true
+send_grid = true
 
 [debug]
 simulation = true
-sim_prod = 2000
+simul_prod = 2000
 debug_file = true
 log_file = true
 debug_file_name = pv_debug.log
 log_file_name = pv.log    
-equipment_debug = true
-regulation_debug = true
-use_persistent = false
+equipment_stdout = True
+regulation_stdout = True
+use_persistent = true
 
 [ECS]
 power_type = variable
