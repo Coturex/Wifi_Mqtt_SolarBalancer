@@ -59,10 +59,14 @@
         "AUTOCONSOMMATION": "#3274D9",
         "CONSO": "semi-dark-orange",
         "CONSOMMATION": "dark-red",
+        "Cumulus": "semi-dark-orange",
         "ECS": "dark-orange",
         "EDF": "dark-blue",
+        "EDF_GRID": "semi-dark-blue",
+        "Grid_EDF": "dark-blue",
+        "INJECTION": "semi-dark-purple",
         "PROD": "light-green",
-        "PRODUCTION": "semi-dark-green"
+        "PRODUCTION": "light-green"
       },
       "bars": false,
       "dashLength": 10,
@@ -213,50 +217,6 @@
           ]
         },
         {
-          "alias": "INJECTION",
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "Instant",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "D",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "mean"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "name",
-              "operator": "=",
-              "value": "INJECTION"
-            }
-          ]
-        },
-        {
           "alias": "Cumulus",
           "groupBy": [
             {
@@ -299,6 +259,94 @@
               "value": "ECS_Cumulus_pwr"
             }
           ]
+        },
+        {
+          "alias": "EDF_GRID",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "Instant",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "E",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "EDF"
+            }
+          ]
+        },
+        {
+          "alias": "INJECTION",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "Instant",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "D",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "INJECTION"
+            }
+          ]
         }
       ],
       "thresholds": [],
@@ -313,6 +361,7 @@
       },
       "transformations": [
         {
+          "disabled": true,
           "id": "calculateField",
           "options": {
             "alias": "EDF",
@@ -417,7 +466,7 @@
         ]
       },
       "gridPos": {
-        "h": 13,
+        "h": 14,
         "w": 5,
         "x": 19,
         "y": 1
@@ -595,6 +644,45 @@
               "value": "INJECTION"
             }
           ]
+        },
+        {
+          "alias": "EDF_GRID",
+          "groupBy": [],
+          "hide": false,
+          "measurement": "Instant",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT sum(\"value\")  / 60 FROM \"Instant\" WHERE (\"idx\" = '293') AND $timeFilter GROUP BY time(1m) fill(null)",
+          "rawQuery": false,
+          "refId": "E",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "integral"
+              },
+              {
+                "params": [
+                  " / 3600000"
+                ],
+                "type": "math"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "EDF"
+            }
+          ]
         }
       ],
       "timeFrom": null,
@@ -644,7 +732,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 14
+        "y": 15
       },
       "id": 120,
       "panels": [
@@ -1125,7 +1213,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 15
+        "y": 16
       },
       "id": 107,
       "panels": [
@@ -1881,7 +1969,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 17
       },
       "id": 118,
       "panels": [
@@ -2596,7 +2684,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 17
+        "y": 18
       },
       "id": 94,
       "panels": [
@@ -3105,7 +3193,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 18
+        "y": 19
       },
       "id": 125,
       "panels": [
@@ -3466,7 +3554,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 19
+        "y": 20
       },
       "id": 138,
       "panels": [
@@ -4273,7 +4361,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 20
+        "y": 21
       },
       "id": 98,
       "panels": [
@@ -4402,5 +4490,5 @@
   "timezone": "",
   "title": "PV_MOUX",
   "uid": "UwzXfgddfgkfdgserwer",
-  "version": 99
+  "version": 105
 }
