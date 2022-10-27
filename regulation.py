@@ -37,6 +37,7 @@
 
 import datetime
 import json
+from pickletools import string1
 import time
 import signal, sys
 import paho.mqtt.client as mqtt
@@ -51,16 +52,14 @@ import equipment
 from equipment import ConstantPowerEquipment, VariablePowerEquipment
 
 import configparser
-status_ = configparser.ConfigParser()
 config = configparser.ConfigParser()
-mem = configparser.ConfigParser()
 config.read('config.ini')
 
 # A debug switch to toggle simulation (uses distinct MQTT topics for instance)
 if (config['debug']['simulation'].lower() == "true"):
         SIMULATION = True
         print("**** SIMULATION IS SET")
-        SIM_PROD = int(config['debug']['sim_prod'])
+        SIM_PROD = int(config['debug']['simul_prod'])
 else:
         SIMULATION = False
 
@@ -92,12 +91,12 @@ PORT = int(config['mqtt']['port'])
 TOPIC_SENSOR_CONSUMPTION =  config['mqtt']['topic_cons'] 
 TOPIC_SENSOR_PRODUCTION = config['mqtt']['topic_prod'] 
 TOPIC_REGULATION = prefix + config['mqtt']['topic_regul'] 
-TOPIC_FORCE = config['mqtt']['topic_force'] # forced/unforced duration - Can be bind to domotics device topic 
+TOPIC_FORCE = prefix + config['mqtt']['topic_force'] # forced/unforced duration - Can be bind to domotics device topic 
 topic_read_power = config['mqtt']['topic_regul'] + "/status"
  
 ###############################################################
 # DOMOTICZ
-TOPIC_DOMOTICZ_IN = "domoticz/in"
+TOPIC_DOMOTICZ_IN = prefix + "domoticz/in"
 IDX_INJECTION = config['domoticz']['idx_injection']
 IDX_GRID = config['domoticz']['idx_grid']
 
@@ -206,8 +205,8 @@ def on_message(client, userdata, msg):
 def signal_handler(signal, frame):
     """ End of program handler, set equipments 0W and save status"""
     global equipments
-    print ("   !! Ctrl+C pressed !!")
-    log(2, "!! Ctrl+C pressed !!") 
+    print ("!! Ctrl+C pressed !!")
+    log(0, "[signal_handler] !! Ctrl+C pressed !!") 
     for e in equipments:
         e.set_current_power(0) 
         log(2, e.name + " : set power to 0") 
@@ -217,37 +216,54 @@ def signal_handler(signal, frame):
     sys.exit(0)
 
 def loadStatus():
-    global mem, CLOUD_forecast, ECS_energy_today, ECS_energy_yesterday, equipment_water_heater
+    global CLOUD_forecast, ECS_energy_today, ECS_energy_yesterday, equipments
+    data = configparser.ConfigParser()
     log(0, "[loadStatus] loading status")
     try:
-        mem.read('status.ini')
-        CLOUD_forecast = int(mem['init']['CLOUD_forecast'])
-        ECS_energy_today = int(mem['init']['ECS_energy_today'])
-        ECS_energy_yesterday = int(mem['init']['ECS_energy_yesterday'])
-        if(mem['init']['ECS_overloaded'].lower() == "true"):
-            equipment_water_heater.set_over()
-        else:
-            equipment_water_heater.unset_over()
+        data.read('status.ini')
+        CLOUD_forecast = int(data['init']['CLOUD_forecast'])
+        ECS_energy_today = int(data['init']['ECS_energy_today'])
+        ECS_energy_yesterday = int(data['init']['ECS_energy_yesterday'])
+        for e in equipments:
+            log(2, "loading " + e.name)
+            try:
+                if (data[e.name]['overloaded'].lower() == "true"):
+                    log(4, "read overloaded : " + data[e.name]['overloaded'].lower())
+                    e.set_over()
+                else:
+                    e.unset_over()
+            except:
+                e.unset_over()
+            try:
+                nrj = data[e.name]['energy']
+                if (int(nrj) >= 0):
+                    log(4, "read energy : " + nrj)
+                    e.set_energy(int(nrj))
+            except:
+                e.set_energy(0)
     except Exception as e:
         log(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
         log(1, e)
         log(2, "cannot load status.ini")
 
 def saveStatus():
-    global mem, CLOUD_forecast, ECS_energy_today, ECS_energy_yesterday, equipment_water_heater
+    global CLOUD_forecast, ECS_energy_today, ECS_energy_yesterday
+    data = configparser.ConfigParser()
     log(0, "[saveStatus] saving status")
     try:
-        mem['init']['CLOUD_forecast'] = str(CLOUD_forecast)
-        mem['init']['ECS_energy_today'] = str(ECS_energy_today)
-        mem['init']['ECS_energy_yesterday'] = str(ECS_energy_yesterday)
-        mem['init']['ECS_overloaded'] = str(equipment_water_heater.is_overed())
-        with open('status.ini', 'w') as status:
-            mem.write(status)
+        data['init'] = {'ECS_energy_today': str(ECS_energy_today),
+                        'ECS_energy_yesterday': str(ECS_energy_yesterday),
+                        'cloud_forecast': str(CLOUD_forecast)
+                        }
+        for e in equipments:
+            data[e.name] = {'overloaded': str(e.is_overed()),
+                            'energy': str(int(e.get_energy()))}
+        with open('status.ini', 'w') as statusFile:
+            data.write(statusFile)
     except Exception as e:
         log(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
         log(1, e)
         log(2, "cannot save status.ini")
-        pass
     
 def reloadStatus():
     """Reload status on signal handler"""
@@ -469,7 +485,9 @@ def main():
     log(0,"")
     log(0,"[Main] Starting PV Power Regulation @" + config['openweathermap']['location'])
 
-    equipment.setup(mqtt_client, not SIMULATION)
+    mqtt_client = mqtt.Client()
+    equipment.setup(mqtt_client, SIMULATION, prefix)
+   
     equipment_water_heater = VariablePowerEquipment('ECS')
     
     # This is a list of EQUIPMENTS BY PRIORITY OREDER (first one has the higher priority). 
@@ -492,10 +510,13 @@ def main():
     
     loadStatus() if (config['debug']['use_persistent'].lower() == "true") else ''
         
-    mqtt_client = mqtt.Client()
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_message
-    mqtt_client.connect(MQTT_BROKER, PORT , 120)
+    try:
+        mqtt_client.connect(MQTT_BROKER, PORT , 120)
+    except:
+        print("Cannot connect " + MQTT_BROKER)
+        sys.exit()
     mqtt_client.loop_forever()
 
 if __name__ == '__main__':

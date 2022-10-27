@@ -1,7 +1,8 @@
 *.pyc
-calibration/out.csv
-doc/.~lock.mqtt_pvrouter_archi.odg#
 *.log
-*.
 config.ini
 status.ini
+calibration/out.csv
+calibration/*_poly.csv
+prod/*
+archives/*

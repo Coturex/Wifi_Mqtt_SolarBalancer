@@ -43,13 +43,16 @@ else: EDEBUG = False
 
 _mqtt_client = None
 _send_commands = True
+_prefix = ''
 
-
-def setup(mqtt_client, send_commands):
-    global _mqtt_client, _send_commands
+def setup(mqtt_client, simulation, prefix):
+    global _mqtt_client, _send_commands, _prefix
     _mqtt_client = mqtt_client
-    _send_commands = send_commands
-
+    _send_commands = True
+    if not simulation:
+        _prefix = ''
+    else:
+        _prefix = prefix
 
 def now_ts():
     return time.time()
@@ -60,7 +63,7 @@ def now_ts():
 class Equipment:
     def __init__(self, name):
         self.name = name
-        self.topic = config[self.name]['topic_set_power'] 
+        self.topic_set_power = _prefix + config[self.name]['topic_set_power'] 
         self.is_forced_ = False
         self.is_over_ = False
         self.check_counter = 0
@@ -143,6 +146,10 @@ class Equipment:
     def get_energy(self):
         return self.energy
 
+    def set_energy(self, energy):
+        log(1, self.name + " set energy : " + str(energy))
+        self.energy = energy
+
     def reset_energy(self):
         if self.last_power_change_date is not None:
             now = now_ts()
@@ -166,7 +173,6 @@ class VariablePowerEquipment(Equipment):
         self.power_tab = []
         self.MIN_POWER = int(config[self.name]['min_power'])
         self.MIN_PERCENT = int(config[self.name]['min_percent'])
-        self.topic_set_power = self.topic + "/cmd"
         self.type = "variable"        
         self.readCalibration("power_calibration_" + name +".csv")
 
@@ -198,8 +204,7 @@ class VariablePowerEquipment(Equipment):
             self.power_tab.append(P)
         self.power_tab.reverse()    
         if EDEBUG:
-            print(self.power_tab)  
-            time.sleep(5)
+            print(self.power_tab)
       
     def power_to_percent(self, value):
         # search nearest value in array using dichotomic method
@@ -325,7 +330,7 @@ class ConstantPowerEquipment(Equipment):
         self.is_on = power != 0
         msg = '1' if self.is_on else '0'
         if _send_commands:
-            _mqtt_client.publish(self.topic, msg, retain=True)
+            _mqtt_client.publish(self.topic_set_power, msg, retain=True)
         debug(4, "sending power command {} for {}".format(self.is_on, self.name))
 
     def decrease_power_by(self, watt):
