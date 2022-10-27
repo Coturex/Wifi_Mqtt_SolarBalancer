@@ -42,7 +42,6 @@ DAY3 = 3
 class Prediction:
     def __init__(self, location, key):
         self.location = location
-        self.energy = 0
         self.data = 0
         self.apiKey = key
 
@@ -53,29 +52,12 @@ class Prediction:
     def getCloudAvg(self, sDAY):
         """ Return percent Average of clouds, @ UTC 09:00:00, UTC 12:00:00, UTC 13:00:00"""
         """ Average : ((time1+time2+time3)/3)"""
-        s = 0
-        q = 3
         c1 = self.getCloudHour(sDAY,9)
         c2 = self.getCloudHour(sDAY,12)
-        c3 = self.getCloudHour(sDAY,15)
-        if (c1 <0):
-            q = q - 1
-        else:
-            s = s + c1
-        if (c2 <0):
-            q = q - 1
-        else:
-            s = s + c2
-        if (c3 <0):
-                q = q - 1
-        else:
-            s = s + c3
-        if q <= 0:
-            return -1
-        else:
-            avg = s/q
-            debug(10, "Average : " +  str(avg) + " %")
-            return (avg)        
+        #c3 = self.getCloudHour(sDAY,15)
+        avg = (c1 + c2) / 2
+        #debug(10, "Average : " +  str(avg) + " %")
+        return (avg)        
 
     def getRawData(self):
         """Print JSON data returned by html request"""
@@ -122,10 +104,13 @@ def main():
     config.read('config.ini') 
     
     weather = Prediction(config['openweathermap']['location'],config['openweathermap']['key'])
-    weather.getCloudHour(TODAY,18)
+    weather.getRawData()
+    print("today 18H UTC : " + str(weather.getCloudHour(TODAY,18)))
+    print("tomorrow  9H UTC : " + str(weather.getCloudHour(TOMORROW,9)))
+    print("tomorrow 12H UTC : " + str(weather.getCloudHour(TOMORROW,12)))
+    print("tomorrow 15H UTC : " + str(weather.getCloudHour(TOMORROW,15)))
     print ("-----------")
-    print(weather.getCloudAvg(TOMORROW))
-    #weather.getRawData()
+    print("avg (9H+12H)/2 tomorrow : " + str(weather.getCloudAvg(TOMORROW)))
    
 if __name__ == '__main__':
     main()
