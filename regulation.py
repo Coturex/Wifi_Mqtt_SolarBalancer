@@ -291,9 +291,16 @@ def low_energy_fallback():
             log(4, 'there is enough energy stored over 2 days : {}'.format(two_days_nrj))
             log(4, 'and clouds forecast is good : {}'.format(CLOUD_forecast))
             log(4, 'cancelling fallback')
-        else:    
+        elif CLOUD_forecast > 50 and two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS:
+            duration = 3600 * (LOW_ECS_ENERGY_TWO_DAYS - ECS_energy_today) / max_power
+            log(4, 'energy fallback: forcing equipment {} to {}W for {} seconds'.format(equipment_water_heater.name, max_power, duration))
+            log(4, 'and clouds forecast is bad : {}'.format(CLOUD_forecast))
+            equipment_water_heater.force(max_power, duration)
+            debug(0, "--")
+        else:
             duration = 3600 * (LOW_ECS_ENERGY_TODAY - ECS_energy_today) / max_power
             log(4, 'energy fallback: forcing equipment {} to {}W for {} seconds'.format(equipment_water_heater.name, max_power, duration))
+            log(4, 'and clouds forecast is medium : {}'.format(CLOUD_forecast))
             equipment_water_heater.force(max_power, duration)
             debug(0, "--")    
 
