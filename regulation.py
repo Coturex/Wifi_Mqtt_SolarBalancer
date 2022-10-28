@@ -67,17 +67,20 @@ if (config['debug']['regulation_stdout'].lower() == "true"):
     SDEBUG = True 
 else: SDEBUG = False
 
+test = True
 last_evaluation_date = None
 last_injection = None
 last_grid = None
 power_production = None
 power_consumption = None
+last_power_production_date = None
 
 equipments = None
 equipment_water_heater = None
 
 ECS_energy_yesterday = 0
 ECS_energy_today = 0
+production_energy = 0
 CLOUD_forecast = None  
 
 weather = Prediction(config['openweathermap']['location'],config['openweathermap']['key'])
@@ -149,7 +152,7 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     # Receive power consumption and production values and triggers the evaluation. We also take into account manual
     # control messages in case we want to turn on/off a given equipment.
-    global power_production, power_consumption
+    global power_production, power_consumption, last_power_production_date, production_energy
     
     print("[on message] topic : " + msg.topic) if SDEBUG else ''
     try:
@@ -162,6 +165,13 @@ def on_message(client, userdata, msg):
             print("[on message]         conso : " + str(power_consumption) + ", prod : " + str(power_production)) if SDEBUG else ''
             j = json.loads(msg.payload.decode())
             power_production = int(j['power'])
+            correction = 1
+            if last_power_production_date is not None:
+                now = now_ts()
+                delta = now - last_power_production_date
+                production_energy += correction *  power_production * delta / 3600.0
+            last_power_production_date = now_ts() 
+
             if SIMULATION:
                 power_production = SIM_PROD
             evaluate()
@@ -216,7 +226,7 @@ def signal_handler(signal, frame):
     sys.exit(0)
 
 def loadStatus():
-    global CLOUD_forecast, ECS_energy_today, ECS_energy_yesterday, equipments
+    global CLOUD_forecast, ECS_energy_today, ECS_energy_yesterday, equipments, production_energy
     data = configparser.ConfigParser()
     log(0, "[loadStatus] loading status")
     try:
@@ -224,6 +234,11 @@ def loadStatus():
         CLOUD_forecast = int(data['init']['CLOUD_forecast'])
         ECS_energy_today = int(data['init']['ECS_energy_today'])
         ECS_energy_yesterday = int(data['init']['ECS_energy_yesterday'])
+        production_energy = int(data['init']['production_energy'])
+        log(2,"CLOUD_forecast : " + str(CLOUD_forecast))
+        log(2,"ECS_energy_today : " + str(ECS_energy_today))
+        log(2,"ECS_energy_yesterday : " + str(ECS_energy_yesterday))
+        log(2,"production_energy : " + str(production_energy))
         for e in equipments:
             log(2, "loading " + e.name)
             try:
@@ -253,7 +268,8 @@ def saveStatus():
     try:
         data['init'] = {'ECS_energy_today': str(ECS_energy_today),
                         'ECS_energy_yesterday': str(ECS_energy_yesterday),
-                        'cloud_forecast': str(CLOUD_forecast)
+                        'cloud_forecast': str(CLOUD_forecast),
+                        'production_energy': str(int(production_energy))
                         }
         for e in equipments:
             data[e.name] = {'overloaded': str(e.is_overed()),
@@ -277,30 +293,31 @@ def low_energy_fallback():
     # solar energy income be below a minimum threshold. We want the water to stay warm.
     # The check is done everyday
 
-    global ECS_energy_yesterday, ECS_energy_today, CLOUD_forecast, power_production
+    global ECS_energy_yesterday, ECS_energy_today, CLOUD_forecast, power_production, equipment_water_heater
 
-    max_power = equipment_water_heater.max_power
+    max_power = equipment_water_heater.MAX_POWER
     two_days_nrj = ECS_energy_today + ECS_energy_yesterday
     log(0, '[low_energy_fallback] ECS Energy Yesterday / Today / Sum : {} / {} / {}'.format(ECS_energy_yesterday, ECS_energy_today, two_days_nrj))
-    log(4, "Cloud forecast : " + str(CLOUD_forecast))
-    if (equipment_water_heater.is_overed):
+    if (equipment_water_heater.is_overed()):
+        log(4, "cloud forecast : " + str(CLOUD_forecast))
         log(4, 'ECS Energy has been overloaded today')
+        log(4, 'cancelling fallback')
         ECS_energy_today = LOW_ECS_ENERGY_TWO_DAYS
-    if (ECS_energy_today) < LOW_ECS_ENERGY_TODAY:
+    elif (ECS_energy_today) < LOW_ECS_ENERGY_TODAY:
         if CLOUD_forecast < 20 and two_days_nrj > LOW_ECS_ENERGY_TWO_DAYS:
+            log(4, 'cloud forecast is good : {}'.format(CLOUD_forecast))
             log(4, 'there is enough energy stored over 2 days : {}'.format(two_days_nrj))
-            log(4, 'and clouds forecast is good : {}'.format(CLOUD_forecast))
             log(4, 'cancelling fallback')
         elif CLOUD_forecast > 50 and two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS:
             duration = 3600 * (LOW_ECS_ENERGY_TWO_DAYS - ECS_energy_today) / max_power
-            log(4, 'energy fallback: forcing equipment {} to {}W for {} seconds'.format(equipment_water_heater.name, max_power, duration))
-            log(4, 'and clouds forecast is bad : {}'.format(CLOUD_forecast))
+            log(4, 'cloud forecast is bad : {}'.format(CLOUD_forecast))
+            log(4, 'completing for 2 days, forcing ECS {} to {}W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
             equipment_water_heater.force(max_power, duration)
             debug(0, "--")
-        else:
+        else: # Cloud FORECAST  20 à 50
             duration = 3600 * (LOW_ECS_ENERGY_TODAY - ECS_energy_today) / max_power
-            log(4, 'energy fallback: forcing equipment {} to {}W for {} seconds'.format(equipment_water_heater.name, max_power, duration))
-            log(4, 'and clouds forecast is medium : {}'.format(CLOUD_forecast))
+            log(4, 'cloud forecast is medium : {}'.format(CLOUD_forecast))
+            log(4, 'completing for today, forcing ECS {} to {}W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
             equipment_water_heater.force(max_power, duration)
             debug(0, "--")    
 
@@ -312,7 +329,8 @@ def evaluate():
     # It examines the list of equipments by priority order, their current state and computes which one should be
     # turned on/off.
 
-    global last_evaluation_date, ECS_energy_today, last_injection, last_grid, CLOUD_forecast, equipments, equipment_water_heater
+    global last_evaluation_date, ECS_energy_today, last_injection, last_grid, CLOUD_forecast
+    global equipments, equipment_water_heater, production_energy
 
     try:
         t = now_ts()
@@ -323,13 +341,20 @@ def evaluate():
             if d1.hour == 8 and d2.hour == 9: # maybe it has been forced this night (low_energy_fallback)
                 equipment_water_heater.unset_overed()
 
+            # d1.hour = 22
+            # d2.hour = 23
             if d1.hour == 22 and d2.hour == 23:
+                #d1.hour = d2.hour = 23
                 log(0,"")
-                log(0,"[evaluate] TODAY Clouds / Production : " + CLOUD_forecast + "% / " + ECS_energy_today)
+                log(0,"[evaluate] TODAY Cloud / Production / Water_heater")
+                log(8, "csv : {} ; {}".format(CLOUD_forecast, ECS_energy_today) )
                 CLOUD_forecast = weather.getCloudAvg(TOMORROW)
-                log(0,"[evaluate] Clouds Forecast : ", CLOUD_forecast)
+                log(0,"[evaluate] Cloud Forecast : ", CLOUD_forecast)
 
+            global test
+            #if test:
             if d1.day != d2.day: # AT MINUIT
+                test = False
                 ECS_energy_today = equipment_water_heater.get_energy()
                 equipment_water_heater.reset_energy()
                 
@@ -473,6 +498,7 @@ def evaluate():
             'date_str': datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d %H:%M:%S'),
             'power_consumption': power_consumption,
             'power_production': power_production,
+            'production_energy': production_energy,
             'injection' : injection,
             'grid' : grid
         }
