@@ -71,10 +71,11 @@ test = True
 last_evaluation_date = None
 last_injection = None
 last_grid = None
+fallback_today = False
 power_production = None
 power_consumption = None
 last_power_production_date = None
-
+status = None
 equipments = None
 equipment_water_heater = None
 
@@ -212,77 +213,79 @@ def on_message(client, userdata, msg):
     except:
         print("[on message]         error, message badly formated (e.g. pzem error...)") if SDEBUG else ''
 
-def signal_handler(signal, frame):
+def signal_handler(sig, frame):
     """ End of program handler, set equipments 0W and save status"""
     global equipments
-    print ("!! Ctrl+C pressed !!")
-    log(0, "[signal_handler] !! Ctrl+C pressed !!") 
-    for e in equipments:
-        e.set_current_power(0) 
-        log(2, e.name + " : set power to 0") 
-    time.sleep(2)
-    saveStatus() if (config['debug']['use_persistent'].lower() == "true") else ''
-    log(0, "Bye")
-    sys.exit(0)
+    if status is not None:
+        signal_name = '(unknown)'
+        if sig == signal.SIGINT:
+            signal_name = 'SIGINT'
+        elif sig == signal.SIGTERM:
+            signal_name = 'SIGTERM'
+        elif sig == signal.SIGUSR1:
+            signal_name = 'SIGUSR1'
+        elif sig == signal.SIGHUP:
+            signal_name = 'SIGHUP'
+        elif sig == signal.SIGBUS:
+            signal_name = 'SIGBUS'
+        print ("!! Received end signal : " + signal_name)
+        log(0, "[signal_handler] !! Received end signal : " + signal_name)
+        for e in equipments:
+            e.set_current_power(0) 
+            log(2, e.name + " : set power to 0") 
+        time.sleep(2)
+        saveStatus() if (config['debug']['use_persistent'].lower() == "true") else ''
+        log(0, "Bye")
+        sys.exit(0) 
 
 def loadStatus():
-    global CLOUD_forecast, ECS_energy_today, ECS_energy_yesterday, equipments, production_energy
-    data = configparser.ConfigParser()
+    global status, ECS_energy_today, ECS_energy_yesterday, CLOUD_forecast, production_energy, equipments
     log(0, "[loadStatus] loading status")
     try:
-        data.read('status.ini')
-        CLOUD_forecast = int(data['init']['CLOUD_forecast'])
-        ECS_energy_today = int(data['init']['ECS_energy_today'])
-        ECS_energy_yesterday = int(data['init']['ECS_energy_yesterday'])
-        production_energy = int(data['init']['production_energy'])
+        statusFile = open('status.ini')
+        j = json.load(statusFile)
+        CLOUD_forecast = j['CLOUD_forecast']
+        if CLOUD_forecast == 'null':
+            CLOUD_forecast = None
+
+        ECS_energy_yesterday = int(j['ECS_energy_yesterday'])
+        production_energy = int(j['production_energy'])
         log(2,"CLOUD_forecast : " + str(CLOUD_forecast))
-        log(2,"ECS_energy_today : " + str(ECS_energy_today))
         log(2,"ECS_energy_yesterday : " + str(ECS_energy_yesterday))
         log(2,"production_energy : " + str(production_energy))
+        i =0
         for e in equipments:
             log(2, "loading " + e.name)
-            try:
-                if (data[e.name]['overloaded'].lower() == "true"):
-                    log(4, "read overloaded : " + data[e.name]['overloaded'].lower())
-                    e.set_over()
-                else:
-                    e.unset_over()
-            except:
-                e.unset_over()
-            try:
-                nrj = data[e.name]['energy']
-                if (int(nrj) >= 0):
-                    log(4, "read energy : " + nrj)
-                    e.set_energy(int(nrj))
-            except:
-                e.set_energy(0)
+            nrj = int(j['equipments'][i]['energy'])
+            e.set_energy(nrj) 
+            log(4, "read energy : " + str(nrj)) 
+            over = j['equipments'][i]['overed']
+            if (over):
+                log(4, "read overloaded : " + str(over))
+                e.set_over()
+            else:
+                e.unset_over()    
+            i += 1
     except Exception as e:
         log(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
         log(1, e)
         log(2, "cannot load status.ini")
-
+  
 def saveStatus():
-    global CLOUD_forecast, ECS_energy_today, ECS_energy_yesterday
-    data = configparser.ConfigParser()
-    log(0, "[saveStatus] saving status")
-    try:
-        data['init'] = {'ECS_energy_today': str(ECS_energy_today),
-                        'ECS_energy_yesterday': str(ECS_energy_yesterday),
-                        'cloud_forecast': str(CLOUD_forecast),
-                        'production_energy': str(int(production_energy))
-                        }
-        for e in equipments:
-            data[e.name] = {'overloaded': str(e.is_overed()),
-                            'energy': str(int(e.get_energy()))}
-        with open('status.ini', 'w') as statusFile:
-            data.write(statusFile)
-    except Exception as e:
-        log(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
-        log(1, e)
-        log(2, "cannot save status.ini")
-    
+    global status
+    if status is not None:
+        log(0, "[saveStatus] saving status")
+        try:
+            with open('status.ini', 'w') as statusFile:
+               json.dump(status, statusFile, indent=4, sort_keys=True)
+            statusFile.close()
+        except Exception as e:
+            log(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            log(1, e)
+            log(2, "cannot save status.ini")
+
 def reloadStatus():
-    """Reload status on signal handler"""
+    """Reload status on signal handler SIGUSR2"""
     # TO BE DONE
     pass
 
@@ -330,7 +333,8 @@ def evaluate():
     # turned on/off.
 
     global last_evaluation_date, ECS_energy_today, last_injection, last_grid, CLOUD_forecast
-    global equipments, equipment_water_heater, production_energy
+    global equipments, equipment_water_heater, production_energy, fallback_today, status
+    global test
 
     try:
         t = now_ts()
@@ -339,27 +343,27 @@ def evaluate():
             d1 = datetime.datetime.fromtimestamp(last_evaluation_date)
             d2 = datetime.datetime.fromtimestamp(t)
             if d1.hour == 8 and d2.hour == 9: # maybe it has been forced this night (low_energy_fallback)
-                equipment_water_heater.unset_overed()
+                equipment_water_heater.unset_over()
 
-            # d1.hour = 22
-            # d2.hour = 23
+            #if test:
+            #    test = False
             if d1.hour == 22 and d2.hour == 23:
-                #d1.hour = d2.hour = 23
+                fallback_today = False
                 log(0,"")
                 log(0,"[evaluate] TODAY Cloud / Production / Water_heater")
-                log(8, "csv : {} ; {}".format(CLOUD_forecast, ECS_energy_today) )
+                log(8, "csv : {} ; {} ; {}".format(CLOUD_forecast, int(production_energy), ECS_energy_today) )
                 CLOUD_forecast = weather.getCloudAvg(TOMORROW)
-                log(0,"[evaluate] Cloud Forecast : ", CLOUD_forecast)
-
-            global test
+                log(0,"[evaluate] Cloud Forecast : " + str(CLOUD_forecast))
             #if test:
             if d1.day != d2.day: # AT MINUIT
-                test = False
-                ECS_energy_today = equipment_water_heater.get_energy()
-                equipment_water_heater.reset_energy()
-                
-                # ensure that water stays warm enough
-                low_energy_fallback()
+                if not fallback_today:  # be sure it's not already done for today
+                    fallback_today = True
+                    ECS_energy_today = equipment_water_heater.get_energy()
+                    equipment_water_heater.reset_energy()
+                    production_energy = 0
+
+                    # ensure that water stays warm enough
+                    low_energy_fallback()
 
                 for e in equipments:
                     e.unset_over()
@@ -374,7 +378,7 @@ def evaluate():
             return
 
         debug(0, '')
-        debug(0, '[evaluate] evaluating power consumption={}, production={}'.format(power_consumption, power_production))
+        debug(0, '[evaluate] evaluating power CONS = {}, PROD = {}'.format(power_consumption, power_production))
 
         # Here starts the real work, compare powers
         if power_consumption > (power_production - MARGIN):
@@ -493,14 +497,17 @@ def evaluate():
         last_grid = grid
         ##########
         # Build a status message
-        status = {
-            'date': t,
+        status = None
+        msg = {
+            'date': int(t),
             'date_str': datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d %H:%M:%S'),
             'power_consumption': power_consumption,
             'power_production': power_production,
-            'production_energy': production_energy,
+            'production_energy': round(production_energy),
             'injection' : injection,
-            'grid' : grid
+            'grid' : grid,
+            'CLOUD_forecast' : CLOUD_forecast,
+            'ECS_energy_yesterday' : ECS_energy_yesterday,
         }
         power_equipments = 0
         eq = []
@@ -511,13 +518,14 @@ def evaluate():
                 'name': e.name,
                 'current_power': 'unknown' if p is None else p,
                 'energy': e.get_energy(),
-                'over' : e.is_overed(),
+                'overed' : e.is_overed(),
                 'forced': e.is_forced()
             })
-        status['power_equipments'] = power_equipments
-        status['power_house'] = power_consumption - power_equipments
-        status['equipments'] = eq
-        mqtt_client.publish(TOPIC_STATUS, json.dumps(status))
+        msg['power_equipments'] = power_equipments
+        msg['power_house'] = power_consumption - power_equipments
+        msg['equipments'] = eq
+        status = msg
+        mqtt_client.publish(TOPIC_STATUS, json.dumps(msg))
     except Exception as e:
         debug(0,"[evaluate exception]") 
         debug(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
@@ -529,7 +537,11 @@ def evaluate():
 def main():
     global mqtt_client, equipments, equipment_water_heater
     signal.signal(signal.SIGINT, signal_handler) 
-
+    signal.signal(signal.SIGHUP, signal_handler) 
+    signal.signal(signal.SIGUSR1, signal_handler)
+    signal.signal(signal.SIGBUS, signal_handler)
+    
+    
     debug(0,"")
     log(0,"")
     log(0,"[Main] Starting PV Power Regulation @" + config['openweathermap']['location'])

@@ -90,8 +90,7 @@ class Equipment:
         pass
 
     def set_current_power(self, power):
-        # correction fait reference au calcul integral de Grafana qui est aussi très proche d'Enedis
-        correction = 1.025 #config['evaluate'].getfloat('nrj_correction') 
+        correction = 1
         if self.last_power_change_date is not None:
             now = now_ts()
             delta = now - self.last_power_change_date

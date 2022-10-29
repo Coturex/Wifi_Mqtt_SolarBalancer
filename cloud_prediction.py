@@ -57,7 +57,7 @@ class Prediction:
         #c3 = self.getCloudHour(sDAY,15)
         avg = (c1 + c2) / 2
         #debug(10, "Average : " +  str(avg) + " %")
-        return (avg)        
+        return int(avg)        
 
     def getRawData(self):
         """Print JSON data returned by html request"""
@@ -111,6 +111,7 @@ def main():
     print("tomorrow 15H UTC : " + str(weather.getCloudHour(TOMORROW,15)))
     print ("-----------")
     print("avg (9H+12H)/2 tomorrow : " + str(weather.getCloudAvg(TOMORROW)))
+    print("bye")
    
 if __name__ == '__main__':
     main()
