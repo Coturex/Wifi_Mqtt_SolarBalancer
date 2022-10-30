@@ -14,6 +14,9 @@ topic_force= None
 [domoticz]
 idx_injection = 648
 idx_grid = 651
+send_domoticz = true
+send_injection = true
+send_grid = true
 
 [evaluate]
 margin = 20
@@ -22,8 +25,6 @@ balance_threshold = 20
 check_at = 16
 low_ecs_energy_two_days = 11000
 low_ecs_energy_today = 7000
-send_injection = true
-send_grid = true
 
 [debug]
 simulation = true

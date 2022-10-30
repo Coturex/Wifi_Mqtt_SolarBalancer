@@ -105,6 +105,9 @@ def main():
     
     weather = Prediction(config['openweathermap']['location'],config['openweathermap']['key'])
     weather.getRawData()
+    print("today 9H UTC : " + str(weather.getCloudHour(TODAY,9)))
+    print("today 12H UTC : " + str(weather.getCloudHour(TODAY,12)))
+    print("today 15H UTC : " + str(weather.getCloudHour(TODAY,15)))
     print("today 18H UTC : " + str(weather.getCloudHour(TODAY,18)))
     print("tomorrow  9H UTC : " + str(weather.getCloudHour(TOMORROW,9)))
     print("tomorrow 12H UTC : " + str(weather.getCloudHour(TOMORROW,12)))

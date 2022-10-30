@@ -68,13 +68,16 @@ if (config['debug']['regulation_stdout'].lower() == "true"):
 else: SDEBUG = False
 
 test = True
-last_evaluation_date = None
-last_injection = None
 last_grid = None
+last_injection = None
+last_evaluation_date = None
+last_production_date = None
+last_consumption_date = None
+last_zero_injection_date = None
+
 fallback_today = False
 power_production = None
 power_consumption = None
-last_power_production_date = None
 status = None
 equipments = None
 equipment_water_heater = None
@@ -84,10 +87,11 @@ ECS_energy_today = 0
 production_energy = 0
 CLOUD_forecast = None  
 
+PZEM_TIMOUT = 20
 weather = Prediction(config['openweathermap']['location'],config['openweathermap']['key'])
 
 ###############################################################
-# MQTT      
+# MQTT CONFIG
 mqtt_client = None
 prefix = 'simu/' if SIMULATION else ''
 MQTT_BROKER = config['mqtt']['broker_ip'] 
@@ -99,13 +103,22 @@ TOPIC_FORCE = prefix + config['mqtt']['topic_force'] # forced/unforced duration 
 TOPIC_STATUS = prefix + config['mqtt']['topic_status']
  
 ###############################################################
-# DOMOTICZ
+# DOMOTICZ CONFIG
 TOPIC_DOMOTICZ_IN = prefix + "domoticz/in"
 IDX_INJECTION = config['domoticz']['idx_injection']
 IDX_GRID = config['domoticz']['idx_grid']
+if (config['domoticz']['send_domoticz'].lower() == "true"): 
+    SEND_DOMOTICZ = True 
+else: SEND_DOMOTICZ = False
+if (config['domoticz']['send_injection'].lower() == "true"): 
+    SEND_INJECTION = True 
+else: SEND_INJECTION = False
+if (config['domoticz']['send_grid'].lower() == "true"): 
+    SEND_GRID = True 
+else: SEND_GRID = False
 
 ###############################################################
-# EVELUATION
+# EVELUATION CONFIG
 # The comparison between power consumption and production is done every N seconds, it must be above the measurement
 # rate, which is currently 2.5s with PZEM-004t v3.0  module.
 EVALUATION_PERIOD = int(config['evaluate']['period'])
@@ -116,12 +129,6 @@ BALANCE_THRESHOLD = int(config['evaluate']['balance_threshold'])
 MARGIN = int(config['evaluate']['margin'])
 LOW_ECS_ENERGY_TWO_DAYS = int(config['evaluate']['low_ecs_energy_two_days'])  # minimal power on two days
 LOW_ECS_ENERGY_TODAY = int(config['evaluate']['low_ecs_energy_today']) # minimal power for today
-if (config['evaluate']['send_injection'].lower() == "true"): 
-    SEND_INJECTION = True 
-else: SEND_INJECTION = False
-if (config['evaluate']['send_grid'].lower() == "true"): 
-    SEND_GRID = True 
-else: SEND_GRID = False
 
 ###############################################################
 # FUNCTIONS
@@ -153,29 +160,30 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     # Receive power consumption and production values and triggers the evaluation. We also take into account manual
     # control messages in case we want to turn on/off a given equipment.
-    global power_production, power_consumption, last_power_production_date, production_energy
-    
+    global power_production, power_consumption, last_production_date, last_consumption_date, production_energy
+    global PZEM_TIMOUT
+
     print("[on message] topic : " + msg.topic) if SDEBUG else ''
+    now = now_ts()
     try:
         if msg.topic == TOPIC_SENSOR_CONSUMPTION:
             print("[on message]         conso : " + str(power_consumption) + ", prod : " + str(power_production)) if SDEBUG else ''
             j = json.loads(msg.payload.decode())
             power_consumption = int(j['power'])
             evaluate()
+            last_consumption_date = now
         elif msg.topic == TOPIC_SENSOR_PRODUCTION:
             print("[on message]         conso : " + str(power_consumption) + ", prod : " + str(power_production)) if SDEBUG else ''
             j = json.loads(msg.payload.decode())
             power_production = int(j['power'])
-            correction = 1
-            if last_power_production_date is not None:
-                now = now_ts()
-                delta = now - last_power_production_date
-                production_energy += correction *  power_production * delta / 3600.0
-            last_power_production_date = now_ts() 
-
+            if last_production_date is not None:
+                delta = now - last_production_date
+                if delta < PZEM_TIMOUT:
+                    production_energy += power_production * delta / 3600.0
             if SIMULATION:
                 power_production = SIM_PROD
             evaluate()
+            last_production_date = now
         elif msg.topic == TOPIC_FORCE: 
             print("[on message]         Forcing...") 
             j = json.loads(msg.payload.decode())
@@ -202,7 +210,7 @@ def on_message(client, userdata, msg):
                     debug(0, 'not forcing equipment {} anymore'.format(name))
                     e.force(None)
                     evaluate()
-        else: # This is topic_read_power msg. Which equipment is 'over loaded'  ?
+        else: # This is a topic_read_power msg. Which equipment is 'over loaded'  ?
             for e in equipments:
                 if (e.topic_read_power != None) and (not e.is_overed):
                     if (msg.topic == e.topic_read_power):
@@ -237,6 +245,8 @@ def signal_handler(sig, frame):
         saveStatus() if (config['debug']['use_persistent'].lower() == "true") else ''
         log(0, "Bye")
         sys.exit(0) 
+    else:
+        print("signal handler ignored")
 
 def loadStatus():
     global status, ECS_energy_today, ECS_energy_yesterday, CLOUD_forecast, production_energy, equipments
@@ -301,8 +311,8 @@ def low_energy_fallback():
     max_power = equipment_water_heater.MAX_POWER
     two_days_nrj = ECS_energy_today + ECS_energy_yesterday
     log(0, '[low_energy_fallback] ECS Energy Yesterday / Today / Sum : {} / {} / {}'.format(ECS_energy_yesterday, ECS_energy_today, two_days_nrj))
+    log(2, "cloud forecast : " + str(CLOUD_forecast))
     if (equipment_water_heater.is_overed()):
-        log(4, "cloud forecast : " + str(CLOUD_forecast))
         log(4, 'ECS Energy has been overloaded today')
         log(4, 'cancelling fallback')
         ECS_energy_today = LOW_ECS_ENERGY_TWO_DAYS
@@ -313,17 +323,19 @@ def low_energy_fallback():
             log(4, 'cancelling fallback')
         elif CLOUD_forecast > 50 and two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS:
             duration = 3600 * (LOW_ECS_ENERGY_TWO_DAYS - ECS_energy_today) / max_power
-            log(4, 'cloud forecast is bad : {}'.format(CLOUD_forecast))
+            log(4, 'cloud forecast is bad : {} then completing 2 days'.format(CLOUD_forecast))
             log(4, 'completing for 2 days, forcing ECS {} to {}W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
             equipment_water_heater.force(max_power, duration)
             debug(0, "--")
         else: # Cloud FORECAST  20 à 50
             duration = 3600 * (LOW_ECS_ENERGY_TODAY - ECS_energy_today) / max_power
-            log(4, 'cloud forecast is medium : {}'.format(CLOUD_forecast))
+            log(4, 'cloud forecast is medium : {} then completing day'.format(CLOUD_forecast))
             log(4, 'completing for today, forcing ECS {} to {}W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
             equipment_water_heater.force(max_power, duration)
             debug(0, "--")    
-
+    else:
+        log(4, 'ECS Energy today {} is enouth, no need to complete it.'.format(ECS_energy_today))
+        log(4, 'cancelling fallback')
     # save the energy so that it can be used in the fallback check tomorrow
     ECS_energy_yesterday = ECS_energy_today
         
@@ -334,7 +346,8 @@ def evaluate():
 
     global last_evaluation_date, ECS_energy_today, last_injection, last_grid, CLOUD_forecast
     global equipments, equipment_water_heater, production_energy, fallback_today, status
-    global test
+    global power_production, power_consumption, last_production_date, last_consumption_date, test
+    global last_zero_injection_date
 
     try:
         t = now_ts()
@@ -374,127 +387,142 @@ def evaluate():
 
         last_evaluation_date = t
 
+
         if power_production is None or power_consumption is None:
             return
+
 
         debug(0, '')
         debug(0, '[evaluate] evaluating power CONS = {}, PROD = {}'.format(power_consumption, power_production))
 
-        # Here starts the real work, compare powers
-        if power_consumption > (power_production - MARGIN):
-            # TOO CONSUMPTION, POWER IS NEEDED, decrease the load
-            excess_power = power_consumption - (power_production - MARGIN)
-            debug(0, "[evaluate] decreasing global power consumption by {}W".format(excess_power))
-            for e in reversed(equipments):
-                debug(2, "1. examining " + e.name)
-                if e.is_overed():
-                    debug(4, "skipping this equipment because it's already full loaded for today")
-                    continue
-                if e.is_forced():
-                    debug(4, "skipping this equipment because it's in forced state")
-                    continue
-                result = e.decrease_power_by(excess_power)
-                if result is None:
-                    debug(2, "stopping here and waiting for the next measurement to see the effect")
-                    break
-                excess_power -= result
-                if excess_power <= 0:
-                    debug(2, "[no more excess power consumption, stopping here")
-                    break
-                else:
-                    debug(2, "There is {}W left to cancel, continuing".format(excess_power))
-            debug(2, "No more equipment to check")
-        elif (power_production - MARGIN - power_consumption) < BALANCE_THRESHOLD:
-            # Nice, this is the goal: CONSUMPTION is EQUAL to PRODUCTION
-            debug(0, "[evaluate] power consumption and production are balanced")
+        if (t - last_consumption_date) > PZEM_TIMOUT or (t- last_production_date) > PZEM_TIMOUT:
+            power_consumption = 0
+            power_production = 0
+            debug(0, "MQTT SUBSCRIBE : PZEM CONSUMPTION OR PRODUCTION TIMEOUT")
+            debug(4, "reset all power equipments to 0")
+            for e in equipments:
+                e.set_current_power(0)
         else:
-            # There's PV POWER IN EXCESS, try to increase the load to consume this available power
-            available_power = power_production - MARGIN - power_consumption
-            debug(0, "[evaluate] increasing global power consumption by {}W".format(available_power))
-            for i, e in enumerate(equipments):                
-                if available_power <= 0:
-                    debug(2, "no more available power")
-                    break
-                debug(2, "2. examining " + e.name)
+            # HERE STARTS THE REAL WORK, compare powers
+            if power_consumption > (power_production - MARGIN):
+                # TOO CONSUMPTION, POWER IS NEEDED, decrease the load
+                excess_power = power_consumption - (power_production - MARGIN)
+                debug(0, "[evaluate] decreasing global power consumption by {}W".format(excess_power))
+                for e in reversed(equipments):
+                    debug(2, "1. examining " + e.name)
+                    if e.is_overed():
+                        debug(4, "skipping this equipment because it's already full loaded for today")
+                        continue
+                    if e.is_forced():
+                        debug(4, "skipping this equipment because it's in forced state")
+                        continue
+                    result = e.decrease_power_by(excess_power)
+                    if result is None:
+                        debug(2, "stopping here and waiting for the next measurement to see the effect")
+                        break
+                    excess_power -= result
+                    if excess_power <= 0:
+                        debug(2, "[no more excess power consumption, stopping here")
+                        break
+                    else:
+                        debug(2, "There is {}W left to cancel, continuing".format(excess_power))
+                debug(2, "No more equipment to check")
+            elif (power_production - MARGIN - power_consumption) < BALANCE_THRESHOLD:
+                # Nice, this is the goal: CONSUMPTION is EQUAL to PRODUCTION
+                debug(0, "[evaluate] power consumption and production are balanced")
+            else:
+                # There's PV POWER IN EXCESS, try to increase the load to consume this available power
+                available_power = power_production - MARGIN - power_consumption
+                debug(0, "[evaluate] increasing global power consumption by {}W".format(available_power))
+                for i, e in enumerate(equipments):                
+                    if available_power <= 0:
+                        debug(2, "no more available power")
+                        break
+                    debug(2, "2. examining " + e.name)
 
-                # Check if this equpment is over loaded, this is a temporaly workaround 
-                # overloaded if (e.current_power > prod) and (prod < e.max_power)
-                if ((e.get_current_power() > power_production) and (power_production < e.MAX_POWER)):
-                    debug(4, "[evaluate] this equipment is overed, it cannot load power anymore "+str(e.MIN_POWER))
-                    log(1, e.name + " is fully loaded for today") if (not e.is_overed()) else ''
-                    e.set_over()
-                    continue
+                    # Check if this equpment is over loaded, this is a temporaly workaround 
+                    # overloaded if (e.current_power > prod) and (prod < e.max_power)
+                    if ((e.get_current_power() > power_production) and (power_production < e.MAX_POWER)):
+                        debug(4, "[evaluate] this equipment is overed, it cannot load power anymore "+str(e.MIN_POWER))
+                        log(1, e.name + " is fully loaded for today") if (not e.is_overed()) else ''
+                        e.set_over()
+                        continue
 
-                if e.is_overed():
-                    debug(4, "skipping this equipment because it's already full loaded for today")
-                    continue
-                if e.is_forced():
-                    debug(4, "skipping this equipment because it's in forced state")
-                    continue
-                result = e.increase_power_by(available_power)
-                if result is None:
-                    debug(2, "stopping here and waiting for the next measurement to see the effect")
-                    break
-                elif result == 0:
-                    debug(2, "no more available power to use, stopping here")
-                    break
-                elif result < 0:
-                    debug(2, "not enough available power to turn on this equipment, trying to recover power on lower priority equipments")
-                    freeable_power = 0
-                    needed_power = -result
-                    for j in range(i + 1, len(equipments)):
-                        o = equipments[j]
-                        if o.is_forced():
-                            continue
-                        p = o.get_current_power()
-                        if p is not None:
-                            freeable_power += p
-                    debug(2, "power used by other equipments: {}W, needed: {}W".format(freeable_power, needed_power))
-                    if freeable_power >= needed_power:
-                        debug(2, "recovering power")
-                        freed_power = 0
-                        for j in reversed(range(i + 1, len(equipments))):
+                    if e.is_overed():
+                        debug(4, "skipping this equipment because it's already full loaded for today")
+                        continue
+                    if e.is_forced():
+                        debug(4, "skipping this equipment because it's in forced state")
+                        continue
+                    result = e.increase_power_by(available_power)
+                    if result is None:
+                        debug(2, "stopping here and waiting for the next measurement to see the effect")
+                        break
+                    elif result == 0:
+                        debug(2, "no more available power to use, stopping here")
+                        break
+                    elif result < 0:
+                        debug(2, "not enough available power to turn on this equipment, trying to recover power on lower priority equipments")
+                        freeable_power = 0
+                        needed_power = -result
+                        for j in range(i + 1, len(equipments)):
                             o = equipments[j]
                             if o.is_forced():
                                 continue
-                            result = o.decrease_power_by(needed_power)
-                            freed_power += result
-                            needed_power -= result
-                            if needed_power <= 0:
-                                debug(2, "enough power has been recovered, stopping here")
-                                break
-                        new_available_power = available_power + freed_power
-                        debug(2, "now trying again to increase power of {} with {}W".format(e.name, new_available_power))
-                        available_power = e.increase_power_by(new_available_power)
+                            p = o.get_current_power()
+                            if p is not None:
+                                freeable_power += p
+                        debug(2, "power used by other equipments: {}W, needed: {}W".format(freeable_power, needed_power))
+                        if freeable_power >= needed_power:
+                            debug(2, "recovering power")
+                            freed_power = 0
+                            for j in reversed(range(i + 1, len(equipments))):
+                                o = equipments[j]
+                                if o.is_forced():
+                                    continue
+                                result = o.decrease_power_by(needed_power)
+                                freed_power += result
+                                needed_power -= result
+                                if needed_power <= 0:
+                                    debug(2, "enough power has been recovered, stopping here")
+                                    break
+                            new_available_power = available_power + freed_power
+                            debug(2, "now trying again to increase power of {} with {}W".format(e.name, new_available_power))
+                            available_power = e.increase_power_by(new_available_power)
+                        else:
+                            debug(2, "this is not possible to recover enough power on lower priority equipments")
                     else:
-                        debug(2, "this is not possible to recover enough power on lower priority equipments")
-                else:
-                    available_power = result
-                    debug(2, "there is {}W left to use, continuing".format(available_power))
-            debug(2, "no more equipment to check")
-        
+                        available_power = result
+                        debug(2, "there is {}W left to use, continuing".format(available_power))
+                debug(2, "no more equipment to check")
+            
         ##########  
         # Build Domoticz Messages (Energy Counter Injection and/or Grid) then InfluxDB will be updated too
-        injection = (power_consumption - power_production) 
-        if injection < 0: # Prepare Injection message
-            grid = 0
-            if last_grid != 0: # Send 0 grid only if last_grid wasn't zero in order to avoid too many repetitions
-                domoticz = "{ \"idx\": " + IDX_GRID + ", \"nvalue\": 0, \"svalue\": \"" + str(grid) + "\"}"
-                mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_GRID else ''
-            domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"" + str(injection) + "\"}"
-            mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_INJECTION else ''
-        else: # Prepare Grid Message, and Zero Injection message   
-            grid = injection
-            injection = 0
-            if last_injection != 0: # Send 0 injection only if last_injection wasn't zero in order to avoid too many repetitions
+        if (SEND_DOMOTICZ):
+            injection = (power_consumption - power_production) 
+            if injection < 0: # Prepare Injection message
+                grid = 0
+                if last_grid != 0: # Send 0 grid only if last_grid wasn't zero in order to avoid too many repetitions into InfluxDB
+                    domoticz = "{ \"idx\": " + IDX_GRID + ", \"nvalue\": 0, \"svalue\": \"" + str(grid) + "\"}"
+                    mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_GRID else ''
+                if last_injection == 0 and (t - last_zero_injection_date) > 20 : # Pic detected then a Workaround is needed in order to improve Grafana Integral calculation
+                    domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"0\"}"
+                    mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_INJECTION else ''    
                 domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"" + str(injection) + "\"}"
                 mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_INJECTION else ''
-            domoticz = "{ \"idx\": " + IDX_GRID + ", \"nvalue\": 0, \"svalue\": \"" + str(grid) + "\"}"
-            mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_GRID else ''   
-        print("[evaluate]                    CALCULATED INJECTION :", injection) if SDEBUG else ''
-        print("[evaluate]                    CALCULATED GRID      :", grid) if SDEBUG else ''        
-        last_injection = injection
-        last_grid = grid
+            else: # Prepare Grid Message, and ZERO INJECTION message   
+                grid = injection
+                injection = 0
+                last_zero_injection_date = t
+                if last_injection != 0: # Send 0 injection only if last_injection wasn't zero in order to avoid too many repetitions
+                    domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"" + str(injection) + "\"}"
+                    mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_INJECTION else ''            
+                domoticz = "{ \"idx\": " + IDX_GRID + ", \"nvalue\": 0, \"svalue\": \"" + str(grid) + "\"}"
+                mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_GRID else ''   
+            print("[evaluate]                    CALCULATED INJECTION :", injection) if SDEBUG else ''
+            print("[evaluate]                    CALCULATED GRID      :", grid) if SDEBUG else ''        
+            last_injection = injection
+            last_grid = grid
         ##########
         # Build a status message
         status = None
