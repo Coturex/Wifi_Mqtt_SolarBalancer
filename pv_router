@@ -1,0 +1,114 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:		pv_router
+# Required-Start:	$remote_fs $syslog
+# Required-Stop:	$remote_fs $syslog
+# Default-Start:	2 3 4 5
+# Default-Stop:		0 1 6
+# Short-Description:	Phothovoltaic Power router
+# Description:
+### END INIT INFO
+
+set -e
+
+PIDFILE=/home/pi/pv_router/regulation.pid
+DAEMON=/home/pi/pv_router/regulation.py
+DIR=/home/pi/pv_router
+#PIDFILE=/var/run/pv_router.pid
+#DAEMON=/home/chris/dev/tools/cctest.py
+#DIR=/home/chris/dev/tools
+
+# /etc/init.d/pv_router: start and stop PV Router daemon
+
+test -x ${DAEMON} || exit 0
+
+umask 022
+
+. /lib/lsb/init-functions
+
+# Are we running from init?
+run_by_init() {
+    ([ "$previous" ] && [ "$runlevel" ]) || [ "$runlevel" = S ]
+}
+
+export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
+
+case "$1" in
+  start)
+	if init_is_upstart; then
+	    exit 1
+	fi
+	log_daemon_msg "Starting PV Router:" "pv_router"
+	if start-stop-daemon --start --quiet --oknodo --make-pidfile -d ${DIR} --pidfile ${PIDFILE} --exec ${DAEMON}  ; then
+	    log_end_msg 0
+	else
+	    log_end_msg 1
+	fi
+	;;
+  kill)
+	if init_is_upstart; then
+	    exit 0
+	fi
+	log_daemon_msg "Killing PV Router:" "pv_router"
+	if start-stop-daemon --stop --quiet --oknodo --pidfile ${PIDFILE}; then
+	    log_end_msg 0
+	    rm -f ${PIDFILE}
+	else
+	    log_end_msg 1
+	fi
+	;;
+
+  stop)
+	if init_is_upstart; then
+	    exit 0
+	fi
+	log_daemon_msg "Stopping PV Router:" "pv_router"
+	if start-stop-daemon --stop --signal INT --quiet --oknodo --pidfile ${PIDFILE}; then
+	    log_end_msg 0
+	    rm -f ${PIDFILE}
+	else
+	    log_end_msg 1
+	fi
+	;;
+
+  reload|force-reload)
+	if init_is_upstart; then
+	    exit 1
+	fi
+	log_daemon_msg "Reloading PV Router configuration:" "pv_router"
+        if start-stop-daemon --stop --signal HUP --quiet --oknodo --pidfile $PIDFILE; then
+            log_end_msg 0
+        else
+            log_end_msg 1
+        fi
+	;;
+
+  restart)
+	if init_is_upstart; then
+	    exit 1
+	fi
+	log_daemon_msg "Restarting PV Router:" "pv_router"
+	if start-stop-daemon --stop --signal INT --quiet --oknodo --pidfile ${PIDFILE}; then
+	    rm -f ${PIDFILE}
+	fi
+	if start-stop-daemon --start --quiet --oknodo --make-pidfile -d ${DIR} --pidfile ${PIDFILE} --exec ${DAEMON}  ; then
+	    log_end_msg 0
+	else
+	    log_end_msg 1
+	fi
+	;;
+
+  status)
+	if init_is_upstart; then
+	    exit 1
+	fi
+	status_of_proc -p ${PIDFILE} ${DAEMON} pv_router && exit 0 || exit $?
+	;;
+
+  *)
+	log_action_msg "Usage: /etc/init.d/pv_router {start|stop|status}"
+	exit 1
+esac
+
+exit 0

@@ -73,6 +73,7 @@ last_injection = None
 last_evaluation_date = None
 last_production_date = None
 last_consumption_date = None
+last_zero_grid_date = None
 last_zero_injection_date = None
 
 fallback_today = False
@@ -347,7 +348,7 @@ def evaluate():
     global last_evaluation_date, ECS_energy_today, last_injection, last_grid, CLOUD_forecast
     global equipments, equipment_water_heater, production_energy, fallback_today, status
     global power_production, power_consumption, last_production_date, last_consumption_date, test
-    global last_zero_injection_date
+    global last_zero_grid_date, last_zero_injection_date
 
     try:
         t = now_ts()
@@ -495,30 +496,56 @@ def evaluate():
                         available_power = result
                         debug(2, "there is {}W left to use, continuing".format(available_power))
                 debug(2, "no more equipment to check")
-            
-        ##########  
-        # Build Domoticz Messages (Energy Counter Injection and/or Grid) then InfluxDB will be updated too
-        if (SEND_DOMOTICZ):
+        
+        if SEND_DOMOTICZ: # THEN SEND GRID & INJECTION MESSAGE
             injection = (power_consumption - power_production) 
-            if injection < 0: # Prepare Injection message
+            if injection < 0:   # This is INJECTION
                 grid = 0
-                if last_grid != 0: # Send 0 grid only if last_grid wasn't zero in order to avoid too many repetitions into InfluxDB
-                    domoticz = "{ \"idx\": " + IDX_GRID + ", \"nvalue\": 0, \"svalue\": \"" + str(grid) + "\"}"
-                    mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_GRID else ''
-                if last_injection == 0 and (t - last_zero_injection_date) > 20 : # Pic detected then a Workaround is needed in order to improve Grafana Integral calculation
-                    domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"0\"}"
-                    mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_INJECTION else ''    
-                domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"" + str(injection) + "\"}"
-                mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_INJECTION else ''
-            else: # Prepare Grid Message, and ZERO INJECTION message   
+                last_zero_grid_date = t
+            else:               # This is GRID
                 grid = injection
                 injection = 0
-                last_zero_injection_date = t
-                if last_injection != 0: # Send 0 injection only if last_injection wasn't zero in order to avoid too many repetitions
+                last_zero_grid_date = t
+            
+            ### HERE Prepare and send  INJECTION MESSAGE
+            if SEND_INJECTION:
+                if injection < 0 and last_injection == 0 and (t - last_zero_injection_date) > 20 : 
+                    # This Workaround is needed in order to improve Grafana Integral calculation. Send 0.
+                    domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"0\"}"
+                    mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) 
+                    print(TOPIC_DOMOTICZ_IN, domoticz) if SDEBUG else ''
+                if injection < 0:
                     domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"" + str(injection) + "\"}"
-                    mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_INJECTION else ''            
-                domoticz = "{ \"idx\": " + IDX_GRID + ", \"nvalue\": 0, \"svalue\": \"" + str(grid) + "\"}"
-                mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) if SEND_GRID else ''   
+                    mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) 
+                    print(TOPIC_DOMOTICZ_IN, domoticz) if SDEBUG else ''
+            
+                if injection == 0 and last_injection == 0:
+                    # Do not repeat this point
+                    pass
+                elif injection == 0:
+                    domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"0\"}"
+                    mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) 
+                    print(TOPIC_DOMOTICZ_IN, domoticz) if SDEBUG else ''
+                    
+            ### HERE Prepare and send  GRIS MESSAGE
+            if SEND_GRID:
+                if grid < 0 and last_grid == 0 and (t - last_zero_grid_date) > 20 : 
+                    # This Workaround is needed in order to improve Grafana Integral calculation. Send 0.
+                    domoticz = "{ \"idx\": " + IDX_GRID + ", \"nvalue\": 0, \"svalue\": \"0\"}"
+                    mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz)
+                    print(TOPIC_DOMOTICZ_IN, domoticz) if SDEBUG else ''
+                if grid < 0:
+                    domoticz = "{ \"idx\": " + IDX_GRID + ", \"nvalue\": 0, \"svalue\": \"" + str(grid) + "\"}"
+                    mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz)
+                    print(TOPIC_DOMOTICZ_IN, domoticz) if SDEBUG else ''
+
+                if grid == 0 and last_grid == 0:
+                    # Do not repeat this point
+                    pass
+                elif grid == 0:
+                    domoticz = "{ \"idx\": " + IDX_GRID + ", \"nvalue\": 0, \"svalue\": \"0\"}"
+                    mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz)
+                    print(TOPIC_DOMOTICZ_IN, domoticz) if SDEBUG else ''
             print("[evaluate]                    CALCULATED INJECTION :", injection) if SDEBUG else ''
             print("[evaluate]                    CALCULATED GRID      :", grid) if SDEBUG else ''        
             last_injection = injection

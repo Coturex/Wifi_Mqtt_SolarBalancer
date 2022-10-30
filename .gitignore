@@ -1,5 +1,6 @@
 *.pyc
 *.log
+*.pid
 config.ini
 status.ini
 calibration/out.csv
