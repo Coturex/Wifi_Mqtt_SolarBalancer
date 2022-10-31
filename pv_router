@@ -6,7 +6,7 @@
 # Required-Stop:	$remote_fs $syslog
 # Default-Start:	2 3 4 5
 # Default-Stop:		0 1 6
-# Short-Description:	Phothovoltaic Power router
+# Short-Description:	Photovoltaic Power router
 # Description:
 ### END INIT INFO
 
@@ -39,8 +39,8 @@ case "$1" in
 	if init_is_upstart; then
 	    exit 1
 	fi
-	log_daemon_msg "Starting PV Router:" "pv_router"
-	if start-stop-daemon --start --quiet --oknodo --make-pidfile -d ${DIR} --pidfile ${PIDFILE} --exec ${DAEMON}  ; then
+	log_daemon_msg "Starting PV Router" "pv_router"
+	if start-stop-daemon --start --quiet --oknodo --background --make-pidfile -d ${DIR} --pidfile ${PIDFILE} --exec ${DAEMON}  ; then
 	    log_end_msg 0
 	else
 	    log_end_msg 1
@@ -50,7 +50,7 @@ case "$1" in
 	if init_is_upstart; then
 	    exit 0
 	fi
-	log_daemon_msg "Killing PV Router:" "pv_router"
+	log_daemon_msg "Killing PV Router - PID" `cat $PIDFILE`
 	if start-stop-daemon --stop --quiet --oknodo --pidfile ${PIDFILE}; then
 	    log_end_msg 0
 	    rm -f ${PIDFILE}
@@ -63,7 +63,7 @@ case "$1" in
 	if init_is_upstart; then
 	    exit 0
 	fi
-	log_daemon_msg "Stopping PV Router:" "pv_router"
+	log_daemon_msg "Stopping PV Router - PID " `cat $PIDFILE`
 	if start-stop-daemon --stop --signal INT --quiet --oknodo --pidfile ${PIDFILE}; then
 	    log_end_msg 0
 	    rm -f ${PIDFILE}
@@ -107,7 +107,7 @@ case "$1" in
 	;;
 
   *)
-	log_action_msg "Usage: /etc/init.d/pv_router {start|stop|status}"
+	log_action_msg "Usage: /etc/init.d/pv_router {start|kill|stop|status}"
 	exit 1
 esac
 

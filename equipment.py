@@ -315,11 +315,11 @@ class VariablePowerEquipment(Equipment):
 ##########################################################################
 #CHILD CLASS 
 class ConstantPowerEquipment(Equipment):
-    def __init__(self, name, nominal_power):
+    def __init__(self, name):
         Equipment.__init__(self, name)
         self.MAX_POWER = int(config[self.name]['max_power'])
         self.MIN_POWER = self.MAX_POWER
-        self.nominal_power = nominal_power
+        self.max_power = self.MAX_POWER
         self.is_on = False
         self.type = "constant"
 
@@ -334,31 +334,31 @@ class ConstantPowerEquipment(Equipment):
 
     def decrease_power_by(self, watt):
         if self.is_on:
-            debug(4, "shutting down {} with a consumption of {}W to recover {}W".format(self.name, self.nominal_power, watt))
+            debug(4, "shutting down {} with a consumption of {}W to recover {}W".format(self.name, self.max_power, watt))
             self.set_current_power(0)
-            return self.nominal_power
+            return self.max_power
         else:
-            debug(4, "{} with a power of {}W is already off".format(self.name, self.nominal_power))
+            debug(4, "{} with a power of {}W is already off".format(self.name, self.max_power))
             return 0
 
     def increase_power_by(self, watt):
         if self.is_on:
-            debug(4, "{} with a power of {}W is already on".format(self.name, self.nominal_power))
+            debug(4, "{} with a power of {}W is already on".format(self.name, self.max_power))
             return watt
         else:
-            if watt >= self.nominal_power:
-                debug(4, "turning on {} with a consumption of {}W to use {}W".format(self.name, self.nominal_power, watt))
-                self.set_current_power(self.nominal_power)
-                return watt - self.nominal_power
+            if watt >= self.max_power:
+                debug(4, "turning on {} with a consumption of {}W to use {}W".format(self.name, self.max_power, watt))
+                self.set_current_power(self.max_power)
+                return watt - self.max_power
             else:
-                debug(4, "not turning on {} with a consumption of {}W because it would use more than the available {}W".format(self.name, self.nominal_power, watt))
+                debug(4, "not turning on {} with a consumption of {}W because it would use more than the available {}W".format(self.name, self.max_power, watt))
                 return watt
 
     def force(self, watt, duration=None):
         # Super -> Call Parent function 
         super(ConstantPowerEquipment, self).force(watt, duration)
-        if watt is not None and watt >= self.nominal_power:
-            self.set_current_power(self.nominal_power)
+        if watt is not None and watt >= self.max_power:
+            self.set_current_power(self.max_power)
         else:
             self.set_current_power(0)
 
