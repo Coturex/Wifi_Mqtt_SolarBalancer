@@ -34,12 +34,8 @@
 
 # See the "equipment module" for the definitions of the loads.
 
-
-import datetime
-import json
 from pickletools import string1
-import time
-import signal, sys
+import signal, sys, os, psutil, datetime, json, time
 import paho.mqtt.client as mqtt
 
 from debug_log import log as log
@@ -59,7 +55,13 @@ config.read('config.ini')
 if (config['debug']['simulation'].lower() == "true"):
         SIMULATION = True
         print("**** SIMULATION IS SET")
-        SIM_PROD = int(config['debug']['simul_prod'])
+        if (config['debug']['simul_prod'].lower() == "none"):
+            SIM_PROD = None
+            print("     PRODCUTION IS AS READ ON MQTT TOPIC")
+        else:
+            SIM_PROD = int(config['debug']['simul_prod'])
+            print("     PROD IS SIMULATED AT " + str(SIM_PROD))
+        input("Enter to continue")
 else:
         SIMULATION = False
 
@@ -73,8 +75,8 @@ last_injection = None
 last_evaluation_date = None
 last_production_date = None
 last_consumption_date = None
-last_zero_grid_date = None
-last_zero_injection_date = None
+last_zero_grid_date = 0
+last_zero_injection_date = 0
 
 fallback_today = False
 power_production = None
@@ -133,6 +135,17 @@ LOW_ECS_ENERGY_TODAY = int(config['evaluate']['low_ecs_energy_today']) # minimal
 
 ###############################################################
 # FUNCTIONS
+def checkProcessRunning(processName):
+    # Checking if there is any running process that contains the given name processName.
+    #Iterate over the all the running process
+    for proc in psutil.process_iter():
+        try:
+            # Check if process name contains the given name string.
+            if processName.lower() in proc.name().lower():
+                return True
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+    return False;
 
 def now_ts():
     return time.time()
@@ -181,7 +194,7 @@ def on_message(client, userdata, msg):
                 delta = now - last_production_date
                 if delta < PZEM_TIMOUT:
                     production_energy += power_production * delta / 3600.0
-            if SIMULATION:
+            if SIMULATION and SIM_PROD is not None:
                 power_production = SIM_PROD
             evaluate()
             last_production_date = now
@@ -352,8 +365,8 @@ def evaluate():
 
     try:
         t = now_ts()
-        if last_evaluation_date is not None:
-            # reset energy counters every day
+        
+        if last_evaluation_date is not None: # Evaluating scheduler
             d1 = datetime.datetime.fromtimestamp(last_evaluation_date)
             d2 = datetime.datetime.fromtimestamp(t)
             if d1.hour == 8 and d2.hour == 9: # maybe it has been forced this night (low_energy_fallback)
@@ -379,8 +392,8 @@ def evaluate():
                     # ensure that water stays warm enough
                     low_energy_fallback()
 
-                for e in equipments:
-                    e.unset_over()
+                    for e in equipments:
+                        e.unset_over()
                     
             # ensure there's a minimum duration between two evaluations
             if t - last_evaluation_date < EVALUATION_PERIOD:
@@ -388,8 +401,7 @@ def evaluate():
 
         last_evaluation_date = t
 
-
-        if power_production is None or power_consumption is None:
+        if power_production is None or power_consumption is None: # Return if None
             return
 
 
@@ -506,7 +518,7 @@ def evaluate():
                 grid = injection
                 injection = 0
                 last_zero_grid_date = t
-            
+            print ("***** SIMULATION DOMOTICZ INJECTION GRID : {} {} {} {}".format(SIMULATION, SEND_DOMOTICZ, SEND_INJECTION, SEND_GRID)) if SDEBUG else ''
             ### HERE Prepare and send  INJECTION MESSAGE
             if SEND_INJECTION:
                 if injection < 0 and last_injection == 0 and (t - last_zero_injection_date) > 20 : 
@@ -529,12 +541,12 @@ def evaluate():
                     
             ### HERE Prepare and send  GRIS MESSAGE
             if SEND_GRID:
-                if grid < 0 and last_grid == 0 and (t - last_zero_grid_date) > 20 : 
+                if grid > 0 and last_grid == 0 and (t - last_zero_grid_date) > 20 : 
                     # This Workaround is needed in order to improve Grafana Integral calculation. Send 0.
                     domoticz = "{ \"idx\": " + IDX_GRID + ", \"nvalue\": 0, \"svalue\": \"0\"}"
                     mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz)
                     print(TOPIC_DOMOTICZ_IN, domoticz) if SDEBUG else ''
-                if grid < 0:
+                if grid > 0:
                     domoticz = "{ \"idx\": " + IDX_GRID + ", \"nvalue\": 0, \"svalue\": \"" + str(grid) + "\"}"
                     mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz)
                     print(TOPIC_DOMOTICZ_IN, domoticz) if SDEBUG else ''
@@ -590,13 +602,16 @@ def evaluate():
 # MAIN
 
 def main():
-    global mqtt_client, equipments, equipment_water_heater
+    global mqtt_client, equipments, equipment_water_heaterc
     signal.signal(signal.SIGINT, signal_handler) 
     signal.signal(signal.SIGHUP, signal_handler) 
     signal.signal(signal.SIGUSR1, signal_handler)
     signal.signal(signal.SIGBUS, signal_handler)
     
-    
+    if os.uname()[1] == "raspberry":
+        while checkProcessRunning("mosquitto") is False:
+            time.sleep(5)
+
     debug(0,"")
     log(0,"")
     log(0,"[Main] Starting PV Power Regulation @" + config['openweathermap']['location'])
@@ -610,7 +625,7 @@ def main():
     # As many equipments as needed can be listed here.
     equipments = (
         equipment_water_heater,
-        # ConstantPowerEquipment('Resille'),
+        ConstantPowerEquipment('Resille'),
         # UnknownPowerEquipment('plug_1')
     )
 
@@ -618,11 +633,13 @@ def main():
     # At startup, reset everything - Mandatory !
     for e in equipments:
         e.set_current_power(0) 
+        log(1, str(e.name) + " power type : " + e.type)
         log(1, str(e.name) + " set power topic : " + e.topic_set_power)
         log(1, str(e.name) + " read power topic : " + e.topic_read_power)
-        log(1, str(e.name) + " power max : " + str(e.MAX_POWER) + " W" )
         log(1, str(e.name) + " power min : " + str(e.MIN_POWER) + " W" )
-        log(1, str(e.name) + " percent min : " + str(e.MIN_PERCENT) + " W" )
+        log(1, str(e.name) + " power max : " + str(e.MAX_POWER) + " W" )
+        if (e.type == "variable"):
+            log(1, str(e.name) + " percent min : " + str(e.MIN_PERCENT) + " %" )
     
     loadStatus() if (config['debug']['use_persistent'].lower() == "true") else ''
         
