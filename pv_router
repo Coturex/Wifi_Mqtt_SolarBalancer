@@ -7,7 +7,9 @@
 # Default-Start:	2 3 4 5
 # Default-Stop:		0 1 6
 # Short-Description:	Photovoltaic Power router
-# Description:
+# Description: 
+#   copy this shell script in /etc/init.d
+#	add it to systemctl -> sudo systemctl enable pv_router.service
 ### END INIT INFO
 
 set -e
