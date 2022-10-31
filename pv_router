@@ -91,8 +91,9 @@ case "$1" in
 	log_daemon_msg "Restarting PV Router:" "pv_router"
 	if start-stop-daemon --stop --signal INT --quiet --oknodo --pidfile ${PIDFILE}; then
 	    rm -f ${PIDFILE}
+		sleep 5
 	fi
-	if start-stop-daemon --start --quiet --oknodo --make-pidfile -d ${DIR} --pidfile ${PIDFILE} --exec ${DAEMON}  ; then
+	if start-stop-daemon --start --quiet --oknodo --background --make-pidfile -d ${DIR} --pidfile ${PIDFILE} --exec ${DAEMON}  ; then
 	    log_end_msg 0
 	else
 	    log_end_msg 1
