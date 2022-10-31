@@ -87,7 +87,7 @@ class Prediction:
                     debug(10, "Clouds : " + str(cloudi) + " %\n")
                     return cloudi
         except Exception as e:
-            return -2
+            return -404
         return -1     
 
     def log(self):

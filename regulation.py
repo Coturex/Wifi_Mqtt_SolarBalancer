@@ -374,12 +374,15 @@ def evaluate():
 
             #if test:
             #    test = False
-            if d1.hour == 22 and d2.hour == 23:
+            if d1.hour == 22 and d2.hour == 23: # Keep CLOUD FORECAST
                 fallback_today = False
                 log(0,"")
                 log(0,"[evaluate] TODAY Cloud / Production / Water_heater")
                 log(8, "csv : {} ; {} ; {}".format(CLOUD_forecast, int(production_energy), ECS_energy_today) )
                 CLOUD_forecast = weather.getCloudAvg(TOMORROW)
+                if (CLOUD_forecast == -404):
+                    log(0,"[evaluate] cannot contact openweathermap")
+                    log(4,"forcing CLOUD Forecast to 100 %")                   
                 log(0,"[evaluate] Cloud Forecast : " + str(CLOUD_forecast))
             #if test:
             if d1.day != d2.day: # AT MINUIT
