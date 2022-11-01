@@ -120,11 +120,11 @@ class Equipment:
     def set_over(self):
         self.is_over_ = True
         self.set_current_power(0)
-        log(1, self.name + " over load is set")
+        log(2, self.name + " over load is set")
 
     def unset_over(self):
         self.is_over_ = False
-        log(1, self.name + " over load is unset")
+        log(2, self.name + " over load is unset")
 
     def is_overed(self):
         """ The equipment cannot absorbe energy anymore, e.g. thermostat control by the equipment"""
@@ -147,7 +147,7 @@ class Equipment:
         return self.energy
 
     def set_energy(self, energy):
-        log(1, self.name + " set energy : " + str(energy))
+        log(2, self.name + " set energy : " + str(energy))
         self.energy = energy
 
     def reset_energy(self):
@@ -179,7 +179,7 @@ class VariablePowerEquipment(Equipment):
     def readCalibration(self, calibrationFile):
         X = Y = None
         try:
-            log(0,"Opening CSV : " + calibrationFile)
+            log(2,"Opening CSV : " + calibrationFile)
             #self.MAX_POWER = readCSV(calibrationFile)
             with open(calibrationFile) as file_name:
                 array = np.loadtxt(file_name, delimiter=";")
@@ -187,13 +187,13 @@ class VariablePowerEquipment(Equipment):
             Y = list(tuple(x[1] for x in array))
         except FileNotFoundError as fnf_error:
             print(fnf_error)
-            log(1,fnf_error)
+            log(2,fnf_error)
             exit()
         except Exception as e:
             print(calibrationFile + " bad format, delimiter...")
             print(e)
-            log(1,calibrationFile + " bad format, delimiter...")
-            log(1,e)
+            log(2,calibrationFile + " bad format, delimiter...")
+            log(2,e)
             debug(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
             exit()
         self.poly_reg = np.poly1d(np.polyfit(X,Y, VariablePowerEquipment.POLYREG_DEGREE))
@@ -203,8 +203,7 @@ class VariablePowerEquipment(Equipment):
             P = (self.poly_reg(percent))
             self.power_tab.append(P)
         self.power_tab.reverse()    
-        if EDEBUG:
-            print(self.power_tab)
+        # print(self.power_tab)
       
     def power_to_percent(self, value):
         # search nearest value in array using dichotomic method

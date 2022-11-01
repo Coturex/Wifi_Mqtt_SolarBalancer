@@ -82,7 +82,7 @@ fallback_today = False
 power_production = None
 power_consumption = None
 status = None
-equipments = None
+equipments = ()
 equipment_water_heater = None
 
 ECS_energy_yesterday = 0
@@ -258,7 +258,7 @@ def signal_handler(sig, frame):
         time.sleep(2)
         saveStatus() if (config['debug']['use_persistent'].lower() == "true") else ''
         log(0, "Bye")
-        sys.exit(0) 
+        exit(0) 
     else:
         print("signal handler ignored")
 
@@ -372,7 +372,7 @@ def evaluate():
             if d1.hour == 8 and d2.hour == 9: # maybe it has been forced this night (low_energy_fallback)
                 equipment_water_heater.unset_over()
 
-            #if test:
+            #if test 
             #    test = False
             if d1.hour == 22 and d2.hour == 23: # Keep CLOUD FORECAST
                 fallback_today = False
@@ -521,7 +521,7 @@ def evaluate():
                 grid = injection
                 injection = 0
                 last_zero_grid_date = t
-            print ("***** SIMULATION DOMOTICZ INJECTION GRID : {} {} {} {}".format(SIMULATION, SEND_DOMOTICZ, SEND_INJECTION, SEND_GRID)) if SDEBUG else ''
+            #print ("***** SIMULATION DOMOTICZ INJECTION GRID : {} {} {} {}".format(SIMULATION, SEND_DOMOTICZ, SEND_INJECTION, SEND_GRID)) if SDEBUG else ''
             ### HERE Prepare and send  INJECTION MESSAGE
             if SEND_INJECTION:
                 if injection < 0 and last_injection == 0 and (t - last_zero_injection_date) > 20 : 
@@ -597,15 +597,15 @@ def evaluate():
         status = msg
         mqtt_client.publish(TOPIC_STATUS, json.dumps(msg))
     except Exception as e:
-        debug(0,"[evaluate exception]") 
-        debug(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
-        debug(1, e)
+        log(0,"[evaluate exception]") 
+        log(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+        log(1, e)
 
 ###############################################################
 # MAIN
 
 def main():
-    global mqtt_client, equipments, equipment_water_heaterc
+    global mqtt_client, equipments, equipment_water_heater
     signal.signal(signal.SIGINT, signal_handler) 
     signal.signal(signal.SIGHUP, signal_handler) 
     signal.signal(signal.SIGUSR1, signal_handler)
@@ -622,28 +622,45 @@ def main():
     mqtt_client = mqtt.Client()
     equipment.setup(mqtt_client, SIMULATION, prefix)
    
-    equipment_water_heater = VariablePowerEquipment('ECS')
+    # Dynamic Load of equipments list
+    # This list of EQUIPMENTS IS PRIORITY ORDERED (first one has the higher priority). 
+    # As many equipments as needed can be listed in config.ini, [equiments] section.
+    log(0, "Making list of equipments :")
+    i = -1
+    for eq_name in config['equipments']:
+        i += 1
+        type = config['equipments'][eq_name]
+        if (i == 0 and type != "water_heater"):
+            log(1, "The first equipment must be 'water_heater' type" + type)
+            exit(0)
+        if (i == 0 and type == "water_heater"):
+            log(1, "Instancing [" + eq_name + "] as 'variable' equipment")
+            equipment_water_heater = VariablePowerEquipment(eq_name)
+            equipments += (equipment_water_heater,)  # append it to the end of list
+            continue
+        if ( type == "constant"):
+            log(1, "Instancing [" + eq_name + "] as 'constant' equipment") 
+            equipments += (ConstantPowerEquipment(eq_name),) # append it to the end of list
+            continue
+        if ( type == "variable"):
+            log(1, "Instancing [" + eq_name + "] as 'variable' equipment") 
+            equipments += (ConstantPowerEquipment(eq_name),) # append it to the end of list
+            continue
+        
+    #equipment_water_heater = VariablePowerEquipment('ECS')
     
-    # This is a list of EQUIPMENTS BY PRIORITY OREDER (first one has the higher priority). 
-    # As many equipments as needed can be listed here.
-    equipments = (
-        equipment_water_heater,
-        ConstantPowerEquipment('Resille'),
-        # UnknownPowerEquipment('plug_1')
-    )
-
     log(0, "Equipments :")
     # At startup, reset everything - Mandatory !
-    for e in equipments:
-        e.set_current_power(0) 
-        log(1, str(e.name) + " power type : " + e.type)
-        log(1, str(e.name) + " set power topic : " + e.topic_set_power)
-        log(1, str(e.name) + " read power topic : " + e.topic_read_power)
-        log(1, str(e.name) + " power min : " + str(e.MIN_POWER) + " W" )
-        log(1, str(e.name) + " power max : " + str(e.MAX_POWER) + " W" )
-        if (e.type == "variable"):
-            log(1, str(e.name) + " percent min : " + str(e.MIN_PERCENT) + " %" )
-    
+    for eq in equipments:
+        eq.set_current_power(0) 
+        log(1, str(eq.name) + " power type : " + eq.type)
+        log(1, str(eq.name) + " set power topic : " + eq.topic_set_power)
+        log(1, str(eq.name) + " read power topic : " + eq.topic_read_power)
+        log(1, str(eq.name) + " power min : " + str(eq.MIN_POWER) + " W" )
+        log(1, str(eq.name) + " power max : " + str(eq.MAX_POWER) + " W" )
+        if (eq.type == "variable"):
+            log(1, str(eq.name) + " percent min : " + str(eq.MIN_PERCENT) + " %" )
+
     loadStatus() if (config['debug']['use_persistent'].lower() == "true") else ''
         
     mqtt_client.on_connect = on_connect
