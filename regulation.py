@@ -133,6 +133,15 @@ BALANCE_THRESHOLD = int(config['evaluate']['balance_threshold'])
 MARGIN = int(config['evaluate']['margin'])
 LOW_ECS_ENERGY_TWO_DAYS = int(config['evaluate']['low_ecs_energy_two_days'])  # minimal power on two days
 LOW_ECS_ENERGY_TODAY = int(config['evaluate']['low_ecs_energy_today']) # minimal power for today
+CHECK_AT = int(config['evaluate']['check_at']) 
+if (CHECK_AT == 0 or CHECK_AT >= 24):
+    CHECK_AT = 0
+    CHECK_AT_prev = 23
+elif (CHECK_AT >= 1):
+    CHECK_AT_prev = CHECK_AT - 1   
+else:
+    log(0, "CHECK AT '{}' is out of range".format(str(CHECK_AT)))
+    exit(0) 
 
 ###############################################################
 # FUNCTIONS
@@ -326,18 +335,18 @@ def low_energy_fallback():
     max_power = equipment_water_heater.MAX_POWER
     two_days_nrj = ECS_energy_today + ECS_energy_yesterday
     log(0, '[low_energy_fallback] ECS Energy Yesterday / Today / Sum :')
-    log(16,'{} / {} / {}'.format(ECS_energy_yesterday, ECS_energy_today, two_days_nrj))
+    log(16,'{} / {} / {}'.format(int(ECS_energy_yesterday), int(ECS_energy_today), int(two_days_nrj)))
     log(2, "cloud forecast : " + str(CLOUD_forecast))
     if (equipment_water_heater.is_overed()):
         log(4, 'ECS Energy has been overloaded today')
         log(4, 'cancelling fallback')
         ECS_energy_today = LOW_ECS_ENERGY_TWO_DAYS
     elif (ECS_energy_today) < LOW_ECS_ENERGY_TODAY:
-        left_today = LOW_ECS_ENERGY_TODAY - ECS_energy_today
+        left_today = int(LOW_ECS_ENERGY_TODAY - ECS_energy_today)
         if two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS:
-            left_tow_days = LOW_ECS_ENERGY_TWO_DAYS - two_days_nrj
+            left_tow_days = int(LOW_ECS_ENERGY_TWO_DAYS - two_days_nrj)
             if CLOUD_forecast < 20:
-                left_energy = min(left_today, left_tow_days)
+                left_energy = int(min(left_today, left_tow_days))
                 duration = 3600 * left_energy / max_power
                 log(4, 'cloud forecast < 20, but day/2days energy not enough, adding {} W'.format(left_energy))
                 log(4, 'forcing ECS {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
@@ -379,8 +388,9 @@ def evaluate():
     global last_evaluation_date, ECS_energy_today, last_injection, last_grid, CLOUD_forecast
     global equipments, equipment_water_heater, production_energy, fallback_today, cloud_requested, status
     global power_production, power_consumption, last_production_date, last_consumption_date, test
-    global last_zero_grid_date, last_zero_injection_date
-
+    global last_zero_grid_date, last_zero_injection_date, CHECK_AT, CHECK_AT_prev
+    TODAY = 0 
+    TOMORROW = 1
     try:
         t = now_ts()
         
@@ -392,21 +402,26 @@ def evaluate():
 
             #if test 
             #    test = False
-            if d1.hour == 22 and d2.hour == 23: # Keep CLOUD FORECAST (be sure it's not already done for today)
+            if d1.hour == 8 and d2.hour == 9: # Here this is near Sunrise 
                 fallback_today = False
-                cloud_requested = True
+            
+            if d1.hour == CHECK_AT_prev and d2.hour == CHECK_AT and not fallback_today:  #(be sure it's not already done for today)
+                fallback_today = True
                 log(0,"")
-                log(0,"[evaluate] TODAY Cloud / Production / Water_heater")
+                log(0,"[evaluate] Past Cloud / Production / Water_heater")
                 log(8, "csv : {} ; {} ; {}".format(CLOUD_forecast, int(production_energy), ECS_energy_today) )
-                CLOUD_forecast = weather.getCloudAvg(TOMORROW)
+                if (CHECK_AT > 7 and CHECK_AT < 24):
+                    CLOUD_forecast = weather.getCloudAvg(TOMORROW)
+                elif (CHECK_AT >= 0):
+                    CLOUD_forecast = weather.getCloudAvg(TODAY)
+
                 if (CLOUD_forecast == -404):
                     log(0,"[evaluate] cannot contact openweathermap")
-                    log(4,"forcing CLOUD Forecast to 100 %")                   
+                    log(4,"forcing CLOUD Forecast to 100 %")   
+                if (CLOUD_forecast == -1):
+                    log(0,"[evaluate] openweathermap is out of range")
+                    log(4,"forcing CLOUD Forecast to 100 %")   
                 log(0,"[evaluate] Cloud Forecast : " + str(CLOUD_forecast))
-            #if test:
-            if d1.day != d2.day and not fallback_today: # AT MINUIT (be sure it's not already done for today)
-                fallback_today = True
-                cloud_requested = False
                 ECS_energy_today = equipment_water_heater.get_energy()
                 equipment_water_heater.reset_energy()
                 production_energy = 0

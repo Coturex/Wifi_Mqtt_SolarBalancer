@@ -1,5 +1,5 @@
 [openweathermap]
-key = xxxxxxxxxxxxxxxxxxxx
+key = xxxxxxx
 location = Moscou
 
 [mqtt]
@@ -23,12 +23,13 @@ send_grid = true
 margin = 20
 period = 3
 balance_threshold = 20
-check_at = 16
+check_at = 1
+ecs_full_capacity = 14000
 low_ecs_energy_two_days = 11000
 low_ecs_energy_today = 7000
 
 [debug]
-simulation = false
+simulation = true
 simul_prod = None
 debug_file = true
 log_file = true

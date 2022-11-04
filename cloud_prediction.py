@@ -113,6 +113,7 @@ def main():
     print("tomorrow 12H UTC : " + str(weather.getCloudHour(TOMORROW,12)))
     print("tomorrow 15H UTC : " + str(weather.getCloudHour(TOMORROW,15)))
     print ("-----------")
+    print("avg (9H+12H)/2 today : " + str(weather.getCloudAvg(TODAY)))
     print("avg (9H+12H)/2 tomorrow : " + str(weather.getCloudAvg(TOMORROW)))
     print("bye")
    
