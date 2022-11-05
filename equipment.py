@@ -76,14 +76,20 @@ class Equipment:
             self.json_set_power = config[self.name]['json_set_power']
             if (self.json_set_power == "None"):
                 self.json_set_power = None
+        except Exception:
+            self.json_set_power = None
+        try:
             self.topic_read_power = config[self.name]['topic_read_power']
             if (self.topic_read_power == "None"):
                 self.topic_read_power = None
+        except Exception:
+            self.topic_read_power = None
+        try:
             self.json_read_power = config[self.name]['json_read_power']
             if (self.json_read_power == "None"):
                 self.json_read_power = None
         except Exception:
-            self.topic_read_power = None
+            self.json_read_power = None
 
     def decrease_power_by(self, watt):
         """ Return the amount of power that has been canceled, None if unknown """
@@ -325,17 +331,30 @@ class ConstantPowerEquipment(Equipment):
         self.MAX_POWER = int(config[self.name]['max_power'])
         self.MIN_POWER = self.MAX_POWER
         self.max_power = self.MAX_POWER
+        self.json_on = config[self.name]['json_on']
+        self.json_off = config[self.name]['json_off']
         self.is_on = False
         self.type = "constant"
-
+        try:
+            self.json_on = config[self.name]['json_on']
+            if (self.json_set_power == "None"):
+                self.json_set_power = None
+        except Exception:
+            self.json_set_power = None
+        
     def set_current_power(self, power):
         # Super -> Call Parent function 
         super(ConstantPowerEquipment, self).set_current_power(power)
         self.is_on = power != 0
         msg = '1' if self.is_on else '0'
         if _send_commands:
+            if self.is_on:
+                msg = self.json_on 
+            else:
+                msg = self.json_off     
             _mqtt_client.publish(self.topic_set_power, msg, retain=True)
         debug(4, "sending power command {} for {}".format(self.is_on, self.name))
+        debug(8, "in topic {}".format(self.topic_set_power))
 
     def decrease_power_by(self, watt):
         if self.is_on:
