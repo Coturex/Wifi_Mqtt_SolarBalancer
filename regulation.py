@@ -61,7 +61,8 @@ if (config['debug']['simulation'].lower() == "true"):
         else:
             SIM_PROD = int(config['debug']['simul_prod'])
             print("     PROD IS SIMULATED AT " + str(SIM_PROD))
-        input("Enter to continue")
+        #input("Enter to continue")
+        time.sleep(2)
 else:
         SIMULATION = False
 
@@ -105,7 +106,7 @@ TOPIC_SENSOR_PRODUCTION = config['mqtt']['topic_prod']
 TOPIC_REGULATION = prefix + config['mqtt']['topic_regul'] 
 TOPIC_FORCE = prefix + config['mqtt']['topic_force'] # forced/unforced duration - Can be bind to domotics device topic 
 TOPIC_STATUS = prefix + config['mqtt']['topic_status']
- 
+
 ###############################################################
 # DOMOTICZ CONFIG
 TOPIC_DOMOTICZ_IN = prefix + "domoticz/in"
@@ -240,7 +241,7 @@ def on_message(client, userdata, msg):
                     if (msg.topic == e.topic_read_power):
                         print("[on message]         "+ e.name + " is Overed ? ") if SDEBUG else ''
                         j = json.loads(msg.payload.decode())
-                        e.check_over(int(j['power']))
+                        e.check_over(int(j[e.json_read_power]))
 
     except:
         print("[on message]         error, message badly formated (e.g. pzem error...)") if SDEBUG else ''
@@ -397,14 +398,13 @@ def evaluate():
         if last_evaluation_date is not None: # Evaluating scheduler
             d1 = datetime.datetime.fromtimestamp(last_evaluation_date)
             d2 = datetime.datetime.fromtimestamp(t)
-            if d1.hour == 8 and d2.hour == 9: # maybe it has been forced this night (low_energy_fallback)
-                equipment_water_heater.unset_over()
+         
+            if d1.hour == 8 and d2.hour == 9: 
+                equipment_water_heater.unset_over() # maybe it has been forced this night (low_energy_fallback)
+                fallback_today = False
 
             #if test 
-            #    test = False
-            if d1.hour == 8 and d2.hour == 9: # Here this is near Sunrise 
-                fallback_today = False
-            
+            #    test = False            
             if d1.hour == CHECK_AT_prev and d2.hour == CHECK_AT and not fallback_today:  #(be sure it's not already done for today)
                 fallback_today = True
                 log(0,"")
@@ -492,11 +492,11 @@ def evaluate():
 
                     # Check if this equpment is over loaded, this is a temporaly workaround 
                     # overloaded if (e.current_power > prod) and (prod < e.max_power)
-                    if ((e.get_current_power() > power_production) and (power_production < e.MAX_POWER)):
-                        debug(4, "[evaluate] this equipment is overed, it cannot load power anymore "+str(e.MIN_POWER))
-                        log(1, e.name + " is fully loaded for today") if (not e.is_overed()) else ''
-                        e.set_over()
-                        continue
+                    #if ((e.get_current_power() > power_production) and (power_production < e.MAX_POWER)):
+                    #    debug(4, "[evaluate] this equipment is overed, it cannot load power anymore "+str(e.MIN_POWER))
+                    #    log(1, e.name + " is fully loaded for today") if (not e.is_overed()) else ''
+                    #    e.set_over()
+                    #    continue
 
                     if e.is_overed():
                         debug(4, "skipping this equipment because it's already full loaded for today")
@@ -688,8 +688,8 @@ def main():
     for eq in equipments:
         eq.set_current_power(0) 
         log(1, str(eq.name) + " power type : " + eq.type)
-        log(1, str(eq.name) + " set power topic : " + eq.topic_set_power)
-        log(1, str(eq.name) + " read power topic : " + eq.topic_read_power)
+        log(1, str(eq.name) + " set power topic : " + str(eq.topic_set_power))
+        log(1, str(eq.name) + " read power topic : " + str(eq.topic_read_power))
         log(1, str(eq.name) + " power min : " + str(eq.MIN_POWER) + " W" )
         log(1, str(eq.name) + " power max : " + str(eq.MAX_POWER) + " W" )
         if (eq.type == "variable"):

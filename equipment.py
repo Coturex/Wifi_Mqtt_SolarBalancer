@@ -73,9 +73,15 @@ class Equipment:
         self.current_power = None
         self.last_power_change_date = None
         try:
+            self.json_set_power = config[self.name]['json_set_power']
+            if (self.json_set_power == "None"):
+                self.json_set_power = None
             self.topic_read_power = config[self.name]['topic_read_power']
             if (self.topic_read_power == "None"):
                 self.topic_read_power = None
+            self.json_read_power = config[self.name]['json_read_power']
+            if (self.json_read_power == "None"):
+                self.json_read_power = None
         except Exception:
             self.topic_read_power = None
 
