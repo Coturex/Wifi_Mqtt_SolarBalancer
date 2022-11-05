@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/sh 
 
 ### BEGIN INIT INFO
 # Provides:		pv_router
@@ -17,9 +17,9 @@ set -e
 PIDFILE=/home/pi/pv_router/regulation.pid
 DAEMON=/home/pi/pv_router/regulation.py
 DIR=/home/pi/pv_router
-#PIDFILE=/var/run/pv_router.pid
-#DAEMON=/home/chris/dev/tools/cctest.py
-#DIR=/home/chris/dev/tools
+#PIDFILE=/home/chris/dev/pv_router.pid
+#DAEMON=/home/chris/dev/regulation.py
+#DIR=/home/chris/dev
 
 # /etc/init.d/pv_router: start and stop PV Router daemon
 

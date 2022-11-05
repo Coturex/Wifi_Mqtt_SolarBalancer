@@ -27,14 +27,16 @@
 # https://api.openweathermap.org/data/2.5/forecast?q=chambery&units=metric&appid=HERE_API_KEY_ID
 
 import requests   
-import time
+import sys
 import datetime
 from pprint import pprint
 from debug_log import debug as debug
- 
+import numpy as np
+
 TODAY = 0 
 DEMAIN = 1
 TOMORROW = 1
+
 DAY0 = 0
 DAY1 = 1
 DAY2 = 2
@@ -51,13 +53,33 @@ class Prediction:
 
     def getCloudAvg(self, sDAY):
         """ Return percent Average of clouds, @ UTC 09:00:00, UTC 12:00:00, UTC 13:00:00"""
-        """ Average : ((time1+time2+time3)/3)"""
-        c1 = self.getCloudHour(sDAY,9)
-        c2 = self.getCloudHour(sDAY,12)
-        #c3 = self.getCloudHour(sDAY,15)
-        avg = (c1 + c2) / 2
-        #debug(10, "Average : " +  str(avg) + " %")
-        return int(avg)        
+        """ Average : ((time1+time2)/2)"""
+        sHour1 = 9
+        sHour2 = 12
+        try:
+            sdate = datetime.date.today() + datetime.timedelta(days=sDAY)
+            sdate1 = str(datetime.datetime(sdate.year, sdate.month,sdate.day, sHour1, 0, 0))
+            sdate2 = str(datetime.datetime(sdate.year, sdate.month,sdate.day, sHour2, 0, 0))
+            url = "https://api.openweathermap.org/data/2.5/forecast?q={}&units=metric&appid={}".format(self.location, self.apiKey)
+            #debug(0, "Cloud_prediction, url : " + url)
+            wdata = requests.get(url).json()
+            # pprint(wdata)
+            debug(0, "Cloud_prediction, requesting " + sdate1 + " " + sdate2)
+            tCloud = np.array([])
+            for i in range(0,len(wdata['list'])):
+                datei  = wdata['list'][i]['dt_txt']
+                cloudi = wdata['list'][i]['clouds']['all']
+                #print(i, datei, cloudi, sdate)
+                if sdate1 == datei or sdate2 == datei:  
+                    #print(i, datei, sdate, cloudi)
+                    debug(10, "Clouds : " + str(cloudi) + " %\n")
+                    tCloud = np.append(tCloud, cloudi)
+                    #print("Clouds : " + str(cloudi) + " %\n")        
+        except Exception as e:
+            print(e)
+            print("Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            return -404
+        return int(np.average(tCloud))     
 
     def getRawData(self):
         """Print JSON data returned by html request"""
@@ -104,16 +126,16 @@ def main():
     config.read('config.ini') 
     
     weather = Prediction(config['openweathermap']['location'],config['openweathermap']['key'])
-    weather.getRawData()
-    print("today 9H UTC : " + str(weather.getCloudHour(TODAY,9)))
-    print("today 12H UTC : " + str(weather.getCloudHour(TODAY,12)))
-    print("today 15H UTC : " + str(weather.getCloudHour(TODAY,15)))
-    print("today 18H UTC : " + str(weather.getCloudHour(TODAY,18)))
-    print("tomorrow  9H UTC : " + str(weather.getCloudHour(TOMORROW,9)))
-    print("tomorrow 12H UTC : " + str(weather.getCloudHour(TOMORROW,12)))
-    print("tomorrow 15H UTC : " + str(weather.getCloudHour(TOMORROW,15)))
-    print ("-----------")
-    print("avg (9H+12H)/2 today : " + str(weather.getCloudAvg(TODAY)))
+    #weather.getRawData()
+    #print("today 9H UTC : " + str(weather.getCloudHour(TODAY,9)))
+    #print("today 12H UTC : " + str(weather.getCloudHour(TODAY,12)))
+    #print("today 15H UTC : " + str(weather.getCloudHour(TODAY,15)))
+    #print("today 18H UTC : " + str(weather.getCloudHour(TODAY,18)))
+    #print("tomorrow  9H UTC : " + str(weather.getCloudHour(TOMORROW,9)))
+    #print("tomorrow 12H UTC : " + str(weather.getCloudHour(TOMORROW,12)))
+    #print("tomorrow 15H UTC : " + str(weather.getCloudHour(TOMORROW,15)))
+    #print ("-----------")
+    #print("avg (9H+12H)/2 today : " + str(weather.getCloudAvg(TOMORROW)))
     print("avg (9H+12H)/2 tomorrow : " + str(weather.getCloudAvg(TOMORROW)))
     print("bye")
    
