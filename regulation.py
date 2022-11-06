@@ -78,6 +78,7 @@ last_production_date = None
 last_consumption_date = None
 last_zero_grid_date = 0
 last_zero_injection_date = 0
+last_saveStatus_date = 0
 
 fallback_today = False
 cloud_requested = False
@@ -134,6 +135,7 @@ BALANCE_THRESHOLD = int(config['evaluate']['balance_threshold'])
 MARGIN = int(config['evaluate']['margin'])
 LOW_ECS_ENERGY_TWO_DAYS = int(config['evaluate']['low_ecs_energy_two_days'])  # minimal power on two days
 LOW_ECS_ENERGY_TODAY = int(config['evaluate']['low_ecs_energy_today']) # minimal power for today
+STATUS_TIME = int(config['evaluate']['status_time']) 
 CHECK_AT = int(config['evaluate']['check_at']) 
 if (CHECK_AT == 0 or CHECK_AT >= 24):
     CHECK_AT = 0
@@ -389,7 +391,7 @@ def evaluate():
     global last_evaluation_date, ECS_energy_today, last_injection, last_grid, CLOUD_forecast
     global equipments, equipment_water_heater, production_energy, fallback_today, cloud_requested, status
     global power_production, power_consumption, last_production_date, last_consumption_date, test
-    global last_zero_grid_date, last_zero_injection_date, CHECK_AT, CHECK_AT_prev
+    global last_zero_grid_date, last_zero_injection_date, CHECK_AT, CHECK_AT_prev, last_saveStatus_date, STATUS_TIME
     TODAY = 0 
     TOMORROW = 1
     try:
@@ -630,6 +632,10 @@ def evaluate():
         msg['equipments'] = eq
         status = msg
         mqtt_client.publish(TOPIC_STATUS, json.dumps(msg))
+        if t - last_saveStatus_date > STATUS_TIME:
+            saveStatus()
+            last_saveStatus_date = t
+
     except Exception as e:
         log(0,"[evaluate exception]") 
         log(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))

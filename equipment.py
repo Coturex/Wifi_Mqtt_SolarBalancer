@@ -73,12 +73,6 @@ class Equipment:
         self.current_power = None
         self.last_power_change_date = None
         try:
-            self.json_set_power = config[self.name]['json_set_power']
-            if (self.json_set_power == "None"):
-                self.json_set_power = None
-        except Exception:
-            self.json_set_power = None
-        try:
             self.topic_read_power = config[self.name]['topic_read_power']
             if (self.topic_read_power == "None"):
                 self.topic_read_power = None
@@ -143,10 +137,10 @@ class Equipment:
         # implement in subclasses, watt may be ignored
         return self.is_over_
 
-    def check_over(self, power):
+    def check_over(self, read_power):
             COUNTER_LIMIT = 5  
-            if (power < 5  and self.get_current_power() >= self.MIN_POWER):
-                ts = now_ts()
+            ts = now_ts()
+            if (read_power < 5  and self.get_current_power() >= self.MIN_POWER):
                 if self.last_check_ts is not None:
                     if ts - self.last_check_ts < 10: # if last_check is < 10s
                         self.check_counter += 1
@@ -287,7 +281,7 @@ class VariablePowerEquipment(Equipment):
             debug(4, "decreasing power consumption of {} by {}W, from {} to {}".format(self.name, int(decrease), int(old), int(new)))
             self.set_current_power(new)
         else:
-            debug(4, "not decreasing power of {} because it is already at 0W".format(self.name))
+            debug(4, "not decreasing power of {} because it is already at 0 W".format(self.name))
 
         return decrease
 
@@ -314,7 +308,7 @@ class VariablePowerEquipment(Equipment):
             debug(4, "increasing power consumption of {} by {}W, from {} to {}".format(self.name, int(increase) , int(old), int(new)))
             self.set_current_power(new)
         else:
-            debug(4, "not increasing power of {} because it is already at maximum power {}W".format(self.name, self.MAX_POWER))
+            debug(4, "not increasing power of {} because it is already at maximum power {} W".format(self.name, self.MAX_POWER))
 
         return remaining
 
@@ -335,12 +329,6 @@ class ConstantPowerEquipment(Equipment):
         self.json_off = config[self.name]['json_off']
         self.is_on = False
         self.type = "constant"
-        try:
-            self.json_on = config[self.name]['json_on']
-            if (self.json_set_power == "None"):
-                self.json_set_power = None
-        except Exception:
-            self.json_set_power = None
         
     def set_current_power(self, power):
         # Super -> Call Parent function 
@@ -358,7 +346,7 @@ class ConstantPowerEquipment(Equipment):
 
     def decrease_power_by(self, watt):
         if self.is_on:
-            debug(4, "shutting down {} with a consumption of {}W to recover {}W".format(self.name, self.max_power, watt))
+            debug(4, "shutting down {} with a consumption of {}W to recover {} W".format(self.name, self.max_power, watt))
             self.set_current_power(0)
             return self.max_power
         else:
@@ -371,11 +359,11 @@ class ConstantPowerEquipment(Equipment):
             return watt
         else:
             if watt >= self.max_power:
-                debug(4, "turning on {} with a consumption of {}W to use {}W".format(self.name, self.max_power, watt))
+                debug(4, "turning on {} with a consumption of {}W to use {} W".format(self.name, self.max_power, watt))
                 self.set_current_power(self.max_power)
                 return watt - self.max_power
             else:
-                debug(4, "not turning on {} with a consumption of {}W because it would use more than the available {}W".format(self.name, self.max_power, watt))
+                debug(4, "not turning on {} with a consumption of {}W because it would use more than the available {} W".format(self.name, self.max_power, watt))
                 return watt
 
     def force(self, watt, duration=None):
