@@ -2,6 +2,7 @@
 key = xxxxxxx
 location = Moscou
 
+
 [mqtt]
 broker_ip = 10.3.141.1
 port = 1883 
@@ -30,13 +31,13 @@ low_ecs_energy_today = 7000
 
 [debug]
 simulation = true
-simul_prod = None
+simul_prod = 2000
 debug_file = true
 log_file = true
 debug_file_name = pv_debug.log
 log_file_name = pv.log    
-equipment_stdout = false
-regulation_stdout = false
+equipment_stdout = true
+regulation_stdout = true
 use_persistent = true
 
 [equipments]
@@ -53,16 +54,12 @@ json_set_power = None
 
 [resille]
 max_power = 596
-topic_set_power = domoticz/out/Resille_Couloir
-json_set_power = nvalue
-topic_read_power = domoticz/out/Resille_Watt
-json_read_power = svalue1
+topic_set_power = domoticz/in
+json_on = {"command": "switchlight", "idx": 359, "switchcmd": "On" }
+json_off = {"command": "switchlight", "idx": 359, "switchcmd": "Off" }
 
 [soufflant_a]
 max_power = 500
 topic_set_power = None
-json_set_power = None
 topic_read_power = None
 json_read_power = None
-
-
