@@ -78,7 +78,7 @@ last_production_date = None
 last_consumption_date = None
 last_zero_grid_date = 0
 last_zero_injection_date = 0
-last_saveStatus_date = 0
+last_saveStatus_date = None
 
 fallback_today = False
 cloud_requested = False
@@ -269,6 +269,7 @@ def signal_handler(sig, frame):
             e.set_current_power(0) 
             log(2, e.name + " : set power to 0") 
         time.sleep(2)
+        log(4, "[saveStatus] saving status")
         saveStatus() if (config['debug']['use_persistent'].lower() == "true") else ''
         log(0, "Bye")
         exit(0) 
@@ -311,7 +312,6 @@ def loadStatus():
 def saveStatus():
     global status
     if status is not None:
-        log(0, "[saveStatus] saving status")
         try:
             with open('status.ini', 'w') as statusFile:
                json.dump(status, statusFile, indent=4, sort_keys=True)
@@ -632,9 +632,12 @@ def evaluate():
         msg['equipments'] = eq
         status = msg
         mqtt_client.publish(TOPIC_STATUS, json.dumps(msg))
-        if t - last_saveStatus_date > STATUS_TIME:
-            saveStatus()
+        if last_saveStatus_date is None:
             last_saveStatus_date = t
+        else:
+            if t - last_saveStatus_date > STATUS_TIME:
+                saveStatus()    
+                last_saveStatus_date = t
 
     except Exception as e:
         log(0,"[evaluate exception]") 
