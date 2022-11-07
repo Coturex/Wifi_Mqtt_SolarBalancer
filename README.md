@@ -19,7 +19,7 @@ Let update/improve this code to your needs...
 - 2  ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter) modules
 - _n_ ![Wifi MQTT Energy Variator](https://github.com/Coturex/Wifi_Mqtt_PowerVariator) module(s) (... this project is on going...)
 - _n_ Wifi MQTT Energy Commutator (like Sonoff Relay etc...)
-- 1 **Raspberry Pi Zero 2**    (which host this python program and Mosquito Mqtt broker)
+- 1 **Raspberry Pi Zero 2 / Pi3 / Pi4**    (which host this python program and Mosquito Mqtt broker)
 
 Installation :
 
@@ -32,9 +32,12 @@ You can monitor the energy flow of the solar system.
 ![→ Grafana](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/grafana_screenshot1.png) 
 
 ![→ Grafana](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/grafana_screenshot2.png)
+
+Grafana screenshots
  
 ![→ Domoticz](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/domoticz.png)
 
+Domoticz (plan) screenshot
 
 ## Python requirements :
 - python 3
