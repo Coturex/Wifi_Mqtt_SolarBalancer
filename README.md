@@ -30,9 +30,11 @@ By installing 2 ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_M
 
 You can monitor the energy flow of the solar system.
 
-![→ Grafana](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/grafana_screenshot.png) screenshot (dev on going...)
+![→ Grafana](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/grafana_screenshot1.png) 
 
+![→ Grafana](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/grafana_screenshot2.png)
  
+![→ Domoticz](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/domoticz.png)
 
 ## Python requirements :
 - python 3
