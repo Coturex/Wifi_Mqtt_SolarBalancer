@@ -1,4 +1,5 @@
-#
+#!/usr/bin/python3
+# 
 # Copyright (C) 2018-2019 Pierre Hebert
 #                 Mods -> Coturex - F5RQG
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +15,6 @@
 # limitations under the License.
 
 import logging
-from mimetypes import init
-
 import configparser
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -29,26 +28,44 @@ logger.setLevel(logging.INFO)
 
 formatter = logging.Formatter('%(asctime)s - %(message)s')
 
-ch1 = logging.StreamHandler()
-ch1.setLevel(logging.DEBUG)
-ch1 = logging.FileHandler(config['debug']['debug_file_name'])
-ch1.setFormatter(formatter)
-debugger.addHandler(ch1)
+unset_words = ("none", "None", "NONE", "false", "False", "FALSE", "nok", "NOK")
 
-ch2 = logging.StreamHandler()
-ch2.setLevel(logging.INFO)
-ch2 = logging.FileHandler(config['debug']['log_file_name'])
-ch2.setFormatter(formatter)
-logger.addHandler(ch2)
+try:
+    debug_file_name = config['debug']['debug_file']
+    if debug_file_name in unset_words:
+        DEBUG = False 
+    else:
+        DEBUG = True
+        ch1 = logging.StreamHandler()
+        ch1.setLevel(logging.DEBUG)
+        ch1 = logging.FileHandler(debug_file_name)
+        ch1.setFormatter(formatter)
+        debugger.addHandler(ch1)
+except Exception:
+    DEBUG = False
+
+try:
+    log_file_name = config['debug']['log_file']
+    if log_file_name in unset_words:
+        LOG = False 
+    else:
+        LOG = True
+        ch2 = logging.StreamHandler()
+        ch2.setLevel(logging.INFO)
+        ch2 = logging.FileHandler(log_file_name)
+        ch2.setFormatter(formatter)
+        logger.addHandler(ch2)
+except Exception:
+    LOG = False
 
 def debug(indent, msg):
-    global config
-    if (config['debug']['debug_file']):
+    global DEBUG
+    if DEBUG:
         debugger.debug(('  '*indent)+str(msg))
 
 def log(indent, msg):
-    global config
-    if (config['debug']['log_file']):
+    global LOG
+    if LOG:
         logger.info(('  '*indent)+str(msg))
 
 

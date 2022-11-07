@@ -2,7 +2,6 @@
 key = xxxxxxx
 location = Moscou
 
-
 [mqtt]
 broker_ip = 10.3.141.1
 port = 1883 
@@ -25,6 +24,7 @@ margin = 20
 period = 3
 balance_threshold = 20
 check_at = 1
+status_time = 60
 ecs_full_capacity = 14000
 low_ecs_energy_two_days = 11000
 low_ecs_energy_today = 7000
@@ -32,10 +32,8 @@ low_ecs_energy_today = 7000
 [debug]
 simulation = true
 simul_prod = 2000
-debug_file = true
-log_file = true
-debug_file_name = pv_debug.log
-log_file_name = pv.log    
+debug_file = none
+log_file = pv.log    
 equipment_stdout = true
 regulation_stdout = true
 use_persistent = true
@@ -50,7 +48,6 @@ min_percent = 4
 topic_set_power = regul/vload/ECS/cmd
 topic_read_power = smeter/pzem/ECS
 json_read_power = power
-json_set_power = None
 
 [resille]
 max_power = 596
@@ -61,5 +58,7 @@ json_off = {"command": "switchlight", "idx": 359, "switchcmd": "Off" }
 [soufflant_a]
 max_power = 500
 topic_set_power = None
-topic_read_power = None
-json_read_power = None
+json_on = None
+json_off = None
+
+
