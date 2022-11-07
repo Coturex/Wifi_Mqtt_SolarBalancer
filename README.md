@@ -48,8 +48,8 @@ Domoticz (plan) screenshot
 - At startup it **Calculate** 'Polynomial Regression' **Vector'** depending on Power Variator technology and differents calibrations/equipment **directly from CSV calibration files**   -> implemented in _VariablePowerEquipment_ subclass
 - Do ![calibration](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/tree/main/calibration) through Mqtt _(instead of pzem hardware attachment)_
 - Read !['Config file'](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/config.ini.sample) at startup (all parameters are declared in this file)
-- Dynamically load of equipments (set in !['Config file'](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/config.ini.sample))
-- Save/load 'status of equipments' while restarting the programm (and every xx seconds cf. 'status-time')
+- Dynamic load of equipments (set in !['Config file'](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/config.ini.sample))
+- Save/load 'status of equipments' while restarting the programm (and every xx seconds cf. 'status_time' @![Config file](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/config.ini.sample))
 
 ## Todo - ideas :
  - attach the (un)forced mode to _MQTT Domoticz device_ - _https://www.domoticz.com/wiki/MQTT_
