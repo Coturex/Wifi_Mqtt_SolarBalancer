@@ -36,6 +36,7 @@ You can monitor the energy flow of the solar system.
  
 ![→ Domoticz](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/domoticz.png)
 
+
 ## Python requirements :
 - python 3
 - paho-mqtt : $> pip3 install paho-mqtt
