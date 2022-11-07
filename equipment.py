@@ -37,7 +37,10 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.ini')
 
-if (config['debug']['equipment_stdout'].lower() == "true"): 
+unset_words = ("none", "None", "NONE", "false", "False", "FALSE", "nok", "NOK")
+set_words = ("true", "True", "TRUE", "ok", "OK", )
+
+if (config['debug']['equipment_stdout'] in set_words): 
     EDEBUG = True 
 else: EDEBUG = False
 
@@ -74,13 +77,13 @@ class Equipment:
         self.last_power_change_date = None
         try:
             self.topic_read_power = config[self.name]['topic_read_power']
-            if (self.topic_read_power == "None"):
+            if (self.topic_read_power in unset_words):
                 self.topic_read_power = None
         except Exception:
             self.topic_read_power = None
         try:
             self.json_read_power = config[self.name]['json_read_power']
-            if (self.json_read_power == "None"):
+            if (self.json_read_power in unset_words):
                 self.json_read_power = None
         except Exception:
             self.json_read_power = None

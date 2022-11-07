@@ -51,11 +51,15 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.ini')
 
+unset_words = ("none", "None", "NONE", "false", "False", "FALSE", "nok", "NOK")
+set_words = ("true", "True", "TRUE", "ok", "OK", )
+
+
 # A debug switch to toggle simulation (uses distinct MQTT topics for instance)
-if (config['debug']['simulation'].lower() == "true"):
+if (config['debug']['simulation'] in set_words):
         SIMULATION = True
         print("**** SIMULATION IS SET")
-        if (config['debug']['simul_prod'].lower() == "none"):
+        if (config['debug']['simul_prod'] in unset_words):
             SIM_PROD = None
             print("     PRODCUTION IS AS READ ON MQTT TOPIC")
         else:
@@ -66,7 +70,7 @@ if (config['debug']['simulation'].lower() == "true"):
 else:
         SIMULATION = False
 
-if (config['debug']['regulation_stdout'].lower() == "true"): 
+if (config['debug']['regulation_stdout'] in set_words): 
     SDEBUG = True 
 else: SDEBUG = False
 
@@ -113,13 +117,13 @@ TOPIC_STATUS = prefix + config['mqtt']['topic_status']
 TOPIC_DOMOTICZ_IN = prefix + "domoticz/in"
 IDX_INJECTION = config['domoticz']['idx_injection']
 IDX_GRID = config['domoticz']['idx_grid']
-if (config['domoticz']['send_domoticz'].lower() == "true"): 
+if (config['domoticz']['send_domoticz'] in set_words): 
     SEND_DOMOTICZ = True 
 else: SEND_DOMOTICZ = False
-if (config['domoticz']['send_injection'].lower() == "true"): 
+if (config['domoticz']['send_injection'] in set_words): 
     SEND_INJECTION = True 
 else: SEND_INJECTION = False
-if (config['domoticz']['send_grid'].lower() == "true"): 
+if (config['domoticz']['send_grid'] in set_words): 
     SEND_GRID = True 
 else: SEND_GRID = False
 
@@ -177,7 +181,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(TOPIC_SENSOR_CONSUMPTION)
     client.subscribe(TOPIC_SENSOR_PRODUCTION)
     client.subscribe("smeter/pzem/ECS")
-    if(TOPIC_FORCE != "None"):
+    if(TOPIC_FORCE not in unset_words):
         debug(1, "Subscribing " + TOPIC_FORCE)
     global equipments
     for e in equipments:
@@ -270,7 +274,7 @@ def signal_handler(sig, frame):
             log(2, e.name + " : set power to 0") 
         time.sleep(2)
         log(4, "[saveStatus] saving status")
-        saveStatus() if (config['debug']['use_persistent'].lower() == "true") else ''
+        saveStatus() if (config['debug']['use_persistent'] in set_words) else ''
         log(0, "Bye")
         exit(0) 
     else:
@@ -704,7 +708,7 @@ def main():
         if (eq.type == "variable"):
             log(1, str(eq.name) + " percent min : " + str(eq.MIN_PERCENT) + " %" )
 
-    loadStatus() if (config['debug']['use_persistent'].lower() == "true") else ''
+    loadStatus() if (config['debug']['use_persistent'] in set_words) else ''
         
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_message
