@@ -18,7 +18,7 @@ Let update/improve this code to your needs...
 
 - At least 2  ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter) modules
    - Here a third Pzem Smartmeter is used, connected to the WaterHeater in order to improve Grafana charts and to detect Over Load while the thermostat is on.
-- _n_ ![Wifi MQTT Energy Variator](https://github.com/Coturex/Wifi_Mqtt_PowerVariator) module(s) (... this project is on going...)
+- _n_ ![Wifi MQTT Energy Variator](https://github.com/Coturex/Wifi_Mqtt_PowerVariator) module(s) 
 - _n_ Wifi MQTT Energy Commutator (like Sonoff Relay etc...)
 - 1 **Raspberry Pi Zero 2 / Pi3 / Pi4**    (which host this python program and Mosquito Mqtt broker)
 
@@ -38,7 +38,7 @@ Above, 2 Grafana screenshots. (EDF is Grid)
  
 ![→ Domoticz](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/domoticz.png)
 
-Above, Domoticz screenshot (in option called 'plan') 
+Above, Domoticz screenshot (from page called 'plan') 
 
 ## Python requirements :
 - python 3
@@ -49,7 +49,7 @@ Above, Domoticz screenshot (in option called 'plan')
 - At startup it **Calculate** 'Polynomial Regression' **Vector'** depending on Power Variator technology and differents calibrations/equipment **directly from CSV calibration files**   -> implemented in _VariablePowerEquipment_ subclass
 - Do ![calibration](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/tree/main/calibration) through Mqtt _(instead of pzem hardware attachment)_
 - Read !['Config file'](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/config.ini.sample) at startup (all parameters/settings are located in this file)
-- Dynamic load of equipments (declarred in !['Config file'](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/config.ini.sample))
+- Dynamic load of equipments (_rules_ in !['Config file'](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/config.ini.sample))
 - Save/Load 'status of equipments' while restarting the program 
    (and every xx seconds cf. 'status_time' in ![Config file](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/config.ini.sample))
 - Cloud forecast, using OpenWeatherMap (https://openweathermap.org/)
