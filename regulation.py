@@ -34,7 +34,6 @@
 
 # See the "equipment module" for the definitions of the loads.
 
-from pickletools import string1
 import signal, sys, os, psutil, datetime, json, time
 import paho.mqtt.client as mqtt
 
@@ -131,7 +130,7 @@ else: SEND_GRID = False
 # EVELUATION CONFIG
 # The comparison between power consumption and production is done every N seconds, it must be above the measurement
 # rate, which is currently 2.5s with PZEM-004t v3.0  module.
-EVALUATION_PERIOD = int(config['evaluate']['period'])
+EVALUATION_PERIOD = float(config['evaluate']['period'])
 # Consider powers are balanced when the difference is below this value (watts). This helps prevent fluctuations.
 BALANCE_THRESHOLD = int(config['evaluate']['balance_threshold'])
 # Keep this margin (in watts) between the power production and consumption. This helps in reducing grid consumption
@@ -373,12 +372,12 @@ def low_energy_fallback():
                 if (ECS_energy_today < 3000):
                     left_energy = 3000 - ECS_energy_today
                     duration = 3600 * left_energy / max_power
-                    log(4, 'cloud forecast not so good, today energy {} W < 3000'.format(CLOUD_forecast))
+                    log(4, 'cloud forecast not so good, today energy {} W < 3000'.format(ECS_energy_today))
                     log(4, 'even there is enough energy stored over 2 days : {}'.format(two_days_nrj))
                     log(4, 'forcing ECS {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
                     equipment_water_heater.force(max_power, duration)   
                 else:
-                    log(4, 'cloud forecast not so good, today energy {} W > 3000'.format(CLOUD_forecast))
+                    log(4, 'cloud forecast not so good, today energy {} W > 3000'.format(ECS_energy_today))
                     log(4, 'there is enough energy stored over 2 days AND today : {}'.format(two_days_nrj))
                     log(4, 'cancelling fallback')   
     else:
