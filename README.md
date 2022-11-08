@@ -26,10 +26,10 @@ Installation :
 
 By installing 2 ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter) in your solar system, and clamping the first PZEM toroid  onto main house loads and the second PZEM toroid onto solar inverter, you can monitor &quot;Grid Consumption Energy&quot; (the energy consumed from the grid), &quot; Solar Production Energy&quot; (the energy producted by solar panels), and &quot;Exported Energy&quot; (the calculated energy exported to the grid) 
 
-![→ Installation](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/installation.png)
+![→ Installation](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/installation_1.png)
 
 
-![→ Compteur](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/compteur.png)
+![→ Compteur](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/installation_2.png)
 
 You can monitor the energy flow of the solar system, as following ;
 
