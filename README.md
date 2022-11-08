@@ -35,7 +35,7 @@ You can monitor the energy flow of the solar system, as following ;
 
 ![→ Grafana](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/grafana_screenshot2.png)
 
-Above, 2 Grafana screenshots. (here EDF is Grid)
+Above, Grafana screenshot. (here EDF is the Grid Consumtion Energy)
  
 ![→ Domoticz](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/domoticz.png)
 
