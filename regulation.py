@@ -638,7 +638,7 @@ def evaluate():
         if last_saveStatus_date is None:
             last_saveStatus_date = t
         else:
-            if t - last_saveStatus_date > STATUS_TIME:
+            if t - last_saveStatus_date > STATUS_TIME and STATUS_TIME >= 60:
                 saveStatus()    
                 last_saveStatus_date = t
 
