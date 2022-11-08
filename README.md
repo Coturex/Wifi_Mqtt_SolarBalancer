@@ -39,7 +39,7 @@ Above, Grafana screenshot. (here EDF is the Grid Consumtion Energy)
  
 ![→ Domoticz](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/domoticz.png)
 
-Above, Domoticz screenshot (from page called 'plan') 
+Above, Domoticz screenshot (from domoticz's page called 'Floorplans') 
 
 ## Python requirements :
 - python 3
