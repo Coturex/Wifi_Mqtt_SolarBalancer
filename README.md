@@ -16,7 +16,8 @@ Let update/improve this code to your needs...
 
 ## Hardware requirements :
 
-- 2  ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter) modules
+- At least 2  ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_Mqtt_SmartMeter) modules
+   - Here a third Pzem Smartmeter is used, connected to the WaterHeater in order to improve Grafana charts and to detect Over Load while the thermostat is on.
 - _n_ ![Wifi MQTT Energy Variator](https://github.com/Coturex/Wifi_Mqtt_PowerVariator) module(s) (... this project is on going...)
 - _n_ Wifi MQTT Energy Commutator (like Sonoff Relay etc...)
 - 1 **Raspberry Pi Zero 2 / Pi3 / Pi4**    (which host this python program and Mosquito Mqtt broker)
