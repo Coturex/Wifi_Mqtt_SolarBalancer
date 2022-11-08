@@ -21,7 +21,7 @@ send_grid = true
 
 [evaluate]
 margin = 20
-period = 3
+period = 2.5
 balance_threshold = 20
 check_at = 1
 status_time = 900
@@ -32,7 +32,7 @@ low_ecs_energy_today = 7000
 [debug]
 simulation = true
 simul_prod = 2000
-debug_file = none
+debug_file = debug.log
 log_file = pv.log    
 equipment_stdout = true
 regulation_stdout = true
@@ -41,6 +41,9 @@ use_persistent = true
 [equipments]
 ecs = water_heater
 resille = constant
+#soufflant_a = constant
+#soufflant_b = variable
+#heater_a = variable
 
 [ecs]
 min_power = 101
