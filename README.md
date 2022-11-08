@@ -4,11 +4,11 @@
 Equipments priority should be managed.
 Communication through _Wifi/Mqtt._
 
-A Python programm called !['regulation.py'](https://github.com/pierrehebert/photovoltaic_optimizer/blob/master/regulation/power_regulation.py) is doing this job. Thanks a lot to ![Pierre](https://github.com/pierrehebert)
+Thanks a lot to ![Pierre](https://github.com/pierrehebert)
 
 Let update/improve this code to your needs...
 
-**Here is a forked version.**
+**Here is a Pierre's forked version.**
 
 ![archi](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/archi.png)
 
