@@ -51,7 +51,7 @@ Above, Domoticz screenshot (in option called 'plan')
 - Read !['Config file'](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/config.ini.sample) at startup (all parameters are declared in this file)
 - Dynamic load of equipments (set in !['Config file'](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/config.ini.sample))
 - Save/load 'status of equipments' while restarting the programm (and every xx seconds cf. 'status_time' @![Config file](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/config.ini.sample))
-- Cloud forecast, using ![OpenWatherMap](https://openweathermap.org/)
+- Cloud forecast, using OpenWatherMap (https://openweathermap.org/)
 
 ## Todo - ideas :
  - attach the (un)forced mode to _MQTT Domoticz device_ - _https://www.domoticz.com/wiki/MQTT_
