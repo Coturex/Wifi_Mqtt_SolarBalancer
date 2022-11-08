@@ -6,9 +6,9 @@ Communication through _Wifi/Mqtt._
 
 Thanks a lot to ![Pierre](https://github.com/pierrehebert)
 
-Let update/improve this code to your needs...
-
 **Here is a Pierre's forked version.**
+
+Let update/improve this code to your needs...
 
 ![archi](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/archi.png)
 
