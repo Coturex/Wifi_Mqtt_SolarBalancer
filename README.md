@@ -28,6 +28,9 @@ By installing 2 ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_M
 
 ![→ Installation](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/installation.png)
 
+
+![→ Compteur](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/compteur.png)
+
 You can monitor the energy flow of the solar system, as following ;
 
 ![→ Grafana](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/grafana_screenshot1.png) 
