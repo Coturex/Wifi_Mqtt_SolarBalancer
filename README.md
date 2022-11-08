@@ -33,8 +33,6 @@ By installing 2 ![Wifi MQTT Energy Smartmeter](https://github.com/Coturex/Wifi_M
 
 You can monitor the energy flow of the solar system, as following ;
 
-![→ Grafana](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/grafana_screenshot1.png) 
-
 ![→ Grafana](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/doc/grafana_screenshot2.png)
 
 Above, 2 Grafana screenshots. (here EDF is Grid)
