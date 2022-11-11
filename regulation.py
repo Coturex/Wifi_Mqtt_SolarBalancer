@@ -340,6 +340,7 @@ def low_energy_fallback():
     
     max_power = equipment_water_heater.MAX_POWER
     two_days_nrj = ECS_energy_today + ECS_energy_yesterday
+    ECS_energy_today = int(ECS_energy_today)
     log(0, '[low_energy_fallback] ECS Energy Yesterday / Today / Sum :')
     log(16,'{} / {} / {}'.format(int(ECS_energy_yesterday), int(ECS_energy_today), int(two_days_nrj)))
     log(2, "cloud forecast : " + str(CLOUD_forecast))
