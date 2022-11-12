@@ -324,10 +324,25 @@ def saveStatus():
             log(1, e)
             log(2, "cannot save status.ini")
 
-def reloadStatus():
-    """Reload status on signal handler SIGUSR2"""
-    # TO BE DONE
-    pass
+def get_season():
+    # get the current Day Of the Year
+    doy = datetime.today().timetuple().tm_yday
+
+    # "day of year" ranges for the northern hemisphere
+    spring = range(80, 172)
+    summer = range(173, 264)
+    fall = range(265, 355)
+    # winter = everything else
+
+    if doy in spring:
+        return 'spring'
+    elif doy in summer:
+        return 'summer'
+    elif doy in fall:
+        return 'fall'
+    else:
+        return 'winter'
+
 
 def low_energy_fallback():
     """ Fallback, when the amount of energy today went below a minimum"""
@@ -355,6 +370,8 @@ def low_energy_fallback():
         if two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS:
             left_two_days = int(LOW_ECS_ENERGY_TWO_DAYS - two_days_nrj)
 
+        # two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS
+
             if CLOUD_forecast < 30:  # and two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS
                 left_energy = int(min(left_today, left_two_days))
                 duration = 3600 * left_energy / max_power
@@ -371,6 +388,8 @@ def low_energy_fallback():
                 log(4, 'forcing ECS  {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
                 equipment_water_heater.force(max_power, duration)            
 
+        # two_days_nrj > LOW_ECS_ENERGY_TWO_DAYS
+
         else:   
             if CLOUD_forecast < 30: # and two_days_nrj > LOW_ECS_ENERGY_TWO_DAYS
                 log(4, 'cloud forecast is good ({} %) and enough 2 days energy ({} W)'.format(CLOUD_forecast, two_days_nrj))
@@ -378,20 +397,13 @@ def low_energy_fallback():
                 log(4, 'CANCELLING fallback')
 
             else:   # CLOUD_forecast is bad and  two_days_nrj > LOW_ECS_ENERGY_TWO_DAYS
-                    # Even if two_days_energy is good, At J+1, at least 3000 W is needed today !
-                if (ECS_energy_today < 3000):
-                    left_energy = 3000 - ECS_energy_today
-                    duration = 3600 * left_energy / max_power
-                    log(4, 'cloud forecast not good ({} %), today energy {} W < 3000'.format(CLOUD_forecast, ECS_energy_today))
-                    log(4, 'even there is enough energy stored over 2 days : {}'.format(two_days_nrj))
-                    log(4, 'forcing ECS {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
-                    equipment_water_heater.force(max_power, duration)   
+                left_energy = left_today
+                duration = 3600 * left_energy / max_power
+                log(4, 'cloud forecast not good ({} %) and not enough 2 days energy ({} W)'.format(CLOUD_forecast, two_days_nrj))
+                log(4, 'completing today energy, adding {} W'.format(left_energy))
+                log(4, 'forcing ECS {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
+                equipment_water_heater.force(max_power, duration)   
 
-                else:   # CLOUD_forecast is bad and two_days_nrj > LOW_ECS_ENERGY_TWO_DAYS and today > 3000
-                    log(4, 'cloud forecast not good ({} %), today energy {} W > 3000'.format(CLOUD_forecast, ECS_energy_today))
-                    log(4, 'there is enough energy stored today and over 2 days ({} W)'.format(two_days_nrj))
-                    log(4, 'CANCELLING fallback')   
-    
     else: # ECS Energy today > LOW_ECS_ENERGY_TODAY
         log(4, 'ECS Energy today {} W is enouth, no need to complete it.'.format(ECS_energy_today))
         log(4, 'CANCELLING fallback')
@@ -568,7 +580,7 @@ def evaluate():
             injection = (power_consumption - power_production) 
             if injection < 0:   # This is INJECTION
                 grid = 0
-                last_zero_grid_date = t
+                last_zero_injection_date = t
             else:               # This is GRID
                 grid = injection
                 injection = 0
@@ -597,7 +609,7 @@ def evaluate():
             ### HERE Prepare and send  GRIS MESSAGE
             if SEND_GRID:
                 if grid > 0 and last_grid == 0 and (t - last_zero_grid_date) > 20 : 
-                    # This Workaround is needed in order to improve Grafana Integral calculation. Send 0.
+                    # This Workaround is needed to improve Grafana Integral calculation. Send 0.
                     domoticz = "{ \"idx\": " + IDX_GRID + ", \"nvalue\": 0, \"svalue\": \"0\"}"
                     mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz)
                     print(TOPIC_DOMOTICZ_IN, domoticz) if SDEBUG else ''
