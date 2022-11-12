@@ -629,7 +629,7 @@ def evaluate():
             'injection' : injection,
             'grid' : grid,
             'CLOUD_forecast' : CLOUD_forecast,
-            'ECS_energy_yesterday' : ECS_energy_yesterday,
+            'ECS_energy_yesterday' : int(ECS_energy_yesterday),
         }
         power_equipments = 0
         eq = []
