@@ -73,7 +73,6 @@ if (config['debug']['regulation_stdout'] in set_words):
     SDEBUG = True 
 else: SDEBUG = False
 
-test = True
 last_grid = None
 last_injection = None
 last_evaluation_date = None
@@ -136,8 +135,6 @@ BALANCE_THRESHOLD = int(config['evaluate']['balance_threshold'])
 # Keep this margin (in watts) between the power production and consumption. This helps in reducing grid consumption
 # knowing that there may be measurement inaccuracy.
 MARGIN = int(config['evaluate']['margin'])
-LOW_ECS_ENERGY_TWO_DAYS = int(config['evaluate']['low_ecs_energy_two_days'])  # minimal power on two days
-LOW_ECS_ENERGY_TODAY = int(config['evaluate']['low_ecs_energy_today']) # minimal power for today
 STATUS_TIME = int(config['evaluate']['status_time']) 
 CHECK_AT = int(config['evaluate']['check_at']) 
 if (CHECK_AT == 0 or CHECK_AT >= 24):
@@ -326,8 +323,7 @@ def saveStatus():
 
 def get_season():
     # get the current Day Of the Year
-    doy = datetime.today().timetuple().tm_yday
-
+    doy = datetime.date.today().timetuple().tm_yday
     # "day of year" ranges for the northern hemisphere
     spring = range(80, 172)
     summer = range(173, 264)
@@ -335,30 +331,46 @@ def get_season():
     # winter = everything else
 
     if doy in spring:
-        return 'spring'
+        return 'SPRING'
     elif doy in summer:
-        return 'summer'
+        return 'SUMMER'
     elif doy in fall:
-        return 'fall'
+        return 'FALL'
     else:
-        return 'winter'
-
+        return 'WINTER'
 
 def low_energy_fallback():
     """ Fallback, when the amount of energy today went below a minimum"""
-
     # This is a custom and very specific fallback method which aim is to turn on the water heater should the daily
     # solar energy income be below a minimum threshold. We want the water to stay warm.
     # The check is done everyday
 
     global ECS_energy_yesterday, ECS_energy_today, CLOUD_forecast, power_production, equipment_water_heater
-    
+  
+    LOW_ECS_ENERGY_TWO_DAYS = int(config['evaluate']['low_ecs_energy_two_days'])  # minimal power on two days
+    LOW_ECS_ENERGY_TODAY = int(config['evaluate']['low_ecs_energy_today']) # minimal power for today
+    season = get_season()
+    if season == "FALL":
+        LOW_ECS_ENERGY_TODAY = LOW_ECS_ENERGY_TODAY
+        LOW_ECS_ENERGY_TWO_DAYS = LOW_ECS_ENERGY_TWO_DAYS
+    elif season == "WINTER":
+        LOW_ECS_ENERGY_TODAY = LOW_ECS_ENERGY_TODAY
+        LOW_ECS_ENERGY_TWO_DAYS = LOW_ECS_ENERGY_TWO_DAYS
+    elif season == "SPRING":
+        LOW_ECS_ENERGY_TODAY = LOW_ECS_ENERGY_TODAY - 1000
+        LOW_ECS_ENERGY_TWO_DAYS = LOW_ECS_ENERGY_TWO_DAYS - 1000
+    elif season == "SUMMER":
+        LOW_ECS_ENERGY_TODAY = LOW_ECS_ENERGY_TODAY - 2000
+        LOW_ECS_ENERGY_TWO_DAYS = LOW_ECS_ENERGY_TWO_DAYS - 2000
+    log(0, '[low_energy_fallback] Season {} : needs TODAY {} / 2DAYS {}'.format(season, LOW_ECS_ENERGY_TODAY, LOW_ECS_ENERGY_TWO_DAYS))
+
     max_power = equipment_water_heater.MAX_POWER
     two_days_nrj = ECS_energy_today + ECS_energy_yesterday
     ECS_energy_today = int(ECS_energy_today)
     log(0, '[low_energy_fallback] ECS Energy Yesterday / Today / Sum :')
     log(16,'{} / {} / {}'.format(int(ECS_energy_yesterday), int(ECS_energy_today), int(two_days_nrj)))
     log(2, "cloud forecast : " + str(CLOUD_forecast))
+    left_energy = 0
     if (equipment_water_heater.is_overed()):
         log(4, 'ECS Energy has been OVERLOADED TODAY')
         log(4, 'CANCELLING fallback')
@@ -371,7 +383,6 @@ def low_energy_fallback():
             left_two_days = int(LOW_ECS_ENERGY_TWO_DAYS - two_days_nrj)
 
         # two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS
-
             if CLOUD_forecast < 30:  # and two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS
                 left_energy = int(min(left_today, left_two_days))
                 duration = 3600 * left_energy / max_power
@@ -389,7 +400,6 @@ def low_energy_fallback():
                 equipment_water_heater.force(max_power, duration)            
 
         # two_days_nrj > LOW_ECS_ENERGY_TWO_DAYS
-
         else:   
             if CLOUD_forecast < 30: # and two_days_nrj > LOW_ECS_ENERGY_TWO_DAYS
                 log(4, 'cloud forecast is good ({} %) and enough 2 days energy ({} W)'.format(CLOUD_forecast, two_days_nrj))
@@ -409,7 +419,7 @@ def low_energy_fallback():
         log(4, 'CANCELLING fallback')
 
     # save the energy so that it can be used in the fallback check tomorrow
-    ECS_energy_yesterday = ECS_energy_today
+    ECS_energy_yesterday = ECS_energy_today + left_energy
         
 def evaluate():
     # This is where all the magic happen. This function takes decision according to the current power measurements.
@@ -431,11 +441,13 @@ def evaluate():
          
             if d1.hour == 8 and d2.hour == 9: 
                 equipment_water_heater.unset_over() # maybe it has been forced this night (low_energy_fallback)
+                equipment_water_heater.reset_energy()
                 fallback_today = False
-
-            #if test 
+            
+            #test = True
+            #if test:
             #    test = False            
-            if d1.hour == CHECK_AT_prev and d2.hour == CHECK_AT and not fallback_today:  #(be sure it's not already done for today)
+            if d1.hour == CHECK_AT_prev and d2.hour == CHECK_AT and not fallback_today:  # fallback_today : be sure it's not already done for today
                 fallback_today = True
                 log(0,"")
                 log(0,"[evaluate] Past Cloud / Production / Water_heater")
@@ -458,9 +470,6 @@ def evaluate():
 
                 # ensure that water stays warm enough
                 low_energy_fallback()
-
-                for e in equipments:
-                        e.unset_over()
                     
             # ensure there's a minimum duration between two evaluations
             if t - last_evaluation_date < EVALUATION_PERIOD:
@@ -646,12 +655,12 @@ def evaluate():
         power_equipments = 0
         eq = []
         for e in equipments:
-            p = e.get_current_power()        
+            p = int(e.get_current_power())       
             power_equipments = power_equipments + p             
             eq.append({
                 'name': e.name,
                 'current_power': 'unknown' if p is None else p,
-                'energy': e.get_energy(),
+                'energy': int(e.get_energy()),
                 'overed' : e.is_overed(),
                 'forced': e.is_forced()
             })
