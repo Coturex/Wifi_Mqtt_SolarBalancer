@@ -52,6 +52,7 @@ Above, Domoticz screenshot (from domoticz's page called 'Floorplans')
 - Save/Load 'status of equipments' while restarting the program 
    (and every xx seconds cf. 'status_time' in ![Config file](https://github.com/Coturex/Wifi_Mqtt_SolarBalancer/blob/main/config.ini.sample))
 - **Cloud forecast**, using OpenWeatherMap (https://openweathermap.org/)
+- 'Water heater fallback' if not enough dayly or 2days solar energy : **Seasons consideration**
 
 ## Todo - ideas :
  - attach the (un)forced mode to _MQTT Domoticz device_ - _https://www.domoticz.com/wiki/MQTT_
@@ -94,15 +95,9 @@ Above, Domoticz screenshot (from domoticz's page called 'Floorplans')
    <kload_topic>/<kload_id>/
    
       ...
+ 
    
-   **Unknown Power Load :** (_uload_topic_ = regul/uload)
-   
-   <uload_topic>/<uload_id>/
-   
-      ...
-   
-   
-   **Domoticz link (then influxDb, Grafana) :**
+   **Domoticz link (then influxDb, Grafana) :** _(and Constant Power Equipment too)_
    
       - domoticz/in/{json} 
       - domoticz/out/{json} 
