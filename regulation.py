@@ -250,7 +250,7 @@ def on_message(client, userdata, msg):
 
 def signal_handler(sig, frame):
     """ End of program handler, set equipments 0W and save status"""
-    global equipments
+    global equipments, status
     if status is not None:
         signal_name = '(unknown)'
         if sig == signal.SIGINT:
@@ -331,13 +331,13 @@ def get_season():
     # winter = everything else
 
     if doy in spring:
-        return 'SPRING'
+        return 'spring'
     elif doy in summer:
-        return 'SUMMER'
+        return 'summer'
     elif doy in fall:
-        return 'FALL'
+        return 'fall'
     else:
-        return 'WINTER'
+        return 'winter'
 
 def low_energy_fallback():
     """ Fallback, when the amount of energy today went below a minimum"""
@@ -347,22 +347,11 @@ def low_energy_fallback():
 
     global ECS_energy_yesterday, ECS_energy_today, CLOUD_forecast, power_production, equipment_water_heater
   
-    LOW_ECS_ENERGY_TWO_DAYS = int(config['evaluate']['low_ecs_energy_two_days'])  # minimal power on two days
-    LOW_ECS_ENERGY_TODAY = int(config['evaluate']['low_ecs_energy_today']) # minimal power for today
     season = get_season()
-    if season == "FALL":
-        LOW_ECS_ENERGY_TODAY = LOW_ECS_ENERGY_TODAY
-        LOW_ECS_ENERGY_TWO_DAYS = LOW_ECS_ENERGY_TWO_DAYS
-    elif season == "WINTER":
-        LOW_ECS_ENERGY_TODAY = LOW_ECS_ENERGY_TODAY
-        LOW_ECS_ENERGY_TWO_DAYS = LOW_ECS_ENERGY_TWO_DAYS
-    elif season == "SPRING":
-        LOW_ECS_ENERGY_TODAY = LOW_ECS_ENERGY_TODAY - 1000
-        LOW_ECS_ENERGY_TWO_DAYS = LOW_ECS_ENERGY_TWO_DAYS - 1000
-    elif season == "SUMMER":
-        LOW_ECS_ENERGY_TODAY = LOW_ECS_ENERGY_TODAY - 2000
-        LOW_ECS_ENERGY_TWO_DAYS = LOW_ECS_ENERGY_TWO_DAYS - 2000
-    log(0, '[low_energy_fallback] Season {} : needs TODAY {} / 2DAYS {}'.format(season, LOW_ECS_ENERGY_TODAY, LOW_ECS_ENERGY_TWO_DAYS))
+    LOW_ECS_ENERGY_TODAY = int(config['fallback']['low_nrj_two_days_' + season]) # minimal power on two days
+    LOW_ECS_ENERGY_TWO_DAYS = int(config['fallback']['low_nrj_today_' + season]) # minimal power for today
+  
+    log(0, '[low_energy_fallback] Season "{}" : needs TODAY {} / 2DAYS {}'.format(season, LOW_ECS_ENERGY_TODAY, LOW_ECS_ENERGY_TWO_DAYS))
 
     max_power = equipment_water_heater.MAX_POWER
     two_days_nrj = ECS_energy_today + ECS_energy_yesterday
@@ -428,10 +417,11 @@ def evaluate():
 
     global last_evaluation_date, ECS_energy_today, last_injection, last_grid, CLOUD_forecast
     global equipments, equipment_water_heater, production_energy, fallback_today, cloud_requested, status
-    global power_production, power_consumption, last_production_date, last_consumption_date, test
+    global power_production, power_consumption, last_production_date, last_consumption_date, status
     global last_zero_grid_date, last_zero_injection_date, CHECK_AT, CHECK_AT_prev, last_saveStatus_date, STATUS_TIME
     TODAY = 0 
     TOMORROW = 1
+
     try:
         t = now_ts()
         
@@ -444,9 +434,9 @@ def evaluate():
                 equipment_water_heater.reset_energy()
                 fallback_today = False
             
-            #test = True
-            #if test:
-            #    test = False            
+            # test = True
+            # if test:
+            #     test = False            
             if d1.hour == CHECK_AT_prev and d2.hour == CHECK_AT and not fallback_today:  # fallback_today : be sure it's not already done for today
                 fallback_today = True
                 log(0,"")
@@ -467,7 +457,6 @@ def evaluate():
                 ECS_energy_today = equipment_water_heater.get_energy()
                 equipment_water_heater.reset_energy()
                 production_energy = 0
-
                 # ensure that water stays warm enough
                 low_energy_fallback()
                     

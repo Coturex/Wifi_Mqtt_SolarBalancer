@@ -25,8 +25,20 @@ period = 2.5
 balance_threshold = 20
 check_at = 1
 status_time = 900
-low_ecs_energy_two_days = 12000
-low_ecs_energy_today = 7000
+
+[fallback]
+# FALL
+low_nrj_two_days_fall = 12000
+low_nrj_today_fall = 7000
+# WINTER
+low_nrj_two_days_winter = 12000
+low_nrj_today_winter = 7000
+# SPRING
+low_nrj_two_days_spring = 11000
+low_nrj_today_spring= 6000
+# SUMMER
+low_nrj_two_days_summer = 10000
+low_nrj_today_summer = 5000
 
 [debug]
 simulation = true
