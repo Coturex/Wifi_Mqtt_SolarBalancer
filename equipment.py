@@ -265,7 +265,7 @@ class VariablePowerEquipment(Equipment):
         debug(4, "MQTT sending power command {}W ({}%) for {}".format(int(self.current_power), str(percent), self.name))
         debug(8, "in topic {}".format(self.topic_set_power))
         if _send_commands:
-            _mqtt_client.publish(self.topic_set_power, str(percent))
+            _mqtt_client.publish(self.topic_set_power, str(percent), retain=True)
 
     def decrease_power_by(self, watt):
 
