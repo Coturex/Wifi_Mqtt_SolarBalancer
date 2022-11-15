@@ -79,7 +79,13 @@ class Prediction:
             print(e)
             print("Error on line {}".format(sys.exc_info()[-1].tb_lineno))
             return -404
-        return int(np.average(tCloud))     
+        try:
+            avg = int(np.average(tCloud))
+        except Exception as e:
+            print(e)
+            print("Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            return -1
+        return avg   
 
     def getRawData(self):
         """Print JSON data returned by html request"""
@@ -136,6 +142,7 @@ def main():
     #print("tomorrow 15H UTC : " + str(weather.getCloudHour(TOMORROW,15)))
     #print ("-----------")
     #print("avg (9H+12H)/2 today : " + str(weather.getCloudAvg(TOMORROW)))
+    print("avg (9H+12H)/2 today : " + str(weather.getCloudAvg(TODAY)))
     print("avg (9H+12H)/2 tomorrow : " + str(weather.getCloudAvg(TOMORROW)))
     print("bye")
    
