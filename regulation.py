@@ -440,8 +440,8 @@ def evaluate():
                 equipment_water_heater.reset_energy()
                 fallback_today = False
             
-        #if d1.hour == CHECK_AT_prev and d2.hour == CHECK_AT and not fallback_today:  # fallback_today : be sure it's not already done for today
-            if True and not fallback_today:  # fallback_today : be sure it's not already done for today
+            if d1.hour == CHECK_AT_prev and d2.hour == CHECK_AT and not fallback_today:  # fallback_today : be sure it's not already done for today
+            #if True and not fallback_today:  # fallback_today : be sure it's not already done for today
                 fallback_today = True
                 log(0,"")
                 log(0,"[evaluate] Past Cloud / Production / Water_heater")
@@ -488,8 +488,9 @@ def evaluate():
                 e.set_current_power(0)
         else:
             # HERE STARTS THE REAL WORK, compare powers
-            if power_consumption > (power_production - MARGIN):
-                # TOO CONSUMPTION, POWER IS NEEDED, decrease the load
+
+            # if, TOO CONSUMPTION, POWER IS NEEDED, decrease the load
+            if power_consumption > (power_production - MARGIN): 
                 excess_power = power_consumption - (power_production - MARGIN)
                 debug(0, "[evaluate] decreasing global power consumption by {}W".format(excess_power))
                 for e in reversed(equipments):
@@ -511,11 +512,10 @@ def evaluate():
                     else:
                         debug(2, "There is {}W left to cancel, continuing".format(excess_power))
                 debug(2, "No more equipment to check")
-            elif (power_production - MARGIN - power_consumption) < BALANCE_THRESHOLD:
+            elif (power_production - MARGIN - power_consumption) < BALANCE_THRESHOLD: 
                 # Nice, this is the goal: CONSUMPTION is EQUAL to PRODUCTION
                 debug(0, "[evaluate] power consumption and production are balanced")
-            else:
-                # There's PV POWER IN EXCESS, try to increase the load to consume this available power
+            else: # There's PV POWER IN EXCESS, try to increase the load to consume this available power
                 available_power = power_production - MARGIN - power_consumption
                 debug(0, "[evaluate] increasing global power consumption by {}W".format(available_power))
                 for i, e in enumerate(equipments):                
@@ -523,14 +523,6 @@ def evaluate():
                         debug(2, "no more available power")
                         break
                     debug(2, "2. examining " + e.name)
-
-                    # Check if this equpment is over loaded, this is a temporaly workaround 
-                    # overloaded if (e.current_power > prod) and (prod < e.max_power)
-                    #if ((e.get_current_power() > power_production) and (power_production < e.MAX_POWER)):
-                    #    debug(4, "[evaluate] this equipment is overed, it cannot load power anymore "+str(e.MIN_POWER))
-                    #    log(1, e.name + " is fully loaded for today") if (not e.is_overed()) else ''
-                    #    e.set_over()
-                    #    continue
 
                     if e.is_overed():
                         debug(4, "skipping this equipment because it's already full loaded for today")
