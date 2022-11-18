@@ -74,7 +74,8 @@ class Prediction:
                     #print(i, datei, sdate, cloudi)
                     debug(10, "Clouds : " + str(cloudi) + " %\n")
                     tCloud = np.append(tCloud, cloudi)
-                    #print("Clouds : " + str(cloudi) + " %\n")        
+                    if __name__ == '__main__':
+                        print("Clouds : " + str(cloudi) + " %\n")        
         except Exception as e:
             print(e)
             print("Error on line {}".format(sys.exc_info()[-1].tb_lineno))
@@ -132,7 +133,7 @@ def main():
     config.read('config.ini') 
     
     weather = Prediction(config['openweathermap']['location'],config['openweathermap']['key'])
-    #weather.getRawData()
+    weather.getRawData()
     #print("today 9H UTC : " + str(weather.getCloudHour(TODAY,9)))
     #print("today 12H UTC : " + str(weather.getCloudHour(TODAY,12)))
     #print("today 15H UTC : " + str(weather.getCloudHour(TODAY,15)))
@@ -142,7 +143,9 @@ def main():
     #print("tomorrow 15H UTC : " + str(weather.getCloudHour(TOMORROW,15)))
     #print ("-----------")
     #print("avg (9H+12H)/2 today : " + str(weather.getCloudAvg(TOMORROW)))
+    print("---------------------------")
     print("avg (9H+12H)/2 today : " + str(weather.getCloudAvg(TODAY)))
+    print("---------------------------")
     print("avg (9H+12H)/2 tomorrow : " + str(weather.getCloudAvg(TOMORROW)))
     print("bye")
    
