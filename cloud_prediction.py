@@ -144,9 +144,9 @@ def main():
     #print ("-----------")
     #print("avg (9H+12H)/2 today : " + str(weather.getCloudAvg(TOMORROW)))
     print("---------------------------")
-    print("avg (9H+12H)/2 today : " + str(weather.getCloudAvg(TODAY)))
+    print("avg UTC(9H+12H)/2 today : " + str(weather.getCloudAvg(TODAY)))
     print("---------------------------")
-    print("avg (9H+12H)/2 tomorrow : " + str(weather.getCloudAvg(TOMORROW)))
+    print("avg UTC(9H+12H)/2 tomorrow : " + str(weather.getCloudAvg(TOMORROW)))
     print("bye")
    
 if __name__ == '__main__':
