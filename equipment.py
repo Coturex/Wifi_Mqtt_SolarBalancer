@@ -262,7 +262,7 @@ class VariablePowerEquipment(Equipment):
         if percent > 100:
             percent = 100
 
-        debug(4, "MQTT sending power command {}W ({}%) for {}".format(int(self.current_power), int(str(percent)), self.name))
+        debug(4, "MQTT sending power command {}W ({}%) for {}".format(int(self.current_power), str(int(percent)), self.name))
         debug(8, "in topic {}".format(self.topic_set_power))
         if _send_commands:
             _mqtt_client.publish(self.topic_set_power, str(percent), retain=True)
