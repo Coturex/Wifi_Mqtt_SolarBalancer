@@ -474,12 +474,13 @@ def evaluate():
         if power_production is None or power_consumption is None: # Return if None
             return
 
+        if last_consumption_date is None or last_production_date is None:
+            return
 
         debug(0, '')
         debug(0, '[evaluate] evaluating power CONS = {}, PROD = {}'.format(power_consumption, power_production))
 
-        if last_consumption_date is not None and last_production_date is not None:
-            if (t - last_consumption_date) > PZEM_TIMEOUT or (t- last_production_date) > PZEM_TIMEOUT:
+        if (t - last_consumption_date) > PZEM_TIMEOUT or (t- last_production_date) > PZEM_TIMEOUT:
                 power_consumption = 0
                 power_production = 0
                 delta_cons = int(t - last_consumption_date)
