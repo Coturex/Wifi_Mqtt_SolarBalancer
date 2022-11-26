@@ -31,6 +31,7 @@ import sys
 import datetime
 from pprint import pprint
 from debug_log import debug as debug
+from debug_log import log as log
 import numpy as np
 
 TODAY = 0 
@@ -72,7 +73,7 @@ class Prediction:
                 #print(i, datei, cloudi, sdate)
                 if sdate1 == datei or sdate2 == datei:  
                     #print(i, datei, sdate, cloudi)
-                    debug(10, "Clouds {}H : {} %".format(datei,cloudi))
+                    log(10, "Clouds {}H : {} %".format(datei,cloudi))
                     tCloud = np.append(tCloud, cloudi)
                     if __name__ == '__main__':
                         print("Clouds {}H : {} %".format(datei,cloudi))

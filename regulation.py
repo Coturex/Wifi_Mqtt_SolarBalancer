@@ -478,25 +478,21 @@ def evaluate():
         debug(0, '')
         debug(0, '[evaluate] evaluating power CONS = {}, PROD = {}'.format(power_consumption, power_production))
 
-        if (t - last_consumption_date) > PZEM_TIMEOUT or (t- last_production_date) > PZEM_TIMEOUT:
-            power_consumption = 0
-            power_production = 0
-            debug(0, "*** MQTT RX : PZEM CONSUMPTION OR PRODUCTION TIMEOUT")
-            debug(4, "now t : {}, timeout : {}".format(t, PZEM_TIMEOUT))
-            debug(4, "last_consumption_date : {}".format(last_consumption_date))
-            debug(4, "t - last_consumption_date : {}".format(t - last_consumption_date))
-            debug(4, "last_production_date : {}".format(last_production_date))
-            debug(4, "t - last_production_date : {}".format(t - last_production_date))
-            
-            debug(8, "reset all power equipments to 0")
-            for e in equipments:
-                if e.is_forced():
-                    debug(8, "skipping this equipment because it's forced")
-                else:
-                    e.set_current_power(0)
+        if last_consumption_date is not None and last_production_date is not None:
+            if (t - last_consumption_date) > PZEM_TIMEOUT or (t- last_production_date) > PZEM_TIMEOUT:
+                power_consumption = 0
+                power_production = 0
+                delta_cons = int(t - last_consumption_date)
+                delta_prod = int(t - last_production_date )
+                log(0, "*** MQTT RX : PZEM CONSUMPTION ({}s) OR PRODUCTION ({}s) TIMEOUT".format(delta_cons, delta_prod))
+                log(4, "reset all power equipments to 0")
+                for e in equipments:
+                    if e.is_forced():
+                        log(8, "skipping {} because it's forced".format(e.name))
+                    else:
+                        e.set_current_power(0)
         else:
             # HERE STARTS THE REAL WORK, compare powers
-
             # if, TOO CONSUMPTION, POWER IS NEEDED, decrease the load
             if power_consumption > (power_production - MARGIN): 
                 excess_power = power_consumption - (power_production - MARGIN)
@@ -547,6 +543,7 @@ def evaluate():
                         break
                     elif result < 0:
                         debug(2, "not enough available power to turn on this equipment, trying to recover power on lower priority equipments")
+         
                         freeable_power = 0
                         needed_power = -result
                         for j in range(i + 1, len(equipments)):
