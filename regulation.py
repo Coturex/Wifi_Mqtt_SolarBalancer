@@ -95,7 +95,7 @@ ECS_energy_today = 0
 production_energy = 0
 CLOUD_forecast = None  
 
-PZEM_TIMOUT = 20
+PZEM_TIMEOUT = 30
 weather = Prediction(config['openweathermap']['location'],config['openweathermap']['key'])
 
 ###############################################################
@@ -188,7 +188,7 @@ def on_message(client, userdata, msg):
     # Receive power consumption and production values and triggers the evaluation. We also take into account manual
     # control messages in case we want to turn on/off a given equipment.
     global power_production, power_consumption, last_production_date, last_consumption_date, production_energy
-    global PZEM_TIMOUT
+    global PZEM_TIMEOUT
 
     print("[on message] topic : " + msg.topic) if SDEBUG else ''
     now = now_ts()
@@ -205,7 +205,7 @@ def on_message(client, userdata, msg):
             power_production = int(j['power'])
             if last_production_date is not None:
                 delta = now - last_production_date
-                if delta < PZEM_TIMOUT:
+                if delta < PZEM_TIMEOUT:
                     production_energy += power_production * delta / 3600.0
             if SIMULATION and SIM_PROD is not None:
                 power_production = SIM_PROD
@@ -356,7 +356,7 @@ def low_energy_fallback():
         log(0,"[low_energy_fallback]") 
         log(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
         log(1, e)
-        log(2, "set to default 7000 / 12000")
+        log(2, "then set to default 7000 / 12000")
         LOW_ECS_ENERGY_TODAY = 7000
         LOW_ECS_ENERGY_TWO_DAYS = 12000
             
@@ -430,7 +430,6 @@ def evaluate():
 
     try:
         t = now_ts()
-        
         if last_evaluation_date is not None: # Evaluating scheduler
             d1 = datetime.datetime.fromtimestamp(last_evaluation_date)
             d2 = datetime.datetime.fromtimestamp(t)
@@ -475,20 +474,26 @@ def evaluate():
         if power_production is None or power_consumption is None: # Return if None
             return
 
+        if last_consumption_date is None or last_production_date is None:
+            return
 
         debug(0, '')
         debug(0, '[evaluate] evaluating power CONS = {}, PROD = {}'.format(power_consumption, power_production))
 
-        if (t - last_consumption_date) > PZEM_TIMOUT or (t- last_production_date) > PZEM_TIMOUT:
-            power_consumption = 0
-            power_production = 0
-            debug(0, "MQTT SUBSCRIBE : PZEM CONSUMPTION OR PRODUCTION TIMEOUT")
-            debug(4, "reset all power equipments to 0")
-            for e in equipments:
-                e.set_current_power(0)
+        if (t - last_consumption_date) > PZEM_TIMEOUT or (t- last_production_date) > PZEM_TIMEOUT:
+                power_consumption = 0
+                power_production = 0
+                delta_cons = int(t - last_consumption_date)
+                delta_prod = int(t - last_production_date )
+                log(0, "*** MQTT RX : PZEM CONSUMPTION ({}s) OR PRODUCTION ({}s) TIMEOUT".format(delta_cons, delta_prod))
+                log(4, "reset all power equipments to 0")
+                for e in equipments:
+                    if e.is_forced():
+                        log(8, "skipping {} because it's forced".format(e.name))
+                    else:
+                        e.set_current_power(0)
         else:
             # HERE STARTS THE REAL WORK, compare powers
-
             # if, TOO CONSUMPTION, POWER IS NEEDED, decrease the load
             if power_consumption > (power_production - MARGIN): 
                 excess_power = power_consumption - (power_production - MARGIN)
@@ -539,6 +544,7 @@ def evaluate():
                         break
                     elif result < 0:
                         debug(2, "not enough available power to turn on this equipment, trying to recover power on lower priority equipments")
+         
                         freeable_power = 0
                         needed_power = -result
                         for j in range(i + 1, len(equipments)):

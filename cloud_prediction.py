@@ -31,6 +31,7 @@ import sys
 import datetime
 from pprint import pprint
 from debug_log import debug as debug
+from debug_log import log as log
 import numpy as np
 
 TODAY = 0 
@@ -64,7 +65,7 @@ class Prediction:
             #debug(0, "Cloud_prediction, url : " + url)
             wdata = requests.get(url).json()
             # pprint(wdata)
-            debug(0, "Cloud_prediction, requesting " + sdate1 + " " + sdate2)
+            debug(0, "[Cloud_prediction] requesting " + sdate1 + " / " + sdate2)
             tCloud = np.array([])
             for i in range(0,len(wdata['list'])):
                 datei  = wdata['list'][i]['dt_txt']
@@ -72,9 +73,10 @@ class Prediction:
                 #print(i, datei, cloudi, sdate)
                 if sdate1 == datei or sdate2 == datei:  
                     #print(i, datei, sdate, cloudi)
-                    debug(10, "Clouds : " + str(cloudi) + " %\n")
+                    log(10, "Clouds {}H : {} %".format(datei,cloudi))
                     tCloud = np.append(tCloud, cloudi)
-                    #print("Clouds : " + str(cloudi) + " %\n")        
+                    if __name__ == '__main__':
+                        print("Clouds {}H : {} %".format(datei,cloudi))
         except Exception as e:
             print(e)
             print("Error on line {}".format(sys.exc_info()[-1].tb_lineno))
@@ -105,14 +107,14 @@ class Prediction:
             #debug(0, "Cloud_prediction, url : " + url)
             wdata = requests.get(url).json()
             # pprint(wdata)
-            debug(0, "Cloud_prediction, requesting " + sdate)
+            debug(0, "[Cloud_prediction] requesting " + sdate)
             for i in range(0,len(wdata['list'])):
                 datei  = wdata['list'][i]['dt_txt']
                 cloudi = wdata['list'][i]['clouds']['all']
                 #print(i, datei, cloudi, sdate)
                 if sdate == datei:  
                     #print(i, datei, sdate, cloudi)
-                    debug(10, "Clouds : " + str(cloudi) + " %\n")
+                    debug(10, "Clouds {}H : {} %".format(sHour,cloudi))
                     return cloudi
         except Exception as e:
             return -404
@@ -132,7 +134,7 @@ def main():
     config.read('config.ini') 
     
     weather = Prediction(config['openweathermap']['location'],config['openweathermap']['key'])
-    #weather.getRawData()
+    weather.getRawData()
     #print("today 9H UTC : " + str(weather.getCloudHour(TODAY,9)))
     #print("today 12H UTC : " + str(weather.getCloudHour(TODAY,12)))
     #print("today 15H UTC : " + str(weather.getCloudHour(TODAY,15)))
@@ -142,8 +144,10 @@ def main():
     #print("tomorrow 15H UTC : " + str(weather.getCloudHour(TOMORROW,15)))
     #print ("-----------")
     #print("avg (9H+12H)/2 today : " + str(weather.getCloudAvg(TOMORROW)))
-    print("avg (9H+12H)/2 today : " + str(weather.getCloudAvg(TODAY)))
-    print("avg (9H+12H)/2 tomorrow : " + str(weather.getCloudAvg(TOMORROW)))
+    print("---------------------------")
+    print("avg UTC(9H+12H)/2 today : " + str(weather.getCloudAvg(TODAY)))
+    print("---------------------------")
+    print("avg UTC(9H+12H)/2 tomorrow : " + str(weather.getCloudAvg(TOMORROW)))
     print("bye")
    
 if __name__ == '__main__':
