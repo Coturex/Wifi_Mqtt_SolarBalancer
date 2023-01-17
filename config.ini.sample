@@ -18,13 +18,19 @@ send_domoticz = True
 send_injection = true
 send_grid = true
 
-
 [evaluate]
 margin = 20
 period = 2.5
 balance_threshold = 20
 check_at = 1
 status_time = 900
+
+[season]
+# season range
+yday_spring = 80
+yday_summer = 173
+yday_fall =  290
+yday_winter = 355
 
 [fallback]
 # FALL

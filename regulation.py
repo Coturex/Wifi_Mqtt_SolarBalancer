@@ -324,12 +324,29 @@ def saveStatus():
 def get_season():
     # get the current Day Of the Year
     doy = datetime.date.today().timetuple().tm_yday
-    # "day of year" ranges for the northern hemisphere
-    spring = range(80, 172)
-    summer = range(173, 264)
-    fall = range(265, 355)
-    # winter = everything else
-
+    
+    try:
+        # "day of year" ranges for my solar usage cf https://miniwebtool.com/day-of-year-calendar/
+        spring_day = int(config['season']['yday_spring'])
+        summer_day = int(config['season']['yday_summer'])
+        fall_day = int(config['season']['yday_fall'])
+        winter_day = int(config['season']['yday_winter'])
+        spring = range(spring_day, summer_day )
+        summer = range(summer_day, fall_day )
+        fall   = range(fall_day, winter_day )
+        # winter = everything else     
+    except Exception:  
+        log(0, '[get_season] config season bad format :')
+        log(4, '  the northern hemisphere ranges are used instead')       
+        # "day of year" official ranges for the northern hemisphere 
+        spring = range(80, 172) # spring ranges for the northern hemisphere
+        summer = range(173, 264) # summer ranges for the northern hemisphere
+        fall = range(265, 355) # fall ranges for the northern hemisphere
+        # winter = everything else
+    #print (spring)
+    #print (summer)
+    #print (fall)
+    
     if doy in spring:
         return 'spring'
     elif doy in summer:
@@ -360,10 +377,11 @@ def low_energy_fallback():
         LOW_ECS_ENERGY_TODAY = 7000
         LOW_ECS_ENERGY_TWO_DAYS = 12000
             
-    max_power = equipment_water_heater.MAX_POWER
+    max_power = int(equipment_water_heater.MAX_POWER)
+    correction = 1.07   # this correction depend on ECS heater resistor, mine is not stable at max of power and the average power go down
     two_days_nrj = int(ECS_energy_today + ECS_energy_yesterday)
     ECS_energy_today = int(ECS_energy_today)
-    log(2, 'ECS Energy Yesterday / Today / Sum : {} / {} / {}'.format(int(ECS_energy_yesterday), int(ECS_energy_today), int(two_days_nrj)))
+    log(2, 'ECS Energy Yesterday / Today / 2days : {} / {} / {}'.format(int(ECS_energy_yesterday), int(ECS_energy_today), int(two_days_nrj)))
     log(2, "cloud forecast : " + str(CLOUD_forecast))
     left_energy = 0
     if (equipment_water_heater.is_overed()):
@@ -384,7 +402,7 @@ def low_energy_fallback():
                 log(4, '2- cloud forecast is good ({} %) but not enough today ({} W) and 2 days energy ({} W)'.format(CLOUD_forecast, ECS_energy_today, two_days_nrj))
                 log(8, 'completing today OR two days energy, adding {} W'.format(left_energy))
                 log(8, 'forcing ECS {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
-                equipment_water_heater.force(max_power, duration)
+                equipment_water_heater.force(max_power, duration * correction)
 
             else:   # CLOUD_forecast is bad   and two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS             
                 left_energy = left_today 
@@ -392,7 +410,7 @@ def low_energy_fallback():
                 log(4, '3- cloud forecast not good ({} %) and not enough 2 days energy ({} W)'.format(CLOUD_forecast, two_days_nrj))
                 log(8, 'completing today energy, adding {} W'.format(left_energy))
                 log(8, 'forcing ECS  {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
-                equipment_water_heater.force(max_power, duration)            
+                equipment_water_heater.force(max_power, duration * correction)            
 
         # two_days_nrj > LOW_ECS_ENERGY_TWO_DAYS
         else:   
@@ -407,7 +425,7 @@ def low_energy_fallback():
                 log(4, '5- cloud forecast not good ({} %) and not enough 2 days energy ({} W)'.format(CLOUD_forecast, two_days_nrj))
                 log(8, 'completing today energy, adding {} W'.format(left_energy))
                 log(8, 'forcing ECS {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
-                equipment_water_heater.force(max_power, duration)   
+                equipment_water_heater.force(max_power, duration * correction)   
 
     else: # ECS Energy today > LOW_ECS_ENERGY_TODAY
         log(4, '6- ECS Energy today {} W is enouth, no need to complete it.'.format(ECS_energy_today))
@@ -430,6 +448,7 @@ def evaluate():
 
     try:
         t = now_ts()
+        # SCHEDULER
         if last_evaluation_date is not None: # Evaluating scheduler
             d1 = datetime.datetime.fromtimestamp(last_evaluation_date)
             d2 = datetime.datetime.fromtimestamp(t)
@@ -475,11 +494,12 @@ def evaluate():
             return
 
         if last_consumption_date is None or last_production_date is None:
-            return
+            return  
 
         debug(0, '')
         debug(0, '[evaluate] evaluating power CONS = {}, PROD = {}'.format(power_consumption, power_production))
 
+        # PSEM TIMEOUT
         if (t - last_consumption_date) > PZEM_TIMEOUT or (t- last_production_date) > PZEM_TIMEOUT:
                 power_consumption = 0
                 power_production = 0
@@ -492,6 +512,7 @@ def evaluate():
                         log(8, "skipping {} because it's forced".format(e.name))
                     else:
                         e.set_current_power(0)
+        # REAL WORK
         else:
             # HERE STARTS THE REAL WORK, compare powers
             # if, TOO CONSUMPTION, POWER IS NEEDED, decrease the load
