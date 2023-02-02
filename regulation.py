@@ -368,6 +368,7 @@ def low_energy_fallback():
         season = get_season()
         LOW_ECS_ENERGY_TODAY = int(config['fallback']['low_nrj_today_' + season]) # minimal power on two days
         LOW_ECS_ENERGY_TWO_DAYS = int(config['fallback']['low_nrj_two_days_' + season]) # minimal power for today
+        ecs_measure_correction =  float(config['evaluate']['ecs_measure_correction'])
         log(0, '[low_energy_fallback] Season "{}" : needs TODAY {} / 2DAYS {}'.format(season, LOW_ECS_ENERGY_TODAY, LOW_ECS_ENERGY_TWO_DAYS))
     except Exception as e:
         log(0,"[low_energy_fallback]") 
@@ -376,11 +377,12 @@ def low_energy_fallback():
         log(2, "then set to default 7000 / 12000")
         LOW_ECS_ENERGY_TODAY = 7000
         LOW_ECS_ENERGY_TWO_DAYS = 12000
+        ecs_measure_correction = 1
             
     max_power = int(equipment_water_heater.MAX_POWER)
-    correction = 1.07   # this correction depend on ECS heater resistor, mine is not stable at max of power and the average power go down
+    duration_correction = 1.07   # this duration_correction depend on ECS heater resistor, mine is not stable at max of power and the average power go down
     two_days_nrj = int(ECS_energy_today + ECS_energy_yesterday)
-    ECS_energy_today = int(ECS_energy_today)
+    ECS_energy_today = int(ECS_energy_today * ecs_measure_correction)
     log(2, 'ECS Energy Yesterday / Today / 2days : {} / {} / {}'.format(int(ECS_energy_yesterday), int(ECS_energy_today), int(two_days_nrj)))
     log(2, "cloud forecast : " + str(CLOUD_forecast))
     left_energy = 0
@@ -402,7 +404,7 @@ def low_energy_fallback():
                 log(4, '2- cloud forecast is good ({} %) but not enough today ({} W) and 2 days energy ({} W)'.format(CLOUD_forecast, ECS_energy_today, two_days_nrj))
                 log(8, 'completing today OR two days energy, adding {} W'.format(left_energy))
                 log(8, 'forcing ECS {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
-                equipment_water_heater.force(max_power, duration * correction)
+                equipment_water_heater.force(max_power, duration * duration_correction)
 
             else:   # CLOUD_forecast is bad   and two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS             
                 left_energy = left_today 
@@ -410,7 +412,7 @@ def low_energy_fallback():
                 log(4, '3- cloud forecast not good ({} %) and not enough 2 days energy ({} W)'.format(CLOUD_forecast, two_days_nrj))
                 log(8, 'completing today energy, adding {} W'.format(left_energy))
                 log(8, 'forcing ECS  {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
-                equipment_water_heater.force(max_power, duration * correction)            
+                equipment_water_heater.force(max_power, duration * duration_correction)            
 
         # two_days_nrj > LOW_ECS_ENERGY_TWO_DAYS
         else:   
@@ -425,7 +427,7 @@ def low_energy_fallback():
                 log(4, '5- cloud forecast not good ({} %) and not enough 2 days energy ({} W)'.format(CLOUD_forecast, two_days_nrj))
                 log(8, 'completing today energy, adding {} W'.format(left_energy))
                 log(8, 'forcing ECS {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
-                equipment_water_heater.force(max_power, duration * correction)   
+                equipment_water_heater.force(max_power, duration * duration_correction)   
 
     else: # ECS Energy today > LOW_ECS_ENERGY_TODAY
         log(4, '6- ECS Energy today {} W is enouth, no need to complete it.'.format(ECS_energy_today))

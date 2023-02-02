@@ -24,6 +24,7 @@ period = 2.5
 balance_threshold = 20
 check_at = 1
 status_time = 900
+ecs_measure_correction = 0.965
 
 [season]
 # season range
