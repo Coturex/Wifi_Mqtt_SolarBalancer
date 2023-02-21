@@ -83,6 +83,7 @@ last_zero_injection_date = 0
 last_saveStatus_date = None
 
 fallback_today = False
+init_today = False
 cloud_requested = False
 power_production = None
 power_consumption = None
@@ -146,6 +147,16 @@ else:
     log(0, "CHECK AT '{}' is out of range".format(str(CHECK_AT)))
     exit(0) 
 
+INIT_AT = int(config['evaluate']['init_at']) 
+if (INIT_AT == 0 or INIT_AT >= 24):
+    INIT_AT = 0
+    INIT_AT_prev = 23
+elif (INIT_AT >= 1):
+    INIT_AT_prev = INIT_AT - 1   
+else:
+    log(0, "CHECK AT '{}' is out of range".format(str(INIT_AT)))
+    exit(0) 
+
 ###############################################################
 # FUNCTIONS
 def checkProcessRunning(processName):
@@ -193,12 +204,16 @@ def on_message(client, userdata, msg):
     print("[on message] topic : " + msg.topic) if SDEBUG else ''
     now = now_ts()
     try:
+        ##########
+        # TOPIC DETECTED IS : CONSUMTION
         if msg.topic == TOPIC_SENSOR_CONSUMPTION:
             print("[on message]         conso : " + str(power_consumption) + ", prod : " + str(power_production)) if SDEBUG else ''
             j = json.loads(msg.payload.decode())
             power_consumption = int(j['power'])
             evaluate()
             last_consumption_date = now
+        ##########
+        # TOPIC DETECTED IS : PRODUCTION
         elif msg.topic == TOPIC_SENSOR_PRODUCTION:
             print("[on message]         conso : " + str(power_consumption) + ", prod : " + str(power_production)) if SDEBUG else ''
             j = json.loads(msg.payload.decode())
@@ -211,8 +226,10 @@ def on_message(client, userdata, msg):
                 power_production = SIM_PROD
             evaluate()
             last_production_date = now
+        ##########
+        # TOPIC DETECTED IS : FORCE
         elif msg.topic == TOPIC_FORCE: 
-            print("[on message]         Forcing...") 
+            print("[on message]         Forcing...") if SDEBUG else ''
             j = json.loads(msg.payload.decode())
             command = j['command']
             name = j['name']
@@ -237,16 +254,31 @@ def on_message(client, userdata, msg):
                     debug(0, 'not forcing equipment {} anymore'.format(name))
                     e.force(None)
                     evaluate()
+
+        ##########
+        # TOPIC DETECTED IS : unknown        
         else: # This is a topic_read_power msg. Which equipment is 'over loaded'  ?
             for e in equipments:
-                if (e.topic_read_power != None) and (not e.is_overed):
+                print("    Equipment : " + e.name)      if SDEBUG else ''   
+                print("        topic_read_power : '" + str(e.topic_read_power)+"'") if SDEBUG else ''   
+                print("        is_overed : " + str(e.is_overed()))      if SDEBUG else ''   
+                
+                if (e.topic_read_power is not None) and (not e.is_overed()):
                     if (msg.topic == e.topic_read_power):
-                        print("[on message]         "+ e.name + " is Overed ? ") if SDEBUG else ''
+                        print("            "+ e.name + " check over") if SDEBUG else ''
                         j = json.loads(msg.payload.decode())
-                        e.check_over(int(j[e.json_read_power]))
-
-    except:
-        print("[on message]         error, message badly formated (e.g. pzem error...)") if SDEBUG else ''
+                        e.measured_power = int(j[e.json_read_power])
+    except Exception as e:
+        if 'PZEM_READ_ERROR' in j:
+            print("************* [on message]         pzem error") if SDEBUG else ''
+        else :
+            log(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            log(4, e)
+            log(4, j)
+            print("*** [on message]         error, message badly formated") if SDEBUG else ''
+            print("*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))  if SDEBUG else ''
+            print(e) if SDEBUG else ''
+            print(j) if SDEBUG else ''
 
 def signal_handler(sig, frame):
     """ End of program handler, set equipments 0W and save status"""
@@ -413,7 +445,7 @@ def low_energy_fallback():
                 log(8, 'completing today energy, adding {} W'.format(left_energy))
                 log(8, 'forcing ECS  {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
                 equipment_water_heater.force(max_power, duration * duration_correction)            
-
+ 
         # two_days_nrj > LOW_ECS_ENERGY_TWO_DAYS
         else:   
             if CLOUD_forecast < 30: # and two_days_nrj > LOW_ECS_ENERGY_TWO_DAYS
@@ -427,7 +459,7 @@ def low_energy_fallback():
                 log(4, '5- cloud forecast not good ({} %) and not enough 2 days energy ({} W)'.format(CLOUD_forecast, two_days_nrj))
                 log(8, 'completing today energy, adding {} W'.format(left_energy))
                 log(8, 'forcing ECS {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
-                equipment_water_heater.force(max_power, duration * duration_correction)   
+                equipment_water_heater.force(max_power, duration * duration_correction)               
 
     else: # ECS Energy today > LOW_ECS_ENERGY_TODAY
         log(4, '6- ECS Energy today {} W is enouth, no need to complete it.'.format(ECS_energy_today))
@@ -442,28 +474,39 @@ def evaluate():
     # turned on/off.
 
     global last_evaluation_date, ECS_energy_today, last_injection, last_grid, CLOUD_forecast
-    global equipments, equipment_water_heater, production_energy, fallback_today, cloud_requested, status
+    global equipments, equipment_water_heater, production_energy, fallback_today, init_today, cloud_requested, status
     global power_production, power_consumption, last_production_date, last_consumption_date, status
-    global last_zero_grid_date, last_zero_injection_date, CHECK_AT, CHECK_AT_prev, last_saveStatus_date, STATUS_TIME
+    global last_zero_grid_date, last_zero_injection_date, INIT_AT, INIT_AT_prev, CHECK_AT, CHECK_AT_prev, last_saveStatus_date, STATUS_TIME
     TODAY = 0 
     TOMORROW = 1
 
     try:
         t = now_ts()
+        
+        ##########
         # SCHEDULER
         if last_evaluation_date is not None: # Evaluating scheduler
+            
+            # ensure there's a minimum duration between two evaluations
+            if t - last_evaluation_date < EVALUATION_PERIOD:
+                return
+
             d1 = datetime.datetime.fromtimestamp(last_evaluation_date)
             d2 = datetime.datetime.fromtimestamp(t)
-         
-            if d1.hour == 8 and d2.hour == 9: 
+
+            if d1.hour == INIT_AT_prev and d2.hour == INIT_AT and not init_today: # ensure it's not already done for today
+                log(0,"[evaluate] ECS energy / Over : " + str(equipment_water_heater.get_energy()) + " / " + str(equipment_water_heater.is_overed()))
                 equipment_water_heater.unset_over() # maybe it has been forced this night (low_energy_fallback)
                 equipment_water_heater.reset_energy()
+                log(0,"           ECS energy / Over : " + str(equipment_water_heater.get_energy()) + " / " + str(equipment_water_heater.is_overed()))
                 fallback_today = False
+                init_today = True
+                return
             
-            if d1.hour == CHECK_AT_prev and d2.hour == CHECK_AT and not fallback_today:  # fallback_today : be sure it's not already done for today
+            if d1.hour == CHECK_AT_prev and d2.hour == CHECK_AT and not fallback_today:  # fallback_today : ensure it's not already done for today
             #if True and not fallback_today:  # fallback_today : be sure it's not already done for today
                 fallback_today = True
-                log(0,"")
+                log(0,"------------------------------------------------------------")
                 log(0,"[evaluate] Past Cloud / Production / Water_heater")
                 log(8, "csv : {} ; {} ; {}".format(CLOUD_forecast, int(production_energy), ECS_energy_today) )
                 if (CHECK_AT > 7 and CHECK_AT < 24):
@@ -485,23 +528,22 @@ def evaluate():
                 production_energy = 0
                 # ensure that water stays warm enough
                 low_energy_fallback()
-                    
-            # ensure there's a minimum duration between two evaluations
-            if t - last_evaluation_date < EVALUATION_PERIOD:
+                init_today = False
                 return
 
+        ##########
         last_evaluation_date = t
-
         if power_production is None or power_consumption is None: # Return if None
             return
-
         if last_consumption_date is None or last_production_date is None:
             return  
 
         debug(0, '')
         debug(0, '[evaluate] evaluating power CONS = {}, PROD = {}'.format(power_consumption, power_production))
+        debug(0, '[evaluate] ECS Energy today {}'.format(equipment_water_heater.get_energy()))
 
-        # PSEM TIMEOUT
+        ##########
+        # IS PZEM TIMEOUT ?
         if (t - last_consumption_date) > PZEM_TIMEOUT or (t- last_production_date) > PZEM_TIMEOUT:
                 power_consumption = 0
                 power_production = 0
@@ -514,9 +556,16 @@ def evaluate():
                         log(8, "skipping {} because it's forced".format(e.name))
                     else:
                         e.set_current_power(0)
+        ##########
         # REAL WORK
         else:
             # HERE STARTS THE REAL WORK, compare powers
+
+            # Check which equipment is over
+            for e in reversed(equipments):
+                if e.measured_power is not None:
+                    e.check_over()
+
             # if, TOO CONSUMPTION, POWER IS NEEDED, decrease the load
             if power_consumption > (power_production - MARGIN): 
                 excess_power = power_consumption - (power_production - MARGIN)
@@ -554,9 +603,11 @@ def evaluate():
 
                     if e.is_overed():
                         debug(4, "skipping this equipment because it's already full loaded for today")
+                        
                         continue
                     if e.is_forced():
                         debug(4, "skipping this equipment because it's in forced state")
+                        
                         continue
                     result = e.increase_power_by(available_power)
                     if result is None:
@@ -601,6 +652,8 @@ def evaluate():
                         debug(2, "there is {}W left to use, continuing".format(available_power))
                 debug(2, "no more equipment to check")
         
+        ##########
+        # DOMOTICZ COMMUNICATION
         if SEND_DOMOTICZ: # THEN SEND GRID & INJECTION MESSAGE
             injection = (power_consumption - power_production) 
             if injection < 0:   # This is INJECTION
@@ -654,8 +707,9 @@ def evaluate():
             print("[evaluate]                    CALCULATED GRID      :", grid) if SDEBUG else ''        
             last_injection = injection
             last_grid = grid
+  
         ##########
-        # Build a status message
+        # Build an MQTT status message, and status file
         status = None
         msg = {
             'date': int(t),
@@ -676,7 +730,7 @@ def evaluate():
             eq.append({
                 'name': e.name,
                 'current_power': 'unknown' if p is None else p,
-                'energy': int(e.get_energy()),
+                'energy': e.get_energy(),
                 'overed' : e.is_overed(),
                 'forced': e.is_forced()
             })

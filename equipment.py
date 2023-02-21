@@ -75,6 +75,7 @@ class Equipment:
         self.energy = 0
         self.current_power = None
         self.last_power_change_date = None
+        self.measured_power = None
         try:
             self.topic_read_power = config[self.name]['topic_read_power']
             if (self.topic_read_power in unset_words):
@@ -128,38 +129,44 @@ class Equipment:
 
     def set_over(self):
         self.is_over_ = True
+        debug(4,"[PARENT: set_over] " + self.name+ " Setting OVERLOADED" )
+        log(2,"*** [" + self.name+ "] Setting OVERLOADED" )
+        debug(4,"[PARENT: set_over] " + self.name+ " set power to 0" )
         self.set_current_power(0)
-        log(2, self.name + " over load is set")
-
+   
     def unset_over(self):
         self.is_over_ = False
-        log(2, self.name + " over load is unset")
+        log(2,"[" + self.name+ "] Unsetting Overloaded" )
 
     def is_overed(self):
         """ The equipment cannot absorbe energy anymore, e.g. thermostat control by the equipment"""
         # implement in subclasses, watt may be ignored
         return self.is_over_
 
-    def check_over(self, read_power):
+    def check_over(self):
             COUNTER_LIMIT = 5  
             ts = now_ts()
-            if (read_power < 5  and self.get_current_power() >= self.MIN_POWER):
+            if (self.measured_power < 5  and self.get_current_power() >= self.MIN_POWER):
                 if self.last_check_ts is not None:
                     if ts - self.last_check_ts < 10: # if last_check is < 10s
                         self.check_counter += 1
+                        debug(0, "[PARENT: check_over]" + self.name + " counter++ : " + str(self.check_counter)+ ", current_power/measured : " + str(self.get_current_power()) + " / " + str(self.measured_power))
+                    else:
+                        self.check_counter = 0
                     if self.check_counter > COUNTER_LIMIT:  # if power measure near 0-5W many times (5)
+                        debug(2, "[PARENT: check_over]" + self.name + " OVER LOADED : current_power/measured is " + str(self.get_current_power()) + " / " + str(self.measured_power))
                         self.set_over()
-                        debug(0, "[PARENT: check_over]" + self.name + " OVER LOADED : pzem detect 0-5W and current_power is " + self.get_current_power())
                 self.last_check_ts = ts 
  
     def get_energy(self):
-        return self.energy
+        return int(self.energy)
 
     def set_energy(self, energy):
         log(2, self.name + " set energy : " + str(energy))
         self.energy = energy
 
     def reset_energy(self):
+        log(2,"[" + self.name+ "] Reseting Energy" )
         if self.last_power_change_date is not None:
             now = now_ts()
             delta = now - self.last_power_change_date

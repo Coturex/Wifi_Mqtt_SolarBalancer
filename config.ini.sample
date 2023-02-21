@@ -23,6 +23,7 @@ margin = 20
 period = 2.5
 balance_threshold = 20
 check_at = 1
+init_at = 6
 status_time = 900
 ecs_measure_correction = 0.965
 
