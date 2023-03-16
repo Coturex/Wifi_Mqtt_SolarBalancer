@@ -400,6 +400,7 @@ def low_energy_fallback():
         season = get_season()
         LOW_ECS_ENERGY_TODAY = int(config['fallback']['low_nrj_today_' + season]) # minimal power on two days
         LOW_ECS_ENERGY_TWO_DAYS = int(config['fallback']['low_nrj_two_days_' + season]) # minimal power for today
+        FULL_ECS = int(config['ecs']['full']) # total energy in a full ECS
         ecs_measure_correction =  float(config['evaluate']['ecs_measure_correction'])
         log(0, '[low_energy_fallback] Season "{}" : needs TODAY {} / 2DAYS {}'.format(season, LOW_ECS_ENERGY_TODAY, LOW_ECS_ENERGY_TWO_DAYS))
     except Exception as e:
@@ -417,28 +418,32 @@ def low_energy_fallback():
     ECS_energy_today = int(ECS_energy_today * ecs_measure_correction)
     log(2, 'ECS Energy Yesterday / Today / 2days : {} / {} / {}'.format(int(ECS_energy_yesterday), int(ECS_energy_today), int(two_days_nrj)))
     log(2, "cloud forecast : " + str(CLOUD_forecast))
+
     left_energy = 0
     if (equipment_water_heater.is_overed()):
         log(4, '1- ECS Energy has been OVERLOADED TODAY')
         log(8, 'CANCELLING fallback')
-        ECS_energy_today = LOW_ECS_ENERGY_TWO_DAYS
+        ECS_energy_today = FULL_ECS
 
     elif (ECS_energy_today) < LOW_ECS_ENERGY_TODAY:
+    # HERE ECS Energy today < LOW_ECS_ENERGY_TODAY
+
         left_today = int(LOW_ECS_ENERGY_TODAY - ECS_energy_today)
 
         if two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS:
             left_two_days = int(LOW_ECS_ENERGY_TWO_DAYS - two_days_nrj)
 
-        # two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS
-            if CLOUD_forecast < 30:  # and two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS
+        # Here two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS
+            if CLOUD_forecast < 30:  
+            # Here Good forecast
                 left_energy = int(min(left_today, left_two_days))
                 duration = 3600 * left_energy / max_power
                 log(4, '2- cloud forecast is good ({} %) but not enough today ({} W) and 2 days energy ({} W)'.format(CLOUD_forecast, ECS_energy_today, two_days_nrj))
                 log(8, 'completing today OR two days energy, adding {} W'.format(left_energy))
                 log(8, 'forcing ECS {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
                 equipment_water_heater.force(max_power, duration * duration_correction)
-
-            else:   # CLOUD_forecast is bad   and two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS             
+            else:  
+            # Here Bad forecast
                 left_energy = left_today 
                 duration = 3600 * left_energy / max_power
                 log(4, '3- cloud forecast not good ({} %) and not enough 2 days energy ({} W)'.format(CLOUD_forecast, two_days_nrj))
@@ -446,23 +451,32 @@ def low_energy_fallback():
                 log(8, 'forcing ECS  {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
                 equipment_water_heater.force(max_power, duration * duration_correction)            
  
-        # two_days_nrj > LOW_ECS_ENERGY_TWO_DAYS
+        # Here two_days_nrj > LOW_ECS_ENERGY_TWO_DAYS
         else:   
-            if CLOUD_forecast < 30: # and two_days_nrj > LOW_ECS_ENERGY_TWO_DAYS
+            if CLOUD_forecast < 30: 
+            # Here Good forecast
                 log(4, '4- cloud forecast is good ({} %) and enough 2 days energy ({} W)'.format(CLOUD_forecast, two_days_nrj))
                 log(8, 'even there is not enough energy stored  today ({} W)'.format(ECS_energy_today))
                 log(8, 'CANCELLING fallback')
 
-            else:   # CLOUD_forecast is bad and  two_days_nrj > LOW_ECS_ENERGY_TWO_DAYS
-                left_energy = left_today
-                duration = 3600 * left_energy / max_power
-                log(4, '5- cloud forecast not good ({} %) and not enough 2 days energy ({} W)'.format(CLOUD_forecast, two_days_nrj))
-                log(8, 'completing today energy, adding {} W'.format(left_energy))
-                log(8, 'forcing ECS {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
-                equipment_water_heater.force(max_power, duration * duration_correction)               
+            else:   
+            # Here Bad forecast
+                if season == 'winter':  
+                # Here Season IS WINTER      
+                    left_energy = left_today
+                    duration = 3600 * left_energy / max_power
+                    log(4, '5- cloud forecast not good ({} %) 2 days energy enough ({} W) BUT season is {})'.format(CLOUD_forecast, two_days_nrj, season))
+                    log(8, 'completing today energy, adding {} W'.format(left_energy))
+                    log(8, 'forcing ECS {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
+                    equipment_water_heater.force(max_power, duration * duration_correction)
+                else:
+                # Here Season IS NOT WINTER    
+                    log(4, '6- cloud forecast not good ({} %) 2 days energy enough ({} W) AND season is {}csv'.format(CLOUD_forecast, two_days_nrj, season))
+                    log(8, 'NOTHING TO COMPLETE')
 
-    else: # ECS Energy today > LOW_ECS_ENERGY_TODAY
-        log(4, '6- ECS Energy today {} W is enouth, no need to complete it.'.format(ECS_energy_today))
+    else: 
+    # HERE ECS Energy today > LOW_ECS_ENERGY_TODAY
+        log(4, '7- ECS Energy today {} W is enouth, no need to complete it.'.format(ECS_energy_today))
         log(8, 'CANCELLING fallback')
 
     # save the energy so that it can be used in the fallback check tomorrow
