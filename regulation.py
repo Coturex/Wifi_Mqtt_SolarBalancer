@@ -471,7 +471,7 @@ def low_energy_fallback():
                     equipment_water_heater.force(max_power, duration * duration_correction)
                 else:
                 # Here Season IS NOT WINTER    
-                    log(4, '6- cloud forecast not good ({} %) 2 days energy enough ({} W) AND season is {}csv'.format(CLOUD_forecast, two_days_nrj, season))
+                    log(4, '6- cloud forecast not good ({} %) 2 days energy enough ({} W) AND season is {}'.format(CLOUD_forecast, two_days_nrj, season))
                     log(8, 'NOTHING TO COMPLETE')
 
     else: 
