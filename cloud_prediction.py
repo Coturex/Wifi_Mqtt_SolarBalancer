@@ -59,30 +59,36 @@ class Prediction:
         clouds = 0
         try:
             url = "https://wttr.in/{}?format=j1".format(self.location)
-            #debug(0, "Cloud_prediction, url : " + url)
+            debug(0, "Cloud_prediction url : " + url)
             wdata = requests.get(url).json()
             # pprint(wdata)
             i = 0
             for h in tHours:
                 i += 1 
+                debug(0,"[getCloudAvg] sDay {}, h {}".format(int(sDAY), int(h)))
                 cloudcoverage = int(wdata['weather'][sDAY]['hourly'][h]['cloudcover'])
+                debug(0,"[getCloudAvg] cloudcoverage {}".format(cloudcoverage))
                 if __name__ == '__main__':
-                    print("Clouds {}H UTC: {} %".format(int(h*3),cloudcoverage)) 
+                    print("Clouds {}H UTC : {} %".format(int(h*3),cloudcoverage)) 
                 else:
                     log(10, "Clouds {}H UTC : {} %".format(int(h*3),cloudcoverage))
                 clouds += cloudcoverage
 
         except Exception as e:
+            log(1,"*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            log(1, e)
+            print("*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
             print(e)
-            print("Error on line {}".format(sys.exc_info()[-1].tb_lineno))
             return -404
+        
         try:
             #avg = int(np.average(tCloud))
             avg = int(clouds / i)
-
         except Exception as e:
             print(e)
-            print("Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            print("*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            log(1,"*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            log(1, e)
             return -1
         return avg   
 
@@ -107,6 +113,10 @@ class Prediction:
                 print("Clouds {}H UTC: {} %".format(int(h*3),cloudcoverage)) 
             return cloudcoverage
         except Exception as e:
+            log(1,"*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            log(1, e)
+            print("*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            print(e)
             return -404
         return -1     
 

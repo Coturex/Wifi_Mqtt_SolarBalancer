@@ -272,7 +272,7 @@ def on_message(client, userdata, msg):
         if 'PZEM_READ_ERROR' in j:
             print("************* [on message]         pzem error") if SDEBUG else ''
         else :
-            log(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            log(1, "*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
             log(4, e)
             log(4, j)
             print("*** [on message]         error, message badly formated") if SDEBUG else ''
@@ -337,7 +337,7 @@ def loadStatus():
                 e.unset_over()    
             i += 1
     except Exception as e:
-        log(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+        log(1, "*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
         log(1, e)
         log(2, "cannot load status.ini")
   
@@ -349,7 +349,7 @@ def saveStatus():
                json.dump(status, statusFile, indent=4, sort_keys=True)
             statusFile.close()
         except Exception as e:
-            log(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            log(1, "*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
             log(1, e)
             log(2, "cannot save status.ini")
 
@@ -405,7 +405,7 @@ def low_energy_fallback():
         log(0, '[low_energy_fallback] Season "{}" : needs TODAY {} / 2DAYS {}'.format(season, LOW_ECS_ENERGY_TODAY, LOW_ECS_ENERGY_TWO_DAYS))
     except Exception as e:
         log(0,"[low_energy_fallback]") 
-        log(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+        log(1, "*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
         log(1, e)
         log(2, "then set to default 7000 / 12000")
         LOW_ECS_ENERGY_TODAY = 7000
@@ -508,6 +508,9 @@ def evaluate():
             d1 = datetime.datetime.fromtimestamp(last_evaluation_date)
             d2 = datetime.datetime.fromtimestamp(t)
 
+            if d1.minute == 2 and d2.minute == 3:     
+                pass
+            
             if d1.hour == INIT_AT_prev and d2.hour == INIT_AT and not init_today: # ensure it's not already done for today
                 log(0,"[evaluate] ECS energy / Over : " + str(equipment_water_heater.get_energy()) + " / " + str(equipment_water_heater.is_overed()))
                 equipment_water_heater.unset_over() # maybe it has been forced this night (low_energy_fallback)
@@ -523,20 +526,26 @@ def evaluate():
                 log(0,"------------------------------------------------------------")
                 log(0,"[evaluate] Past Cloud / Production / Water_heater")
                 log(8, "csv : {} ; {} ; {}".format(CLOUD_forecast, int(production_energy), ECS_energy_today) )
-                if (CHECK_AT > 7 and CHECK_AT < 24):
-                    CLOUD_forecast = weather.getCloudAvg(TOMORROW)
-                elif (CHECK_AT >= 0):
-                    CLOUD_forecast = weather.getCloudAvg(TODAY)
+                CLOUD_forecast = -1
+                retry = 0
+                while CLOUD_forecast < 0 and retry < 5:
+                    retry = retry + 1
+                    if (CHECK_AT > 7 and CHECK_AT < 24):
+                        CLOUD_forecast = weather.getCloudAvg(TOMORROW)
+                        log(0,"[evaluate] Cloud Forecast Tomorrow : " + str(CLOUD_forecast))
+                    elif (CHECK_AT >= 0):
+                        CLOUD_forecast = weather.getCloudAvg(TODAY)
+                        log(0,"[evaluate] Cloud Forecast Today : " + str(CLOUD_forecast))
+                    time.sleep(5) # Delays for 5 seconds
 
                 if (CLOUD_forecast == -404):
-                    log(0,"[evaluate] cannot contact openweathermap")
-                    log(4,"forcing CLOUD Forecast to 100 %")  
+                    log(0,"*** cannot contact weather server")
+                    log(4,"FORCING CLOUD Forecast to 100 %")  
                     CLOUD_forecast = 100 
                 elif (CLOUD_forecast == -1):
-                    log(0,"[evaluate] openweathermap is out of range")
-                    log(4,"forcing CLOUD Forecast to 100 %")   
+                    log(0,"*** openweathermap is out of range")
+                    log(4,"FORCING CLOUD Forecast to 100 %")   
                     CLOUD_forecast = 100 
-                log(0,"[evaluate] Cloud Forecast : " + str(CLOUD_forecast))
                 ECS_energy_today = equipment_water_heater.get_energy()
                 equipment_water_heater.reset_energy()
                 production_energy = 0
@@ -762,7 +771,7 @@ def evaluate():
 
     except Exception as e:
         log(0,"[evaluate exception]") 
-        log(1, "Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+        log(1, "*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
         log(1, e)
 
 ###############################################################
