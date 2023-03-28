@@ -1,6 +1,6 @@
 [openweathermap]
-key = xxxxxxx
-location = Moscou
+key = xxx
+location = Chambery
 
 [mqtt]
 broker_ip = 10.3.141.1
@@ -24,11 +24,12 @@ period = 2.5
 balance_threshold = 20
 check_at = 1
 init_at = 6
-status_time = 900
+status_time = 60
 ecs_measure_correction = 0.965
+good_forecast = 30
 
 [season]
-# season range
+# season range https://miniwebtool.com/day-of-year-calendar/
 yday_spring = 80
 yday_summer = 173
 yday_fall =  290
@@ -53,18 +54,17 @@ simulation = true
 simul_prod = 2000
 debug_file = debug.log
 log_file = pv.log    
-equipment_stdout = true
-regulation_stdout = true
+equipment_stdout = false
+regulation_stdout = false
 use_persistent = true
 
 [equipments]
 ecs = water_heater
 resille = constant
-#soufflant_a = constant
-#soufflant_b = variable
-#heater_a = variable
 
 [ecs]
+full = 14000
+morning = 4000
 min_power = 101
 min_percent = 4
 topic_set_power = regul/vload/ECS/cmd

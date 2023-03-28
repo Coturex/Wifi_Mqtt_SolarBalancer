@@ -401,6 +401,8 @@ def low_energy_fallback():
         LOW_ECS_ENERGY_TODAY = int(config['fallback']['low_nrj_today_' + season]) # minimal power on two days
         LOW_ECS_ENERGY_TWO_DAYS = int(config['fallback']['low_nrj_two_days_' + season]) # minimal power for today
         FULL_ECS = int(config['ecs']['full']) # total energy in a full ECS
+        MORNING_ECS = int(config['ecs']['morning']) # minimun of morning ecs energy needs (to assure first 'douche') 
+        GOOD_FORECAST = int(config['evaluate']['good_forecast']) # good forecast level
         ecs_measure_correction =  float(config['evaluate']['ecs_measure_correction'])
         log(0, '[low_energy_fallback] Season "{}" : needs TODAY {} / 2DAYS {}'.format(season, LOW_ECS_ENERGY_TODAY, LOW_ECS_ENERGY_TWO_DAYS))
     except Exception as e:
@@ -434,11 +436,11 @@ def low_energy_fallback():
             left_two_days = int(LOW_ECS_ENERGY_TWO_DAYS - two_days_nrj)
 
         # Here two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS
-            if CLOUD_forecast < 30:  
+            if CLOUD_forecast < GOOD_FORECAST:  
             # Here Good forecast but no more 4 kw is needed !
                 left_energy = int(min(left_today, left_two_days))
-                if (left_energy > 4000):
-                    left_energy = 4000
+                if (left_energy > MORNING_ECS):
+                    left_energy = MORNING_ECS
                 duration = 3600 * left_energy / max_power
                 log(4, '2- cloud forecast is good ({} %) but not enough today ({} W) and 2 days energy ({} W)'.format(CLOUD_forecast, ECS_energy_today, two_days_nrj))
                 log(8, 'completing today OR two days energy and no more 4kW, adding {} W'.format(left_energy))
@@ -446,8 +448,10 @@ def low_energy_fallback():
                 equipment_water_heater.force(max_power, duration * duration_correction)
 
             else:  
-            # Here Bad forecast
+            # Here Bad forecast, at least 4kw + x is needed
                 left_energy = left_today 
+                # 4kw + x calculation
+                left_energy = MORNING_ECS + (left_energy - MORNING_ECS) * (CLOUD_forecast / 100)
                 duration = 3600 * left_energy / max_power
                 log(4, '3- cloud forecast not good ({} %) and not enough 2 days energy ({} W)'.format(CLOUD_forecast, two_days_nrj))
                 log(8, 'completing TODAY energy, adding {} W'.format(left_energy))
@@ -456,7 +460,7 @@ def low_energy_fallback():
  
         # Here two_days_nrj > LOW_ECS_ENERGY_TWO_DAYS
         else:   
-            if CLOUD_forecast < 30: 
+            if CLOUD_forecast < GOOD_FORECAST: 
             # Here Good forecast
                 log(4, '4- cloud forecast is good ({} %) and enough 2 days energy ({} W)'.format(CLOUD_forecast, two_days_nrj))
                 log(8, 'even there is not enough energy stored  today ({} W)'.format(ECS_energy_today))
