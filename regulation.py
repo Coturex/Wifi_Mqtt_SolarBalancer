@@ -325,17 +325,20 @@ def loadStatus():
         log(2,"production_energy : " + str(production_energy))
         i =0
         for e in equipments:
-            log(2, "loading " + e.name)
-            nrj = int(j['equipments'][i]['energy'])
-            e.set_energy(nrj) 
-            log(4, "read energy : " + str(nrj)) 
-            over = j['equipments'][i]['overed']
-            if (over):
-                log(4, "read overloaded : " + str(over))
-                e.set_over()
-            else:
-                e.unset_over()    
-            i += 1
+            log(0, "loading " + e.name )
+            for i in range(len(j['equipments'])):
+                if (e.name == j['equipments'][i]['name']):
+                    #log(4, " find ; " + j['equipments'][i]['name']) 
+                    nrj = int(j['equipments'][i]['energy'])
+                    log(4, "read energy : " + str(nrj)) 
+                    e.set_energy(nrj) 
+                    over = j['equipments'][i]['overed']
+                    if (over):
+                        log(4, "read overloaded : " + str(over))
+                        e.set_over()
+                    else:
+                        e.unset_over()    
+    
     except Exception as e:
         log(1, "*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
         log(1, e)
@@ -437,7 +440,7 @@ def low_energy_fallback():
 
         # Here two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS
             if CLOUD_forecast < GOOD_FORECAST:  
-            # Here Good forecast but no more 4 kw is needed !
+            # Here Good forecast but no more 3-4 kw is needed !
                 left_energy = int(min(left_today, left_two_days))
                 if (left_energy > MORNING_ECS):
                     left_energy = MORNING_ECS
@@ -448,7 +451,7 @@ def low_energy_fallback():
                 equipment_water_heater.force(max_power, duration * duration_correction)
 
             else:  
-            # Here Bad forecast, at least 4kw + x is needed
+            # Here Bad forecast, at least 3-4kw + x is needed
                 left_energy = left_today 
                 # 4kw + x calculation
                 left_energy = MORNING_ECS + (left_energy - MORNING_ECS) * (CLOUD_forecast / 100)
