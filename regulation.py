@@ -452,9 +452,13 @@ def low_energy_fallback():
 
             else:  
             # Here Bad forecast, at least 3-4kw + x is needed
-                left_energy = left_today 
+                # left_energy = int(MORNING_ECS + (left_today - MORNING_ECS) * (CLOUD_forecast / 100))
                 # 4kw + x calculation
-                left_energy = MORNING_ECS + (left_energy - MORNING_ECS) * (CLOUD_forecast / 100)
+                if (ECS_energy_today < MORNING_ECS):
+                    left_energy = int((MORNING_ECS - ECS_energy_today) + ((LOW_ECS_ENERGY_TODAY - MORNING_ECS) * CLOUD_forecast / 100))
+                else:
+                    #left_energy = int(left_today * (CLOUD_forecast / 100))
+                    left_energy = int((LOW_ECS_ENERGY_TODAY - MORNING_ECS) * CLOUD_forecast / 100)
                 duration = 3600 * left_energy / max_power
                 log(4, '3- cloud forecast not good ({} %) and not enough 2 days energy ({} W)'.format(CLOUD_forecast, two_days_nrj))
                 log(8, 'completing TODAY energy, adding {} W'.format(left_energy))
