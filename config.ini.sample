@@ -10,10 +10,12 @@ topic_prod = smeter/pzem/PRODUCTION
 topic_regul= regul
 topic_status = regul/status
 topic_force= None
+topic_ecsMode = domoticz/out/Automate_Cumulus
 
 [domoticz]
 idx_injection = 648
 idx_grid = 651
+idx_ecs_mode = 338
 send_domoticz = True
 send_injection = true
 send_grid = true

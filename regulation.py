@@ -95,6 +95,7 @@ ECS_energy_yesterday = 0
 ECS_energy_today = 0
 production_energy = 0
 CLOUD_forecast = None  
+ECS_MODE = 20     # set to Domoticz value 20 wich is SOLAIRE_FEEDBACK widget level
 
 PZEM_TIMEOUT = 30
 weather = Prediction(config['openweathermap']['location'],config['openweathermap']['key'])
@@ -110,12 +111,16 @@ TOPIC_SENSOR_PRODUCTION = config['mqtt']['topic_prod']
 TOPIC_REGULATION = prefix + config['mqtt']['topic_regul'] 
 TOPIC_FORCE = prefix + config['mqtt']['topic_force'] # forced/unforced duration - Can be bind to domotics device topic 
 TOPIC_STATUS = prefix + config['mqtt']['topic_status']
+TOPIC_ECSMODE = config['mqtt']['topic_ecsMode']
+print (TOPIC_ECSMODE)
 
 ###############################################################
 # DOMOTICZ CONFIG
 TOPIC_DOMOTICZ_IN = prefix + "domoticz/in"
 IDX_INJECTION = config['domoticz']['idx_injection']
 IDX_GRID = config['domoticz']['idx_grid']
+IDX_ECS_MODE = config['domoticz']['idx_ecs_mode']
+
 if (config['domoticz']['send_domoticz'] in set_words): 
     SEND_DOMOTICZ = True 
 else: SEND_DOMOTICZ = False
@@ -184,9 +189,11 @@ def on_connect(client, userdata, flags, rc):
     debug(0, "Connected to BROKER " + MQTT_BROKER )
     debug(1, "Subscribing " + TOPIC_SENSOR_CONSUMPTION)
     debug(1, "Subscribing " + TOPIC_SENSOR_PRODUCTION)
+    debug(1, "Subscribing " + TOPIC_ECSMODE)
     #debug(1, "Subscribing " + TOPIC_REGULATION_MODE)
     client.subscribe(TOPIC_SENSOR_CONSUMPTION)
     client.subscribe(TOPIC_SENSOR_PRODUCTION)
+    client.subscribe(TOPIC_ECSMODE)
     client.subscribe("smeter/pzem/ECS")
     if(TOPIC_FORCE not in unset_words):
         debug(1, "Subscribing " + TOPIC_FORCE)
@@ -199,7 +206,7 @@ def on_message(client, userdata, msg):
     # Receive power consumption and production values and triggers the evaluation. We also take into account manual
     # control messages in case we want to turn on/off a given equipment.
     global power_production, power_consumption, last_production_date, last_consumption_date, production_energy
-    global PZEM_TIMEOUT
+    global PZEM_TIMEOUT, ECS_MODE
 
     print("[on message] topic : " + msg.topic) if SDEBUG else ''
     now = now_ts()
@@ -226,6 +233,12 @@ def on_message(client, userdata, msg):
                 power_production = SIM_PROD
             evaluate()
             last_production_date = now
+        ##########
+        # TOPIC DETECTED IS : ECS_MODE
+        elif msg.topic == TOPIC_ECSMODE :
+            j = json.loads(msg.payload.decode())
+            ECS_MODE = int(j['svalue1'])
+            print("[on message]         ********************************** ECS_MODE : " + str(ECS_MODE)) if SDEBUG else ''
         ##########
         # TOPIC DETECTED IS : FORCE
         elif msg.topic == TOPIC_FORCE: 
@@ -391,13 +404,20 @@ def get_season():
     else:
         return 'winter'
 
+def request_ECS_mode():  # domoticz request : does ECS is Jour/Nuit, Solaire_fallback, OFF   ?
+    # Request Device Info
+    # {"command": "getdeviceinfo", "idx": 2450 }
+    domoticz = "{ \"command\": \"getdeviceinfo\", \"idx\": " + IDX_ECS_MODE + "}"
+    mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) 
+    print(TOPIC_DOMOTICZ_IN, domoticz) if SDEBUG else ''
+
 def low_energy_fallback():
     """ Fallback, when the amount of energy today went below a minimum"""
     # This is a custom and very specific fallback method which aim is to turn on the water heater should the daily
     # solar energy income be below a minimum threshold. We want the water to stay warm.
     # The check is done everyday
 
-    global ECS_energy_yesterday, ECS_energy_today, CLOUD_forecast, power_production, equipment_water_heater
+    global ECS_energy_yesterday, ECS_energy_today, CLOUD_forecast, power_production, equipment_water_heater, ECS_MODE
   
     try:
         season = get_season()
@@ -421,11 +441,17 @@ def low_energy_fallback():
     duration_correction = 1.07   # this duration_correction depend on ECS heater resistor, mine is not stable at max of power and the average power go down
     two_days_nrj = int(ECS_energy_today + ECS_energy_yesterday)
     ECS_energy_today = int(ECS_energy_today * ecs_measure_correction)
+    left_energy = 0
     log(2, 'ECS Energy Yesterday / Today / 2days : {} / {} / {}'.format(int(ECS_energy_yesterday), int(ECS_energy_today), int(two_days_nrj)))
     log(2, "cloud forecast : " + str(CLOUD_forecast))
+    request_ECS_mode()
+    time.sleep(5)
+    log(2, "ECS_MODE : " + str(ECS_MODE))
 
-    left_energy = 0
-    if (equipment_water_heater.is_overed()):
+    if (ECS_MODE < 20):
+        log(4, '0- ECS MODE IS NOT SET TO SOLAIRE_Feedback here json svalue1 = 0 (OFF) or 10 (JOUR/NUIT) ')
+        log(8, 'CANCELLING fallback')
+    elif(equipment_water_heater.is_overed()):
         log(4, '1- ECS Energy has been OVERLOADED TODAY')
         log(8, 'CANCELLING fallback')
         ECS_energy_today = FULL_ECS
@@ -454,14 +480,15 @@ def low_energy_fallback():
             # Here Bad forecast, at least 3-4kw + x is needed
                 # left_energy = int(MORNING_ECS + (left_today - MORNING_ECS) * (CLOUD_forecast / 100))
                 # 4kw + x calculation
+                log(4, '3- cloud forecast not good ({} %) and not enough 2 days energy ({} W)'.format(CLOUD_forecast, two_days_nrj))
                 if (ECS_energy_today < MORNING_ECS):
                     left_energy = int((MORNING_ECS - ECS_energy_today) + ((LOW_ECS_ENERGY_TODAY - MORNING_ECS) * CLOUD_forecast / 100))
+                    log(8, 'completing % TODAY energy, adding {} W ({}-{}+({}-{})*{}/100)'.format(left_energy,MORNING_ECS,ECS_energy_today,LOW_ECS_ENERGY_TODAY,MORNING_ECS,CLOUD_forecast))
                 else:
                     #left_energy = int(left_today * (CLOUD_forecast / 100))
                     left_energy = int((LOW_ECS_ENERGY_TODAY - MORNING_ECS) * CLOUD_forecast / 100)
+                    log(8, 'completing % TODAY energy, adding {} W ({}-{}*{}/100)'.format(left_energy,LOW_ECS_ENERGY_TODAY,MORNING_ECS,CLOUD_forecast))
                 duration = 3600 * left_energy / max_power
-                log(4, '3- cloud forecast not good ({} %) and not enough 2 days energy ({} W)'.format(CLOUD_forecast, two_days_nrj))
-                log(8, 'completing TODAY energy, adding {} W'.format(left_energy))
                 log(8, 'forcing ECS  {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
                 equipment_water_heater.force(max_power, duration * duration_correction)            
  
@@ -475,8 +502,8 @@ def low_energy_fallback():
 
             else:   
             # Here Bad forecast
-                if season != 'summer':  
-                # Here Season IS WINTER, SPRING or FALL  
+                if season == 'winter':  
+                # Here Season IS WINTER 
                     left_energy = left_today
                     duration = 3600 * left_energy / max_power
                     log(4, '5- cloud forecast not good ({} %) 2 days energy enough ({} W) BUT season is {})'.format(CLOUD_forecast, two_days_nrj, season))
@@ -484,13 +511,21 @@ def low_energy_fallback():
                     log(8, 'forcing ECS {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
                     equipment_water_heater.force(max_power, duration * duration_correction)
                 else:
-                # Here Season IS SUMMER 
-                    log(4, '6- cloud forecast not good ({} %) 2 days energy enough ({} W) AND season is {}'.format(CLOUD_forecast, two_days_nrj, season))
-                    log(8, 'NOTHING TO COMPLETE')
-
+                # Here Season SUMMER
+                    if season == 'summer': 
+                        log(4, '7- cloud forecast not good ({} %) 2 days energy enough ({} W) AND season is {}'.format(CLOUD_forecast, two_days_nrj, season))
+                        log(8, 'NOTHING TO COMPLETE')
+                    else:
+                    # Here Season IS SPRING, FALL
+                        left_energy = left_today * (CLOUD_forecast / 100)
+                        duration = 3600 * left_energy / max_power
+                        log(4, '6- cloud forecast not good ({} %) 2 days energy enough ({} W) BUT season is {})'.format(CLOUD_forecast, two_days_nrj, season))
+                        log(8, 'completing % TODAY energy, adding {} W ({}*{}/100)'.format(left_today,CLOUD_forecast))
+                        log(8, 'forcing ECS {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
+                        equipment_water_heater.force(max_power, duration * duration_correction)              
     else: 
     # HERE ECS Energy today > LOW_ECS_ENERGY_TODAY
-        log(4, '7- ECS Energy today {} W is enouth, no need to complete it.'.format(ECS_energy_today))
+        log(4, '8- ECS Energy today {} W is enouth, no need to complete it.'.format(ECS_energy_today))
         log(8, 'CANCELLING fallback')
 
     # save the energy so that it can be used in the fallback check tomorrow
