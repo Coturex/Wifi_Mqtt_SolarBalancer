@@ -520,7 +520,7 @@ def low_energy_fallback():
                         left_energy = left_today * (CLOUD_forecast / 100)
                         duration = 3600 * left_energy / max_power
                         log(4, '6- cloud forecast not good ({} %) 2 days energy enough ({} W) BUT season is {})'.format(CLOUD_forecast, two_days_nrj, season))
-                        log(8, 'completing % TODAY energy, adding {} W ({}*{}/100)'.format(left_today,CLOUD_forecast))
+                        log(8, 'completing % TODAY energy, adding {} W ({}*{}/100)'.format(left_energy,left_today,CLOUD_forecast))
                         log(8, 'forcing ECS {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
                         equipment_water_heater.force(max_power, duration * duration_correction)              
     else: 
