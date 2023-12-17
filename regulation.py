@@ -411,6 +411,16 @@ def request_ECS_mode():  # domoticz request : does ECS is Jour/Nuit, Solaire_fal
     mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) 
     print(TOPIC_DOMOTICZ_IN, domoticz) if SDEBUG else ''
 
+def send_keep_alive():  # domoticz request : does ECS is Jour/Nuit, Solaire_fallback, OFF   ?
+    # Send keep Alive to Domoticz Device
+    # {"command": "getdeviceinfo", "idx": 2450 }
+    IDX_KEEP_ALIVE = "658"
+    domoticz = "{ \"idx\": " + IDX_KEEP_ALIVE + ", \"nvalue\": 1}"
+    mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz)    
+    debug(0, TOPIC_DOMOTICZ_IN + domoticz)
+    #print("###################################################################" + TOPIC_DOMOTICZ_IN + domoticz)
+    
+
 def low_energy_fallback():
     """ Fallback, when the amount of energy today went below a minimum"""
     # This is a custom and very specific fallback method which aim is to turn on the water heater should the daily
@@ -427,7 +437,11 @@ def low_energy_fallback():
         MORNING_ECS = int(config['ecs']['morning']) # minimun of morning ecs energy needs (to assure first 'douche') 
         GOOD_FORECAST = int(config['evaluate']['good_forecast']) # good forecast level
         ecs_measure_correction =  float(config['evaluate']['ecs_measure_correction'])
-        log(0, '[low_energy_fallback] Season "{}" : needs TODAY {} / 2DAYS {}'.format(season, LOW_ECS_ENERGY_TODAY, LOW_ECS_ENERGY_TWO_DAYS))
+        log(0, '[low_energy_fallback] Season "{}" : '.format(season))
+        log(2, "need ENERGY_TODAY : " + str(LOW_ECS_ENERGY_TODAY))
+        log(2, "need ENERGY_TWO_DAYS : " + str(LOW_ECS_ENERGY_TWO_DAYS))
+        log(2, "need MORNING_ECS : " + str(MORNING_ECS))
+    
     except Exception as e:
         log(0,"[low_energy_fallback]") 
         log(1, "*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
@@ -442,8 +456,11 @@ def low_energy_fallback():
     two_days_nrj = int(ECS_energy_today + ECS_energy_yesterday)
     ECS_energy_today = int(ECS_energy_today * ecs_measure_correction)
     left_energy = 0
-    log(2, 'ECS Energy Yesterday / Today / 2days : {} / {} / {}'.format(int(ECS_energy_yesterday), int(ECS_energy_today), int(two_days_nrj)))
-    log(2, "cloud forecast : " + str(CLOUD_forecast))
+    log(2, "--")
+    log(2, "Cloud forecast : " + str(CLOUD_forecast))
+    log(2, 'ECS Energy Yesterday : {}'.format(str(int(ECS_energy_yesterday))))
+    log(2, 'ECS Energy two days : {}'.format(str(int(two_days_nrj))))
+    log(2, 'ECS Energy today : {}'.format(str(int(ECS_energy_today))))
     request_ECS_mode()
     time.sleep(5)
     log(2, "ECS_MODE : " + str(ECS_MODE))
@@ -483,18 +500,18 @@ def low_energy_fallback():
                 log(4, '3- cloud forecast not good ({} %) and not enough 2 days energy ({} W)'.format(CLOUD_forecast, two_days_nrj))
                 if (ECS_energy_today < MORNING_ECS):
                     left_energy = int((MORNING_ECS - ECS_energy_today) + ((LOW_ECS_ENERGY_TODAY - MORNING_ECS) * CLOUD_forecast / 100))
-                    log(8, 'completing % TODAY energy, adding {} W ({}-{}+({}-{})*{}/100)'.format(left_energy,MORNING_ECS,ECS_energy_today,LOW_ECS_ENERGY_TODAY,MORNING_ECS,CLOUD_forecast))
+                    log(8, '3.1- completing % TODAY energy, adding {} W ({}-{}+({}-{})*{}/100)'.format(left_energy,MORNING_ECS,ECS_energy_today,LOW_ECS_ENERGY_TODAY,MORNING_ECS,CLOUD_forecast))
                 else:
                     #left_energy = int(left_today * (CLOUD_forecast / 100))
-                    left_energy = int((LOW_ECS_ENERGY_TODAY - MORNING_ECS) * CLOUD_forecast / 100)
-                    log(8, 'completing % TODAY energy, adding {} W ({}-{}*{}/100)'.format(left_energy,LOW_ECS_ENERGY_TODAY,MORNING_ECS,CLOUD_forecast))
+                    left_energy = int((LOW_ECS_ENERGY_TODAY - ECS_energy_today) * CLOUD_forecast / 100)
+                    log(8, '3.2- completing % TODAY energy, adding {} W (({}-{})*{}/100)'.format(left_energy,LOW_ECS_ENERGY_TODAY,ECS_energy_today,CLOUD_forecast))
                 duration = 3600 * left_energy / max_power
                 log(8, 'forcing ECS  {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
                 equipment_water_heater.force(max_power, duration * duration_correction)            
  
         # Here two_days_nrj > LOW_ECS_ENERGY_TWO_DAYS
         else:   
-            if CLOUD_forecast < GOOD_FORECAST: 
+            if CLOUD_forecast < GOOD_FORECAST:  
             # Here Good forecast
                 log(4, '4- cloud forecast is good ({} %) and enough 2 days energy ({} W)'.format(CLOUD_forecast, two_days_nrj))
                 log(8, 'even there is not enough energy stored  today ({} W)'.format(ECS_energy_today))
@@ -557,9 +574,10 @@ def evaluate():
             d1 = datetime.datetime.fromtimestamp(last_evaluation_date)
             d2 = datetime.datetime.fromtimestamp(t)
 
-            if d1.minute == 2 and d2.minute == 3:     
-                pass
-            
+            if d1.minute == 20 and d2.minute == 21:  # every hours and 3 minutes (...14h03, 15h03...)
+                #print ("**************************************************************************")
+                send_keep_alive()  
+               
             if d1.hour == INIT_AT_prev and d2.hour == INIT_AT and not init_today: # ensure it's not already done for today
                 log(0,"[evaluate] ECS energy / Over : " + str(equipment_water_heater.get_energy()) + " / " + str(equipment_water_heater.is_overed()))
                 equipment_water_heater.unset_over() # maybe it has been forced this night (low_energy_fallback)
@@ -578,15 +596,16 @@ def evaluate():
                 CLOUD_forecast = -1
                 retry = 0
                 while CLOUD_forecast < 0 and retry < 5:
+                    log(0,"[evaluate] Cloud request : " + str(retry))
                     retry = retry + 1
                     if (CHECK_AT > 7 and CHECK_AT < 24):
-                        CLOUD_forecast = weather.getCloudAvg(TOMORROW)
                         log(0,"[evaluate] Cloud Forecast Tomorrow : " + str(CLOUD_forecast))
+                        CLOUD_forecast = weather.getCloudAvg(TOMORROW)
                     elif (CHECK_AT >= 0):
-                        CLOUD_forecast = weather.getCloudAvg(TODAY)
                         log(0,"[evaluate] Cloud Forecast Today : " + str(CLOUD_forecast))
+                        CLOUD_forecast = weather.getCloudAvg(TODAY)
                     time.sleep(5) # Delays for 5 seconds
-
+                log(0,"[evaluate] Cloud forcast : " + str(CLOUD_forecast))
                 if (CLOUD_forecast == -404):
                     log(0,"*** cannot contact weather server")
                     log(4,"FORCING CLOUD Forecast to 100 %")  
@@ -595,6 +614,7 @@ def evaluate():
                     log(0,"*** openweathermap is out of range")
                     log(4,"FORCING CLOUD Forecast to 100 %")   
                     CLOUD_forecast = 100 
+
                 ECS_energy_today = equipment_water_heater.get_energy()
                 equipment_water_heater.reset_energy()
                 production_energy = 0

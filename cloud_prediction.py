@@ -75,9 +75,9 @@ class Prediction:
                 clouds += cloudcoverage
 
         except Exception as e:
-            log(1,"*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            log(1,"[cloud_prediction] *** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
             log(1, e)
-            print("*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            print("[cloud_prediction] *** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
             print(e)
             return -404
         
@@ -86,8 +86,8 @@ class Prediction:
             avg = int(clouds / i)
         except Exception as e:
             print(e)
-            print("*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
-            log(1,"*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            print("[cloud_prediction] *** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            log(1,"[cloud_prediction] *** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
             log(1, e)
             return -1
         return avg   
@@ -113,9 +113,9 @@ class Prediction:
                 print("Clouds {}H UTC: {} %".format(int(h*3),cloudcoverage)) 
             return cloudcoverage
         except Exception as e:
-            log(1,"*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            log(1,"[cloud_prediction] *** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
             log(1, e)
-            print("*** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
+            print("[cloud_prediction] *** Error on line {}".format(sys.exc_info()[-1].tb_lineno))
             print(e)
             return -404
         return -1     
