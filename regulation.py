@@ -78,6 +78,8 @@ last_injection = None
 last_evaluation_date = None
 last_production_date = None
 last_consumption_date = None
+last_grid_date = 0
+last_injection_date = 0
 last_zero_grid_date = 0
 last_zero_injection_date = 0
 last_saveStatus_date = None
@@ -465,6 +467,10 @@ def low_energy_fallback():
     time.sleep(5)
     log(2, "ECS_MODE : " + str(ECS_MODE))
 
+    if season == 'winter':  
+        CLOUD_forecast = 100
+        log(2, "Winter Cloud forecast forced to bad: " + str(CLOUD_forecast))
+
     if (ECS_MODE < 20):
         log(4, '0- ECS MODE IS NOT SET TO SOLAIRE_Feedback here json svalue1 = 0 (OFF) or 10 (JOUR/NUIT) ')
         log(8, 'CANCELLING fallback')
@@ -477,10 +483,12 @@ def low_energy_fallback():
     # HERE ECS Energy today < LOW_ECS_ENERGY_TODAY
 
         left_today = int(LOW_ECS_ENERGY_TODAY - ECS_energy_today)
+        log(4, "left today : " + str(left_today))
 
         if two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS:
             left_two_days = int(LOW_ECS_ENERGY_TWO_DAYS - two_days_nrj)
-
+            log(4, "left two days : " + str(left_two_days))
+            
         # Here two_days_nrj < LOW_ECS_ENERGY_TWO_DAYS
             if CLOUD_forecast < GOOD_FORECAST:  
             # Here Good forecast but no more 3-4 kw is needed !
@@ -489,7 +497,7 @@ def low_energy_fallback():
                     left_energy = MORNING_ECS
                 duration = 3600 * left_energy / max_power
                 log(4, '2- cloud forecast is good ({} %) but not enough today ({} W) and 2 days energy ({} W)'.format(CLOUD_forecast, ECS_energy_today, two_days_nrj))
-                log(8, 'completing today OR two days energy and no more 4kW, adding {} W'.format(left_energy))
+                log(8, 'completing today OR two days energy and no more 3-4kW, adding {} W'.format(left_energy))
                 log(8, 'forcing ECS {} to {} W for {} min'.format(equipment_water_heater.name, max_power, int(duration/60)))
                 equipment_water_heater.force(max_power, duration * duration_correction)
 
@@ -556,7 +564,7 @@ def evaluate():
     global last_evaluation_date, ECS_energy_today, last_injection, last_grid, CLOUD_forecast
     global equipments, equipment_water_heater, production_energy, fallback_today, init_today, cloud_requested, status
     global power_production, power_consumption, last_production_date, last_consumption_date, status
-    global last_zero_grid_date, last_zero_injection_date, INIT_AT, INIT_AT_prev, CHECK_AT, CHECK_AT_prev, last_saveStatus_date, STATUS_TIME
+    global last_grid_date, last_injection_date,last_zero_grid_date, last_zero_injection_date, INIT_AT, INIT_AT_prev, CHECK_AT, CHECK_AT_prev, last_saveStatus_date, STATUS_TIME
     TODAY = 0 
     TOMORROW = 1
 
@@ -750,15 +758,15 @@ def evaluate():
             injection = (power_consumption - power_production) 
             if injection < 0:   # This is INJECTION
                 grid = 0
-                last_zero_injection_date = t
+                last_injection_date = t
             else:               # This is GRID
                 grid = injection
                 injection = 0
-                last_zero_grid_date = t
+                last_grid_date = t
             #print ("***** SIMULATION DOMOTICZ INJECTION GRID : {} {} {} {}".format(SIMULATION, SEND_DOMOTICZ, SEND_INJECTION, SEND_GRID)) if SDEBUG else ''
             ### HERE Prepare and send  INJECTION MESSAGE
             if SEND_INJECTION:
-                if injection < 0 and last_injection == 0 and (t - last_zero_injection_date) > 20 : 
+                if injection < 0 and last_injection == 0 and (t - last_injection_date) > 20 : 
                     # This Workaround is needed in order to improve Grafana Integral calculation. Send 0.
                     domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"0\"}"
                     mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) 
@@ -769,16 +777,16 @@ def evaluate():
                     print(TOPIC_DOMOTICZ_IN, domoticz) if SDEBUG else ''
             
                 if injection == 0 and last_injection == 0:
-                    # Do not repeat this point
+                    # Do not repeat this point 
                     pass
                 elif injection == 0:
                     domoticz = "{ \"idx\": " + IDX_INJECTION + ", \"nvalue\": 0, \"svalue\": \"0\"}"
                     mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz) 
                     print(TOPIC_DOMOTICZ_IN, domoticz) if SDEBUG else ''
                     
-            ### HERE Prepare and send  GRIS MESSAGE
+            ### HERE Prepare and send  GRID MESSAGE
             if SEND_GRID:
-                if grid > 0 and last_grid == 0 and (t - last_zero_grid_date) > 20 : 
+                if grid > 0 and last_grid == 0 and (t - last_grid_date) > 20 : 
                     # This Workaround is needed to improve Grafana Integral calculation. Send 0.
                     domoticz = "{ \"idx\": " + IDX_GRID + ", \"nvalue\": 0, \"svalue\": \"0\"}"
                     mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz)
@@ -789,12 +797,17 @@ def evaluate():
                     print(TOPIC_DOMOTICZ_IN, domoticz) if SDEBUG else ''
 
                 if grid == 0 and last_grid == 0:
-                    # Do not repeat this point
-                    pass
+                    # Do not repeat this point if last zero grid is not older than 30min (this is a keepalive for Domoticz)
+                    if (t - last_zero_grid_date > 1800 ):
+                        domoticz = "{ \"idx\": " + IDX_GRID + ", \"nvalue\": 0, \"svalue\": \"0\"}"
+                        mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz)
+                        print(TOPIC_DOMOTICZ_IN, domoticz) if SDEBUG else ''
+                        last_zero_grid_date = t
                 elif grid == 0:
                     domoticz = "{ \"idx\": " + IDX_GRID + ", \"nvalue\": 0, \"svalue\": \"0\"}"
                     mqtt_client.publish(TOPIC_DOMOTICZ_IN, domoticz)
                     print(TOPIC_DOMOTICZ_IN, domoticz) if SDEBUG else ''
+                    last_zero_grid_date = t
             print("[evaluate]                    CALCULATED INJECTION :", injection) if SDEBUG else ''
             print("[evaluate]                    CALCULATED GRID      :", grid) if SDEBUG else ''        
             last_injection = injection
