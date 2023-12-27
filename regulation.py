@@ -53,6 +53,9 @@ config.read('config.ini')
 unset_words = ("none", "None", "NONE", "false", "False", "FALSE", "nok", "NOK")
 set_words = ("true", "True", "TRUE", "ok", "OK", )
 
+SIMULATION = False  
+SIM_PROD = None
+SIM_FALLBACK = False
 
 # A debug switch to toggle simulation (uses distinct MQTT topics for instance)
 if (config['debug']['simulation'] in set_words):
@@ -64,10 +67,15 @@ if (config['debug']['simulation'] in set_words):
         else:
             SIM_PROD = int(config['debug']['simul_prod'])
             print("     PROD IS SIMULATED AT " + str(SIM_PROD))
+        
+        if (config['debug']['simul_fallback'] in unset_words):
+            SIM_FALLBACK = None
+            print("     FALLBACK IS NOT SIMULATED")
+        else:
+            SIM_FALLBACK = True
+            print("     FALLBACK IS SIMULATED ")
         #input("Enter to continue")
         time.sleep(2)
-else:
-        SIMULATION = False
 
 if (config['debug']['regulation_stdout'] in set_words): 
     SDEBUG = True 
@@ -100,7 +108,7 @@ CLOUD_forecast = None
 ECS_MODE = 20     # set to Domoticz value 20 wich is SOLAIRE_FEEDBACK widget level
 
 PZEM_TIMEOUT = 30
-weather = Prediction(config['openweathermap']['location'],config['openweathermap']['key'])
+weather = Prediction(config['cloudForecast']['location'],config['cloudForecast']['key'])
 
 ###############################################################
 # MQTT CONFIG
@@ -460,16 +468,16 @@ def low_energy_fallback():
     left_energy = 0
     log(2, "--")
     log(2, "Cloud forecast : " + str(CLOUD_forecast))
+    log(2, 'ECS Energy Today : {}'.format(str(int(ECS_energy_today))))
     log(2, 'ECS Energy Yesterday : {}'.format(str(int(ECS_energy_yesterday))))
-    log(2, 'ECS Energy two days : {}'.format(str(int(two_days_nrj))))
-    log(2, 'ECS Energy today : {}'.format(str(int(ECS_energy_today))))
+    log(2, 'ECS Energy Two days : {}'.format(str(int(two_days_nrj))))
     request_ECS_mode()
     time.sleep(5)
     log(2, "ECS_MODE : " + str(ECS_MODE))
 
-    if season == 'winter':  
+    if (config['cloudForecast'][season] in unset_words):
         CLOUD_forecast = 100
-        log(2, "Winter Cloud forecast forced to bad: " + str(CLOUD_forecast))
+        log(2, str(season) + " cloud forecast forced to bad: " + str(CLOUD_forecast))
 
     if (ECS_MODE < 20):
         log(4, '0- ECS MODE IS NOT SET TO SOLAIRE_Feedback here json svalue1 = 0 (OFF) or 10 (JOUR/NUIT) ')
@@ -564,7 +572,8 @@ def evaluate():
     global last_evaluation_date, ECS_energy_today, last_injection, last_grid, CLOUD_forecast
     global equipments, equipment_water_heater, production_energy, fallback_today, init_today, cloud_requested, status
     global power_production, power_consumption, last_production_date, last_consumption_date, status
-    global last_grid_date, last_injection_date,last_zero_grid_date, last_zero_injection_date, INIT_AT, INIT_AT_prev, CHECK_AT, CHECK_AT_prev, last_saveStatus_date, STATUS_TIME
+    global last_grid_date, last_injection_date,last_zero_grid_date, last_zero_injection_date
+    global SIM_FALLBACK, INIT_AT, INIT_AT_prev, CHECK_AT, CHECK_AT_prev, last_saveStatus_date, STATUS_TIME
     TODAY = 0 
     TOMORROW = 1
 
@@ -594,7 +603,12 @@ def evaluate():
                 fallback_today = False
                 init_today = True
                 return
-            
+
+            if SIM_FALLBACK and not fallback_today:
+                fallback_today = True
+                print("Simulating low_energy_fallback...")
+                low_energy_fallback()
+
             if d1.hour == CHECK_AT_prev and d2.hour == CHECK_AT and not fallback_today:  # fallback_today : ensure it's not already done for today
             #if True and not fallback_today:  # fallback_today : be sure it's not already done for today
                 fallback_today = True
@@ -619,7 +633,7 @@ def evaluate():
                     log(4,"FORCING CLOUD Forecast to 100 %")  
                     CLOUD_forecast = 100 
                 elif (CLOUD_forecast == -1):
-                    log(0,"*** openweathermap is out of range")
+                    log(0,"*** cloudForecast is out of range")
                     log(4,"FORCING CLOUD Forecast to 100 %")   
                     CLOUD_forecast = 100 
 
@@ -872,7 +886,7 @@ def main():
 
     debug(0,"")
     log(0,"")
-    log(0,"[Main] Starting PV Power Regulation @" + config['openweathermap']['location'])
+    log(0,"[Main] Starting PV Power Regulation @" + config['cloudForecast']['location'])
 
     mqtt_client = mqtt.Client()
     equipment.setup(mqtt_client, SIMULATION, prefix)

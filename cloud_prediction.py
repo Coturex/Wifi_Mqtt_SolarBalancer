@@ -133,7 +133,7 @@ def main():
     config = configparser.ConfigParser()
     config.read('config.ini') 
     
-    weather = Prediction(config['openweathermap']['location'],config['openweathermap']['key'])
+    weather = Prediction(config['cloudForecast']['location'],config['cloudForecast']['key'])
     #weather.getRawData()
     #print("today 9H UTC : " + str(weather.getCloudHour(TODAY,9)))
     #print("today 12H UTC : " + str(weather.getCloudHour(TODAY,12)))

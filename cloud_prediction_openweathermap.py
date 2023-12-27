@@ -20,11 +20,11 @@
 #   Forecast deep and time sample rate limited to 3 Hours (forecast), 1 our on day weather
 #
 # Url public request 
-# https://openweathermap.org/city/3027422
+# https://cloudForcast.org/city/3027422
 # Url API request - Today
-# https://api.openweathermap.org/data/2.5/weather?q=chambery&units=metric&appid=HERE_API_KEY_ID
+# https://api.cloudForcast.org/data/2.5/weather?q=chambery&units=metric&appid=HERE_API_KEY_ID
 # Url API request - Forecast Prochaines heures
-# https://api.openweathermap.org/data/2.5/forecast?q=chambery&units=metric&appid=HERE_API_KEY_ID
+# https://api.cloudForcast.org/data/2.5/forecast?q=chambery&units=metric&appid=HERE_API_KEY_ID
 
 import requests   
 import sys
@@ -61,7 +61,7 @@ class Prediction:
             sdate = datetime.date.today() + datetime.timedelta(days=sDAY)
             sdate1 = str(datetime.datetime(sdate.year, sdate.month,sdate.day, sHour1, 0, 0))
             sdate2 = str(datetime.datetime(sdate.year, sdate.month,sdate.day, sHour2, 0, 0))
-            url = "https://api.openweathermap.org/data/2.5/forecast?q={}&units=metric&appid={}".format(self.location, self.apiKey)
+            url = "https://api.cloudForcast.org/data/2.5/forecast?q={}&units=metric&appid={}".format(self.location, self.apiKey)
             #debug(0, "Cloud_prediction, url : " + url)
             wdata = requests.get(url).json()
             # pprint(wdata)
@@ -92,7 +92,7 @@ class Prediction:
     def getRawData(self):
         """Print JSON data returned by html request"""
         try:
-            url = "https://api.openweathermap.org/data/2.5/forecast?q={}&units=metric&appid={}".format(self.location, self.apiKey)
+            url = "https://api.cloudForcast.org/data/2.5/forecast?q={}&units=metric&appid={}".format(self.location, self.apiKey)
             wdata = requests.get(url).json()
             pprint(wdata)
         except:
@@ -103,7 +103,7 @@ class Prediction:
         try:
             sdate = datetime.date.today() + datetime.timedelta(days=sDAY)
             sdate = str(datetime.datetime(sdate.year, sdate.month,sdate.day, sHour, 0, 0))
-            url = "https://api.openweathermap.org/data/2.5/forecast?q={}&units=metric&appid={}".format(self.location, self.apiKey)
+            url = "https://api.cloudForcast.org/data/2.5/forecast?q={}&units=metric&appid={}".format(self.location, self.apiKey)
             #debug(0, "Cloud_prediction, url : " + url)
             wdata = requests.get(url).json()
             # pprint(wdata)
@@ -133,7 +133,7 @@ def main():
     config = configparser.ConfigParser()
     config.read('config.ini') 
     
-    weather = Prediction(config['openweathermap']['location'],config['openweathermap']['key'])
+    weather = Prediction(config['cloudForcast']['location'],config['cloudForcast']['key'])
     weather.getRawData()
     #print("today 9H UTC : " + str(weather.getCloudHour(TODAY,9)))
     #print("today 12H UTC : " + str(weather.getCloudHour(TODAY,12)))
